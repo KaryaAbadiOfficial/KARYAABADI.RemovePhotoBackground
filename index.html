@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Hapus background foto otomatis dalam kualitas HD dengan AI. Cepat, gratis, dan profesional.">
+    <title>Karya Abadi Remove Photo Background</title>
+    <link rel="manifest" href="data:application/json,{}">
+    <meta name="theme-color" content="#2563EB">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- CSS Reset & Rendering Fix -->
+    <style>
+        html, body { visibility: visible !important; opacity: 1 !important; display: block !important; }
+    </style>
+
+    <style>
+        :root {
+            --primary: #2563EB; --primary-dark: #1D4ED8; --primary-light: #3B82F6;
+            --primary-50: #EFF6FF; --primary-100: #DBEAFE; --primary-200: #BFDBFE;
+            --white: #FFFFFF; --gray-50: #F8FAFC; --gray-100: #F1F5F9;
+            --gray-200: #E2E8F0; --gray-300: #CBD5E1; --gray-400: #94A3B8;
+            --gray-500: #64748B; --gray-600: #475569; --gray-700: #334155;
+            --gray-800: #1E293B; --gray-900: #0F172A;
+            --success: #10B981; --danger: #EF4444; --warning: #F59E0B;
+            --radius: 16px; --radius-sm: 10px; --radius-lg: 24px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08); --shadow-md: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.1); --shadow-primary: 0 8px 30px rgba(37,99,235,0.3);
+            --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        [data-theme="dark"] {
+            --white: #0F172A; --gray-50: #1E293B; --gray-100: #1E293B; --gray-200: #334155;
+            --gray-300: #475569; --gray-400: #64748B; --gray-500: #94A3B8; --gray-600: #CBD5E1;
+            --gray-700: #E2E8F0; --gray-800: #F1F5F9; --gray-900: #F8FAFC;
+            --primary-50: #172554; --primary-100: #1E3A5F;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.3); --shadow-md: 0 4px 20px rgba(0,0,0,0.3);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.4);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(--gray-800); overflow-x: hidden; transition: background 0.3s, color 0.3s; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--gray-100); }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 99px; }
+
+        .navbar-custom { background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--gray-200); padding: 12px 0; transition: var(--transition); z-index: 1050; }
+        [data-theme="dark"] .navbar-custom { background: rgba(15,23,42,0.9); }
+        .navbar-custom.scrolled { box-shadow: var(--shadow-md); }
+        .navbar-brand-text { font-weight: 700; font-size: 1.15rem; color: var(--primary) !important; display: flex; align-items: center; gap: 8px; }
+        .navbar-brand-text i { font-size: 1.5rem; }
+        .nav-link { font-weight: 500; color: var(--gray-600) !important; padding: 8px 16px !important; border-radius: var(--radius-sm); transition: var(--transition); font-size: 0.92rem; }
+        .nav-link:hover, .nav-link.active { color: var(--primary) !important; background: var(--primary-50); }
+        .dark-toggle { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--gray-200); background: var(--gray-50); color: var(--gray-600); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); font-size: 1.1rem; }
+        .dark-toggle:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-50); }
+
+        .hero-section { min-height: 100vh; display: flex; align-items: center; position: relative; overflow: hidden; padding-top: 80px; }
+        .hero-bg-gradient { position: absolute; top: -200px; right: -200px; width: 700px; height: 700px; border-radius: 50%; background: radial-gradient(circle, rgba(37,99,235,0.12) 0%, transparent 70%); pointer-events: none; }
+        .hero-bg-gradient-2 { position: absolute; bottom: -200px; left: -200px; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%); pointer-events: none; }
+        .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--primary-50); color: var(--primary); padding: 8px 20px; border-radius: 99px; font-size: 0.85rem; font-weight: 600; margin-bottom: 24px; border: 1px solid var(--primary-100); }
+        .hero-title { font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 800; line-height: 1.15; color: var(--gray-900); margin-bottom: 20px; letter-spacing: -0.02em; }
+        .hero-title span { background: linear-gradient(135deg, var(--primary), #7C3AED); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .hero-subtitle { font-size: 1.1rem; color: var(--gray-500); line-height: 1.7; margin-bottom: 32px; max-width: 560px; }
+        .hero-buttons { display: flex; gap: 14px; flex-wrap: wrap; }
+
+        .btn-primary-custom { background: linear-gradient(135deg, var(--primary), #4F46E5); color: #fff; border: none; padding: 14px 32px; border-radius: var(--radius-sm); font-weight: 600; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px; transition: var(--transition); box-shadow: var(--shadow-primary); cursor: pointer; text-decoration: none; }
+        .btn-primary-custom:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(37,99,235,0.4); color: #fff; }
+        .btn-outline-custom { background: var(--white); color: var(--gray-700); border: 2px solid var(--gray-200); padding: 12px 28px; border-radius: var(--radius-sm); font-weight: 600; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px; transition: var(--transition); cursor: pointer; text-decoration: none; }
+        .btn-outline-custom:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-50); }
+
+        .hero-illustration { position: relative; max-width: 520px; margin: 0 auto; }
+        .hero-illust-card { background: var(--white); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); overflow: hidden; border: 1px solid var(--gray-200); }
+        [data-theme="dark"] .hero-illust-card { background: #1E293B; }
+        .hero-illust-header { background: linear-gradient(135deg, var(--primary), #7C3AED); padding: 16px 20px; display: flex; align-items: center; gap: 10px; }
+        .hero-illust-header span { color: #fff; font-weight: 600; font-size: 0.9rem; }
+        .hero-illust-header i { color: rgba(255,255,255,0.8); }
+        .hero-illust-body { padding: 20px; }
+        .hero-illust-before { position: relative; border-radius: var(--radius); overflow: hidden; }
+        .hero-illust-before img { width: 100%; height: 260px; object-fit: cover; display: block; }
+        .hero-illust-after { position: absolute; top: 0; left: 0; width: 55%; height: 100%; overflow: hidden; border-right: 3px solid var(--primary); }
+        .hero-illust-after img { width: 200%; height: 260px; object-fit: cover; }
+        .hero-illust-label { position: absolute; bottom: 12px; padding: 4px 14px; border-radius: 99px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .label-before { right: 12px; background: rgba(0,0,0,0.6); color: #fff; }
+        .label-after { left: 12px; background: var(--primary); color: #fff; }
+        .hero-illist-stats { display: flex; gap: 12px; margin-top: 16px; }
+        .hero-stat { flex: 1; background: var(--gray-50); border-radius: var(--radius-sm); padding: 12px; text-align: center; }
+        [data-theme="dark"] .hero-stat { background: #0F172A; }
+        .hero-stat-value { font-weight: 700; font-size: 1.1rem; color: var(--primary); }
+        .hero-stat-label { font-size: 0.72rem; color: var(--gray-400); font-weight: 500; }
+        .hero-float-badge { position: absolute; background: var(--white); border-radius: var(--radius); padding: 12px 18px; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 10px; animation: floatBadge 3s ease-in-out infinite; border: 1px solid var(--gray-100); z-index: 2; }
+        [data-theme="dark"] .hero-float-badge { background: #1E293B; }
+        .float-badge-1 { top: -20px; right: -30px; }
+        .float-badge-2 { bottom: 30px; left: -40px; animation-delay: 1.5s; }
+        .hero-float-badge i { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+        .float-badge-1 i { background: #DCFCE7; color: #16A34A; }
+        .float-badge-2 i { background: var(--primary-100); color: var(--primary); }
+        .hero-float-badge .fb-text { font-size: 0.78rem; }
+        .hero-float-badge .fb-text strong { display: block; color: var(--gray-800); font-weight: 700; }
+        .hero-float-badge .fb-text span { color: var(--gray-400); font-weight: 500; }
+        @keyframes floatBadge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        .section-padding { padding: 80px 0; }
+        .section-label { display: inline-flex; align-items: center; gap: 8px; background: var(--primary-50); color: var(--primary); padding: 6px 18px; border-radius: 99px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px; border: 1px solid var(--primary-100); }
+        .section-title { font-size: clamp(1.8rem, 3.5vw, 2.5rem); font-weight: 800; color: var(--gray-900); margin-bottom: 16px; letter-spacing: -0.02em; }
+        .section-subtitle { font-size: 1.05rem; color: var(--gray-400); max-width: 600px; margin: 0 auto 48px; line-height: 1.7; }
+
+        .feature-card { background: rgba(255,255,255,0.7); backdrop-filter: blur(20px); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 32px 28px; transition: var(--transition); height: 100%; position: relative; overflow: hidden; }
+        [data-theme="dark"] .feature-card { background: rgba(30,41,59,0.7); }
+        .feature-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--primary), #7C3AED); transform: scaleX(0); transition: var(--transition); }
+        .feature-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); border-color: var(--primary-200); }
+        .feature-card:hover::before { transform: scaleX(1); }
+        .feature-icon { width: 56px; height: 56px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-bottom: 20px; }
+        .fi-blue { background: var(--primary-100); color: var(--primary); }
+        .fi-green { background: #DCFCE7; color: #16A34A; }
+        .fi-purple { background: #F3E8FF; color: #7C3AED; }
+        .fi-orange { background: #FFF7ED; color: #EA580C; }
+        .fi-pink { background: #FCE7F3; color: #DB2777; }
+        .fi-cyan { background: #CFFAFE; color: #0891B2; }
+        .feature-card h4 { font-weight: 700; font-size: 1.1rem; color: var(--gray-800); margin-bottom: 10px; }
+        .feature-card p { font-size: 0.9rem; color: var(--gray-400); line-height: 1.6; margin: 0; }
+        .share-icons { display: flex; gap: 8px; margin-top: 14px; }
+        .share-icon { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; transition: var(--transition); cursor: pointer; color: #fff; }
+        .share-icon:hover { transform: scale(1.15); }
+        .si-wa { background: #25D366; } .si-fb { background: #1877F2; }
+        .si-ig { background: linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); }
+        .si-tg { background: #0088CC; } .si-tw { background: #1DA1F2; }
+
+        .upload-section { background: linear-gradient(180deg, var(--primary-50) 0%, var(--gray-50) 100%); }
+        .upload-area { background: var(--white); border: 2px dashed var(--gray-300); border-radius: var(--radius-lg); padding: 60px 40px; text-align: center; transition: var(--transition); cursor: pointer; }
+        [data-theme="dark"] .upload-area { background: #1E293B; }
+        .upload-area:hover, .upload-area.dragover { border-color: var(--primary); background: var(--primary-50); }
+        .upload-area.dragover { transform: scale(1.01); box-shadow: var(--shadow-primary); }
+        .upload-icon { width: 80px; height: 80px; border-radius: 50%; background: var(--primary-100); color: var(--primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2rem; transition: var(--transition); }
+        .upload-area:hover .upload-icon { transform: scale(1.1); background: var(--primary); color: #fff; }
+        .upload-text { font-size: 1.1rem; font-weight: 600; color: var(--gray-700); margin-bottom: 8px; }
+        .upload-subtext { font-size: 0.85rem; color: var(--gray-400); margin-bottom: 16px; }
+        .upload-formats { display: inline-flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+        .format-badge { background: var(--gray-100); color: var(--gray-500); padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        .preview-card { background: var(--white); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); border: 1px solid var(--gray-200); overflow: hidden; }
+        [data-theme="dark"] .preview-card { background: #1E293B; }
+        .preview-header { padding: 20px 24px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: space-between; }
+        .preview-header h5 { font-weight: 700; margin: 0; color: var(--gray-800); }
+
+        .comparison-container { position: relative; width: 100%; max-width: 600px; margin: 0 auto; overflow: hidden; border-radius: var(--radius); cursor: ew-resize; user-select: none; background: repeating-conic-gradient(var(--gray-200) 0% 25%, transparent 0% 50%) 0 0 / 20px 20px; }
+        [data-theme="dark"] .comparison-container { background: repeating-conic-gradient(#334155 0% 25%, transparent 0% 50%) 0 0 / 20px 20px; }
+        .comparison-container img { display: block; width: 100%; height: auto; }
+        .comparison-after { position: absolute; top: 0; left: 0; width: 50%; height: 100%; overflow: hidden; }
+        .comparison-after img { width: 200%; max-width: none; }
+        .comparison-slider { position: absolute; top: 0; left: 50%; width: 4px; height: 100%; background: var(--primary); transform: translateX(-50%); z-index: 10; }
+        .comparison-handle { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 44px; height: 44px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1rem; box-shadow: var(--shadow-primary); }
+        .comparison-label { position: absolute; bottom: 16px; padding: 5px 14px; border-radius: 99px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; z-index: 5; }
+        .lbl-before { left: 16px; background: rgba(0,0,0,0.6); color: #fff; }
+        .lbl-after { right: 16px; background: var(--primary); color: #fff; }
+
+        .result-buttons { display: flex; flex-wrap: wrap; gap: 10px; padding: 20px 24px; }
+        .btn-result { flex: 1; min-width: 140px; padding: 12px 16px; border-radius: var(--radius-sm); font-weight: 600; font-size: 0.85rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: var(--transition); cursor: pointer; border: none; }
+        .btn-result.primary { background: linear-gradient(135deg, var(--primary), #4F46E5); color: #fff; box-shadow: var(--shadow-primary); }
+        .btn-result.primary:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(37,99,235,0.4); }
+        .btn-result.secondary { background: var(--gray-100); color: var(--gray-700); border: 1px solid var(--gray-200); }
+        .btn-result.secondary:hover { border-color: var(--primary); color: var(--primary); }
+
+        .step-card { text-align: center; padding: 40px 28px; position: relative; }
+        .step-number { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #7C3AED); color: #fff; font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: var(--shadow-primary); }
+        .step-card h4 { font-weight: 700; color: var(--gray-800); margin-bottom: 10px; }
+        .step-card p { font-size: 0.9rem; color: var(--gray-400); line-height: 1.6; }
+        .step-connector { position: absolute; top: 72px; right: -40px; color: var(--gray-300); font-size: 1.5rem; }
+        @media (max-width: 768px) { .step-connector { display: none; } }
+
+        .faq-section { background: var(--white); }
+        [data-theme="dark"] .faq-section { background: var(--gray-50); }
+        .faq-item { background: var(--gray-50); border-radius: var(--radius); margin-bottom: 12px; border: 1px solid var(--gray-200); overflow: hidden; transition: var(--transition); }
+        [data-theme="dark"] .faq-item { background: rgba(30,41,59,0.5); }
+        .faq-item:hover { border-color: var(--primary-200); }
+        .faq-question { padding: 20px 24px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-weight: 600; color: var(--gray-800); font-size: 0.95rem; transition: var(--transition); }
+        .faq-question:hover { color: var(--primary); }
+        .faq-question i { transition: var(--transition); color: var(--gray-400); }
+        .faq-item.open .faq-question i { transform: rotate(180deg); color: var(--primary); }
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+        .faq-item.open .faq-answer { max-height: 200px; }
+        .faq-answer p { padding: 0 24px 20px; font-size: 0.9rem; color: var(--gray-400); line-height: 1.7; margin: 0; }
+
+        .footer-section { background: var(--gray-900); color: var(--gray-400); padding: 60px 0 30px; }
+        [data-theme="dark"] .footer-section { background: #020617; }
+        .footer-brand { font-weight: 700; font-size: 1.2rem; color: #fff; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+        .footer-brand i { color: var(--primary-light); font-size: 1.5rem; }
+        .footer-desc { font-size: 0.88rem; line-height: 1.7; margin-bottom: 24px; max-width: 400px; }
+        .footer-links { list-style: none; padding: 0; }
+        .footer-links li { margin-bottom: 10px; }
+        .footer-links a { color: var(--gray-400); text-decoration: none; font-size: 0.88rem; font-weight: 500; transition: var(--transition); }
+        .footer-links a:hover { color: var(--primary-light); padding-left: 4px; }
+        .footer-bottom { border-top: 1px solid var(--gray-700); padding-top: 24px; margin-top: 40px; text-align: center; font-size: 0.82rem; }
+
+        .toast-container { position: fixed; top: 90px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast-msg { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-sm); padding: 14px 20px; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 10px; font-size: 0.88rem; font-weight: 500; animation: toastIn 0.4s ease; min-width: 280px; }
+        .toast-msg.success { border-left: 4px solid var(--success); }
+        .toast-msg.error { border-left: 4px solid var(--danger); }
+        .toast-msg.info { border-left: 4px solid var(--primary); }
+        @keyframes toastIn { from { opacity:0; transform:translateX(40px); } to { opacity:1; transform:translateX(0); } }
+        @keyframes toastOut { from { opacity:1; transform:translateX(0); } to { opacity:0; transform:translateX(40px); } }
+
+        .processing-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 9998; align-items: center; justify-content: center; }
+        .processing-overlay.active { display: flex; }
+        .processing-box { background: var(--white); border-radius: var(--radius-lg); padding: 40px 48px; text-align: center; box-shadow: var(--shadow-lg); max-width: 440px; }
+        [data-theme="dark"] .processing-box { background: #1E293B; }
+        .processing-spinner { width: 56px; height: 56px; border: 4px solid var(--gray-200); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .processing-box h5 { font-weight: 700; color: var(--gray-800); margin-bottom: 8px; }
+        .processing-box p { font-size: 0.88rem; color: var(--gray-400); margin-bottom: 16px; }
+        .processing-progress-bar { height: 8px; border-radius: 99px; background: var(--gray-200); overflow: hidden; margin-top: 12px; }
+        .processing-progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--primary), #7C3AED); transition: width 0.4s ease; width: 0%; }
+        .processing-step { font-size: 0.82rem; color: var(--gray-500); margin-top: 8px; font-weight: 500; }
+
+        .share-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); z-index: 9997; align-items: center; justify-content: center; }
+        .share-modal-overlay.active { display: flex; }
+        .share-modal { background: var(--white); border-radius: var(--radius-lg); padding: 32px; box-shadow: var(--shadow-lg); max-width: 420px; width: 90%; text-align: center; }
+        [data-theme="dark"] .share-modal { background: #1E293B; }
+        .share-modal h5 { font-weight: 700; margin-bottom: 20px; color: var(--gray-800); }
+        .share-modal-icons { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+        .share-modal-icon { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: #fff; transition: var(--transition); cursor: pointer; text-decoration: none; }
+        .share-modal-icon:hover { transform: scale(1.15); }
+        .share-modal-close { margin-top: 20px; background: var(--gray-100); border: none; padding: 10px 28px; border-radius: var(--radius-sm); font-weight: 600; color: var(--gray-600); cursor: pointer; transition: var(--transition); }
+        .share-modal-close:hover { background: var(--gray-200); }
+
+        .back-to-top { position: fixed; bottom: 30px; right: 30px; width: 48px; height: 48px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer; box-shadow: var(--shadow-primary); transition: var(--transition); opacity: 0; pointer-events: none; z-index: 999; border: none; }
+        .back-to-top.visible { opacity: 1; pointer-events: auto; }
+        .back-to-top:hover { transform: translateY(-3px); }
+
+        .ai-status { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 99px; font-size: 0.78rem; font-weight: 600; margin-top: 12px; }
+        .ai-status.loading { background: #FEF3C7; color: #92400E; }
+        .ai-status.ready { background: #DCFCE7; color: #166534; }
+        .ai-status.error { background: #FEE2E2; color: #991B1B; }
+        .ai-status .dot { width: 8px; height: 8px; border-radius: 50%; }
+        .ai-status.loading .dot { background: #F59E0B; animation: pulse 1.5s infinite; }
+        .ai-status.ready .dot { background: #10B981; }
+        .ai-status.error .dot { background: #EF4444; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+        .fade-up { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 991px) { .hero-illustration { margin-top: 48px; } .hero-float-badge { display: none; } }
+        @media (max-width: 576px) {
+            .hero-buttons { flex-direction: column; }
+            .hero-buttons .btn-primary-custom, .hero-buttons .btn-outline-custom { width: 100%; justify-content: center; }
+            .upload-area { padding: 40px 20px; }
+            .result-buttons { flex-direction: column; }
+            .btn-result { min-width: 100%; }
+            .processing-box { padding: 32px 24px; margin: 0 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-custom fixed-top" id="mainNav">
+        <div class="container">
+            <a class="navbar-brand navbar-brand-text" href="#"><i class="fa-solid fa-wand-magic-sparkles"></i> Karya Abadi</a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu"><i class="fa-solid fa-bars" style="color:var(--gray-600);"></i></button>
+            <div class="collapse navbar-collapse" id="navMenu">
+                <ul class="navbar-nav ms-auto me-3 align-items-lg-center">
+                    <li class="nav-item"><a class="nav-link active" href="#home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#cara-kerja">Cara Kerja</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#fitur">Fitur</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#kontak">Kontak</a></li>
+                </ul>
+                <button class="dark-toggle" id="darkToggle" title="Toggle Dark Mode"><i class="fa-solid fa-moon"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero-section" id="home">
+        <div class="hero-bg-gradient"></div>
+        <div class="hero-bg-gradient-2"></div>
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="fade-up">
+                        <div class="hero-badge"><i class="fa-solid fa-bolt"></i> AI-Powered Background Remover</div>
+                        <h1 class="hero-title">Hapus Background Foto Otomatis dalam <span>Kualitas HD</span></h1>
+                        <p class="hero-subtitle">Upload foto Anda dan biarkan AI menghapus background secara otomatis dalam hitungan detik. Hasil tajam, bersih, dan siap digunakan untuk bisnis, marketplace, desain, maupun media sosial.</p>
+                        <div class="hero-buttons">
+                            <a href="#upload" class="btn-primary-custom"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Foto</a>
+                            <a href="#upload" class="btn-outline-custom"><i class="fa-solid fa-play"></i> Coba Gratis</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="hero-illustration fade-up" style="transition-delay:0.2s;">
+                        <div class="hero-illust-card">
+                            <div class="hero-illust-header"><i class="fa-solid fa-wand-magic-sparkles"></i><span>AI Background Remover</span></div>
+                            <div class="hero-illust-body">
+                                <div class="hero-illust-before">
+                                    <img src="https://picsum.photos/seed/karyaabadi-hero3/600/400.jpg" alt="Demo">
+                                    <div class="hero-illust-after"><img src="https://picsum.photos/seed/karyaabadi-hero3/600/400.jpg" alt="After" style="filter:brightness(1.1) saturate(0.3);"></div>
+                                    <span class="hero-illust-label label-before">Before</span>
+                                    <span class="hero-illust-label label-after">After</span>
+                                </div>
+                                <div class="hero-illist-stats">
+                                    <div class="hero-stat"><div class="hero-stat-value">~5s</div><div class="hero-stat-label">Processing</div></div>
+                                    <div class="hero-stat"><div class="hero-stat-value">HD</div><div class="hero-stat-label">Quality</div></div>
+                                    <div class="hero-stat"><div class="hero-stat-value">AI</div><div class="hero-stat-label">Powered</div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hero-float-badge float-badge-1"><i class="fa-solid fa-check"></i><div class="fb-text"><strong>Background Removed!</strong><span>Dengan AI</span></div></div>
+                        <div class="hero-float-badge float-badge-2"><i class="fa-solid fa-download"></i><div class="fb-text"><strong>HD Ready</strong><span>PNG Download</span></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FITUR -->
+    <section class="section-padding" id="fitur">
+        <div class="container">
+            <div class="text-center fade-up">
+                <div class="section-label"><i class="fa-solid fa-sparkles"></i> Fitur Unggulan</div>
+                <h2 class="section-title">Fitur yang Membuat Hasil Lebih Sempurna</h2>
+                <p class="section-subtitle">Teknologi AI terkini untuk menghapus background foto dengan akurasi tinggi dan kualitas profesional.</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6 fade-up"><div class="feature-card"><div class="feature-icon fi-blue"><i class="fa-solid fa-wand-magic-sparkles"></i></div><h4>AI Background Remover</h4><p>Menghapus background secara otomatis dengan akurasi tinggi menggunakan model AI U2-Net yang berjalan langsung di browser.</p></div></div>
+                <div class="col-lg-4 col-md-6 fade-up" style="transition-delay:0.1s;"><div class="feature-card"><div class="feature-icon fi-green"><i class="fa-solid fa-image"></i></div><h4>HD Quality</h4><p>Hasil PNG transparan dengan kualitas tinggi tanpa kehilangan detail. Tajam dan bersih.</p></div></div>
+                <div class="col-lg-4 col-md-6 fade-up" style="transition-delay:0.2s;"><div class="feature-card"><div class="feature-icon fi-purple"><i class="fa-solid fa-bolt"></i></div><h4>Fast Processing</h4><p>Proses hanya beberapa detik. AI model berjalan di browser Anda tanpa perlu upload ke server.</p></div></div>
+                <div class="col-lg-4 col-md-6 fade-up" style="transition-delay:0.3s;"><div class="feature-card"><div class="feature-icon fi-orange"><i class="fa-solid fa-download"></i></div><h4>Download Instan</h4><p>Download hasil dalam format PNG HD atau JPG dengan background putih secara instan.</p></div></div>
+                <div class="col-lg-4 col-md-6 fade-up" style="transition-delay:0.4s;"><div class="feature-card"><div class="feature-icon fi-pink"><i class="fa-solid fa-share-nodes"></i></div><h4>Share Hasil</h4><p>Bagikan langsung ke platform media sosial favorit Anda.</p><div class="share-icons"><span class="share-icon si-wa"><i class="fa-brands fa-whatsapp"></i></span><span class="share-icon si-fb"><i class="fa-brands fa-facebook-f"></i></span><span class="share-icon si-ig"><i class="fa-brands fa-instagram"></i></span><span class="share-icon si-tg"><i class="fa-brands fa-telegram"></i></span><span class="share-icon si-tw"><i class="fa-brands fa-x-twitter"></i></span></div></div></div>
+                <div class="col-lg-4 col-md-6 fade-up" style="transition-delay:0.5s;"><div class="feature-card"><div class="feature-icon fi-cyan"><i class="fa-solid fa-shield-halved"></i></div><h4>Secure & Private</h4><p>Foto diproses 100% di browser Anda. Tidak ada data yang dikirim ke server. Privasi terjamin!</p></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- UPLOAD -->
+    <section class="section-padding upload-section" id="upload">
+        <div class="container">
+            <div class="text-center fade-up">
+                <div class="section-label"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Foto</div>
+                <h2 class="section-title">Hapus Background Sekarang</h2>
+                <p class="section-subtitle">Upload foto Anda dan biarkan AI kami bekerja. Semua diproses langsung di browser — foto Anda tidak dikirim ke mana-mana.</p>
+                <div id="aiStatus" class="ai-status loading"><span class="dot"></span> Memuat AI Engine...</div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-8 fade-up">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                        <div class="upload-text">Seret foto ke sini atau klik untuk memilih file</div>
+                        <div class="upload-subtext">Mendukung format: JPG, JPEG, PNG, WEBP • Maksimal 20 MB</div>
+                        <div class="upload-formats"><span class="format-badge">JPG</span><span class="format-badge">JPEG</span><span class="format-badge">PNG</span><span class="format-badge">WEBP</span></div>
+                        <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp" hidden>
+                    </div>
+                    <div id="previewBefore" style="display:none; margin-top:24px;">
+                        <div class="preview-card">
+                            <div class="preview-header"><h5><i class="fa-solid fa-image me-2" style="color:var(--primary);"></i>Preview Foto</h5><button class="btn btn-sm btn-outline-custom" id="removeBtn" style="padding:6px 16px;font-size:0.8rem;"><i class="fa-solid fa-xmark"></i> Hapus</button></div>
+                            <div class="p-4 text-center"><img id="previewImg" src="" alt="Preview" style="max-width:100%;max-height:400px;border-radius:var(--radius);"><div id="fileInfo" class="mt-3" style="font-size:0.85rem;color:var(--gray-400);"></div></div>
+                            <div class="p-3 text-center" style="border-top:1px solid var(--gray-200);"><button class="btn-primary-custom" id="removeBgBtn" style="border:none;"><i class="fa-solid fa-wand-magic-sparkles"></i> Remove Background</button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row justify-content-center" id="resultSection" style="display:none;">
+                <div class="col-lg-8">
+                    <div class="preview-card">
+                        <div class="preview-header"><h5><i class="fa-solid fa-check-circle me-2" style="color:var(--success);"></i>Hasil Remove Background</h5><button class="btn btn-sm btn-outline-custom" id="newUploadBtn" style="padding:6px 16px;font-size:0.8rem;"><i class="fa-solid fa-plus"></i> Upload Baru</button></div>
+                        <div class="p-4">
+                            <div class="comparison-container" id="comparisonContainer">
+                                <img id="resultBeforeImg" src="" alt="Before">
+                                <div class="comparison-after" id="comparisonAfter"><img id="resultAfterImg" src="" alt="After"></div>
+                                <div class="comparison-slider" id="comparisonSlider"><div class="comparison-handle"><i class="fa-solid fa-arrows-left-right"></i></div></div>
+                                <span class="comparison-label lbl-before">Before</span>
+                                <span class="comparison-label lbl-after">After</span>
+                            </div>
+                        </div>
+                        <div class="result-buttons">
+                            <button class="btn-result primary" id="downloadPng"><i class="fa-solid fa-download"></i> Download PNG HD</button>
+                            <button class="btn-result secondary" id="downloadJpg"><i class="fa-solid fa-image"></i> Download JPG Putih</button>
+                            <button class="btn-result secondary" id="shareBtn"><i class="fa-solid fa-share-nodes"></i> Share</button>
+                            <button class="btn-result secondary" id="uploadNewResult"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Foto Baru</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CARA KERJA -->
+    <section class="section-padding" id="cara-kerja" style="background:var(--white);">
+        <div class="container">
+            <div class="text-center fade-up"><div class="section-label"><i class="fa-solid fa-list-ol"></i> Cara Kerja</div><h2 class="section-title">3 Langkah Mudah</h2><p class="section-subtitle">Proses sederhana untuk menghapus background foto secara otomatis.</p></div>
+            <div class="row">
+                <div class="col-md-4 fade-up"><div class="step-card"><div class="step-number">1</div><h4>Upload Foto</h4><p>Seret atau pilih foto yang ingin Anda hapus background-nya. Mendukung JPG, PNG, dan WEBP.</p><span class="step-connector"><i class="fa-solid fa-arrow-right"></i></span></div></div>
+                <div class="col-md-4 fade-up" style="transition-delay:0.15s;"><div class="step-card"><div class="step-number">2</div><h4>AI Menghapus Background</h4><p>Model AI U2-Net berjalan langsung di browser Anda — tanpa upload ke server, privasi terjaga.</p><span class="step-connector"><i class="fa-solid fa-arrow-right"></i></span></div></div>
+                <div class="col-md-4 fade-up" style="transition-delay:0.3s;"><div class="step-card"><div class="step-number">3</div><h4>Download Hasil HD</h4><p>Unduh hasil dalam format PNG transparan atau JPG dengan background putih. Siap digunakan!</p></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section-padding faq-section" id="faq">
+        <div class="container">
+            <div class="text-center fade-up"><div class="section-label"><i class="fa-solid fa-circle-question"></i> FAQ</div><h2 class="section-title">Pertanyaan yang Sering Diajukan</h2><p class="section-subtitle">Temukan jawaban atas pertanyaan umum tentang layanan kami.</p></div>
+            <div class="row justify-content-center"><div class="col-lg-8 fade-up">
+                <div class="faq-item"><div class="faq-question"><span>Apakah gratis?</span><i class="fa-solid fa-chevron-down"></i></div><div class="faq-answer"><p>Ya, sepenuhnya gratis! Semua proses berjalan di browser Anda menggunakan AI model, tidak ada biaya server.</p></div></div>
+                <div class="faq-item"><div class="faq-question"><span>Format apa yang didukung?</span><i class="fa-solid fa-chevron-down"></i></div><div class="faq-answer"><p>Kami mendukung format JPG, JPEG, PNG, dan WEBP. Ukuran file maksimal 20 MB.</p></div></div>
+                <div class="faq-item"><div class="faq-question"><span>Apakah hasilnya HD?</span><i class="fa-solid fa-chevron-down"></i></div><div class="faq-answer"><p>Ya, hasil dapat diunduh dalam kualitas tinggi. Kami memproses foto Anda dengan resolusi penuh.</p></div></div>
+                <div class="faq-item"><div class="faq-question"><span>Apakah foto saya aman?</span><i class="fa-solid fa-chevron-down"></i></div><div class="faq-answer"><p>Sangat aman! Foto diproses 100% di browser Anda. Tidak ada data yang dikirim ke server manapun.</p></div></div>
+                <div class="faq-item"><div class="faq-question"><span>Berapa lama prosesnya?</span><i class="fa-solid fa-chevron-down"></i></div><div class="faq-answer"><p>Proses biasanya memakan waktu 3-10 detik tergantung ukuran foto dan spesifikasi perangkat.</p></div></div>
+                <div class="faq-item"><div class="faq-question"><span>Mengapa loading pertama lama?</span><i class="fa-solid fa-chevron-down"></i></div><div class="faq-answer"><p>Pada penggunaan pertama, browser perlu mengunduh AI model (~30MB). Model ini akan di-cache sehingga penggunaan berikutnya jauh lebih cepat.</p></div></div>
+            </div></div>
+        </div>
+    </section>
+
+    <!-- KONTAK / CTA -->
+    <section class="section-padding" id="kontak" style="background:linear-gradient(135deg,var(--primary),#4F46E5);">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-7 text-white fade-up">
+                    <h2 style="font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:800;margin-bottom:16px;">Siap Menghapus Background Foto Anda?</h2>
+                    <p style="font-size:1.1rem;opacity:0.85;line-height:1.7;margin-bottom:32px;">Coba sekarang gratis dan rasakan kemudahan menghapus background foto dengan AI. Hasil berkualitas HD dalam hitungan detik.</p>
+                    <a href="#upload" class="btn-primary-custom" style="background:#fff;color:var(--primary);box-shadow:0 8px 30px rgba(0,0,0,0.2);"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Foto Sekarang</a>
+                </div>
+                <div class="col-lg-5 text-white text-center text-lg-end mt-4 mt-lg-0 fade-up" style="transition-delay:0.15s;">
+                    <div style="font-size:4rem;margin-bottom:12px;"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                    <div style="font-size:0.95rem;opacity:0.8;"><p class="mb-1"><i class="fa-solid fa-envelope me-2"></i> info@karyaabadi.com</p><p class="mb-1"><i class="fa-brands fa-whatsapp me-2"></i> +62 812 3456 7890</p><p class="mb-0"><i class="fa-solid fa-location-dot me-2"></i> Indonesia</p></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-5 mb-4 mb-lg-0"><div class="footer-brand"><i class="fa-solid fa-wand-magic-sparkles"></i> Karya Abadi Remove Photo Background</div><p class="footer-desc">Solusi cepat dan profesional untuk menghapus background foto secara otomatis dengan teknologi AI terkini. 100% gratis, 100% privat.</p><div class="d-flex gap-3"><a href="#" style="color:var(--gray-400);font-size:1.2rem;" onmouseover="this.style.color='#3B82F6'" onmouseout="this.style.color='var(--gray-400)'"><i class="fa-brands fa-facebook"></i></a><a href="#" style="color:var(--gray-400);font-size:1.2rem;" onmouseover="this.style.color='#3B82F6'" onmouseout="this.style.color='var(--gray-400)'"><i class="fa-brands fa-instagram"></i></a><a href="#" style="color:var(--gray-400);font-size:1.2rem;" onmouseover="this.style.color='#3B82F6'" onmouseout="this.style.color='var(--gray-400)'"><i class="fa-brands fa-x-twitter"></i></a><a href="#" style="color:var(--gray-400);font-size:1.2rem;" onmouseover="this.style.color='#3B82F6'" onmouseout="this.style.color='var(--gray-400)'"><i class="fa-brands fa-youtube"></i></a></div></div>
+                <div class="col-lg-3 col-md-6 mb-4 mb-md-0"><h6 style="color:#fff;font-weight:700;margin-bottom:16px;">Menu</h6><ul class="footer-links"><li><a href="#home">Home</a></li><li><a href="#cara-kerja">Cara Kerja</a></li><li><a href="#fitur">Fitur</a></li><li><a href="#upload">Upload Foto</a></li><li><a href="#faq">FAQ</a></li></ul></div>
+                <div class="col-lg-4 col-md-6"><h6 style="color:#fff;font-weight:700;margin-bottom:16px;">Legal</h6><ul class="footer-links"><li><a href="#">Privacy Policy</a></li><li><a href="#">Terms of Service</a></li><li><a href="#">Contact</a></li><li><a href="#">Cookie Policy</a></li></ul></div>
+            </div>
+            <div class="footer-bottom">© 2026 Karya Abadi Remove Photo Background. All Rights Reserved.</div>
+        </div>
+    </footer>
+
+    <button class="back-to-top" id="backToTop"><i class="fa-solid fa-arrow-up"></i></button>
+
+    <!-- PROCESSING OVERLAY -->
+    <div class="processing-overlay" id="processingOverlay">
+        <div class="processing-box">
+            <div class="processing-spinner"></div>
+            <h5 id="processingTitle">Memproses Foto...</h5>
+            <p id="processingDesc">AI sedang menghapus background foto Anda</p>
+            <div class="processing-progress-bar"><div class="processing-progress-fill" id="processingProgressFill"></div></div>
+            <div class="processing-step" id="processingStep">Menginisialisasi...</div>
+        </div>
+    </div>
+
+    <!-- SHARE MODAL -->
+    <div class="share-modal-overlay" id="shareModal">
+        <div class="share-modal">
+            <h5><i class="fa-solid fa-share-nodes me-2" style="color:var(--primary);"></i>Bagikan Hasil</h5>
+            <div class="share-modal-icons">
+                <a class="share-modal-icon" style="background:#25D366;" href="#" id="shareWhatsapp" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+                <a class="share-modal-icon" style="background:#1877F2;" href="#" id="shareFacebook" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
+                <a class="share-modal-icon" style="background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);" href="#" id="shareInstagram"><i class="fa-brands fa-instagram"></i></a>
+                <a class="share-modal-icon" style="background:#0088CC;" href="#" id="shareTelegram" target="_blank"><i class="fa-brands fa-telegram"></i></a>
+                <a class="share-modal-icon" style="background:#1DA1F2;" href="#" id="shareTwitter" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+            </div>
+            <button class="share-modal-close" id="closeShareModal">Tutup</button>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+    <canvas id="exportCanvas" style="display:none;"></canvas>
+
+    <!-- Bootstrap JS (non-blocking) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- ALL Custom JS (Non-Module, runs immediately for UI) -->
+    <script>
+        const $ = id => document.getElementById(id);
+
+        // ===== DARK MODE =====
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateDarkIcon(savedTheme);
+        $('darkToggle').addEventListener('click', () => {
+            const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            updateDarkIcon(next);
+        });
+        function updateDarkIcon(t) { $('darkToggle').innerHTML = t === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>'; }
+
+        // ===== NAVBAR SCROLL =====
+        window.addEventListener('scroll', () => {
+            $('mainNav').classList.toggle('scrolled', window.scrollY > 50);
+            $('backToTop').classList.toggle('visible', window.scrollY > 400);
+        });
+        $('backToTop').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // ===== SMOOTH SCROLL =====
+        document.querySelectorAll('a[href^="#"]').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                const t = document.querySelector(link.getAttribute('href'));
+                if (t) window.scrollTo({ top: t.offsetTop - 80, behavior: 'smooth' });
+                const c = document.querySelector('.navbar-collapse.show');
+                if (c) bootstrap.Collapse.getInstance(c)?.hide();
+            });
+        });
+
+        // ===== ACTIVE NAV =====
+        window.addEventListener('scroll', () => {
+            let cur = '';
+            document.querySelectorAll('section[id]').forEach(s => { if (window.pageYOffset >= s.offsetTop - 100) cur = s.id; });
+            document.querySelectorAll('.nav-link').forEach(l => { l.classList.remove('active'); if (l.getAttribute('href') === '#' + cur) l.classList.add('active'); });
+        });
+
+        // ===== FADE UP =====
+        const fadeObs = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }), { threshold: 0.1 });
+        document.querySelectorAll('.fade-up').forEach(el => fadeObs.observe(el));
+
+        // ===== FAQ =====
+        document.querySelectorAll('.faq-question').forEach(q => {
+            q.addEventListener('click', () => {
+                const item = q.parentElement, was = item.classList.contains('open');
+                document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+                if (!was) item.classList.add('open');
+            });
+        });
+
+        // ===== TOAST =====
+        function showToast(message, type = 'info') {
+            const c = $('toastContainer'), t = document.createElement('div');
+            t.className = `toast-msg ${type}`;
+            const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
+            const colors = { success: 'var(--success)', error: 'var(--danger)', info: 'var(--primary)' };
+            t.innerHTML = `<i class="fa-solid ${icons[type]}" style="color:${colors[type]};font-size:1.1rem;"></i> ${message}`;
+            c.appendChild(t);
+            setTimeout(() => { t.style.animation = 'toastOut 0.3s ease forwards'; setTimeout(() => t.remove(), 300); }, 4000);
+        }
+    </script>
+
+    <!-- AI Engine + Upload Logic (ES Module - loads asynchronously in background) -->
+    <script type="module">
+        const $ = id => document.getElementById(id);
+
+        let removeBackgroundFn = null;
+        let aiReady = false;
+        let uploadedFile = null;
+        let originalImageDataUrl = null;
+        let processedBlob = null;
+        let processedImageDataUrl = null;
+
+        const aiStatusEl = $('aiStatus');
+
+        // ===== LOAD AI ENGINE (Background, non-blocking) =====
+        loadAIEngine();
+
+        async function loadAIEngine() {
+            try {
+                aiStatusEl.className = 'ai-status loading';
+                aiStatusEl.innerHTML = '<span class="dot"></span> Memuat AI Engine...';
+
+                const module = await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm');
+                removeBackgroundFn = module.default || module.removeBackground || module;
+
+                if (typeof removeBackgroundFn !== 'function') {
+                    for (const key of Object.keys(module)) {
+                        if (typeof module[key] === 'function') { removeBackgroundFn = module[key]; break; }
+                    }
+                }
+
+                aiReady = true;
+                aiStatusEl.className = 'ai-status ready';
+                aiStatusEl.innerHTML = '<span class="dot"></span> AI Engine Siap ✓';
+                console.log('✅ AI Engine loaded');
+            } catch (err) {
+                console.error('❌ AI Engine failed:', err);
+                aiStatusEl.className = 'ai-status error';
+                aiStatusEl.innerHTML = '<span class="dot"></span> Gagal memuat AI — Coba reload';
+            }
+        }
+
+        // ===== UPLOAD HANDLERS =====
+        $('uploadArea').addEventListener('click', () => $('fileInput').click());
+        $('fileInput').addEventListener('change', e => { if (e.target.files.length) handleFile(e.target.files[0]); });
+
+        const ua = $('uploadArea');
+        ua.addEventListener('dragover', e => { e.preventDefault(); ua.classList.add('dragover'); });
+        ua.addEventListener('dragleave', () => ua.classList.remove('dragover'));
+        ua.addEventListener('drop', e => { e.preventDefault(); ua.classList.remove('dragover'); if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]); });
+
+        function handleFile(file) {
+            const ALLOWED = ['image/jpeg', 'image/png', 'image/webp'];
+            if (!ALLOWED.includes(file.type)) { showToast('Format tidak didukung. Gunakan JPG, PNG, atau WEBP.', 'error'); return; }
+            if (file.size > 20*1024*1024) { showToast('Ukuran file melebihi 20 MB.', 'error'); return; }
+
+            uploadedFile = file;
+            const reader = new FileReader();
+            reader.onload = e => {
+                originalImageDataUrl = e.target.result;
+                $('previewImg').src = originalImageDataUrl;
+                $('fileInfo').innerHTML = `<strong>${file.name}</strong> • ${(file.size/1024/1024).toFixed(2)} MB • ${file.type.split('/')[1].toUpperCase()}`;
+                $('previewBefore').style.display = 'block';
+                $('resultSection').style.display = 'none';
+                ua.style.display = 'none';
+                showToast('Foto berhasil diupload! Klik "Remove Background" untuk memulai.', 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        $('removeBtn').addEventListener('click', resetUpload);
+        function resetUpload() {
+            uploadedFile = null; originalImageDataUrl = null; processedBlob = null; processedImageDataUrl = null;
+            $('fileInput').value = ''; $('previewBefore').style.display = 'none'; $('resultSection').style.display = 'none';
+            ua.style.display = 'block';
+        }
+
+        // ===== PROCESS IMAGE =====
+        $('removeBgBtn').addEventListener('click', processImage);
+
+        async function processImage() {
+            if (!uploadedFile) return;
+            if (!aiReady || !removeBackgroundFn) { showToast('AI Engine belum siap. Tunggu atau reload halaman.', 'error'); return; }
+
+            const overlay = $('processingOverlay');
+            const pFill = $('processingProgressFill');
+            const pStep = $('processingStep');
+            const pTitle = $('processingTitle');
+            const pDesc = $('processingDesc');
+
+            overlay.classList.add('active');
+            pFill.style.width = '0%';
+            pStep.textContent = 'Mempersiapkan gambar...';
+            $('removeBgBtn').disabled = true;
+
+            try {
+                const blob = await removeBackgroundFn(uploadedFile, {
+                    model: 'medium',
+                    output: { format: 'image/png', quality: 0.9 },
+                    progress: (key, current, total) => {
+                        const pct = total > 0 ? Math.round((current / total) * 100) : 0;
+                        if (key.includes('fetch') || key.includes('download')) {
+                            pTitle.textContent = 'Mengunduh AI Model...';
+                            pDesc.textContent = 'Penggunaan pertama perlu mengunduh model (~30MB). Penggunaan berikutnya lebih cepat.';
+                            pStep.textContent = `Mengunduh model: ${pct}%`;
+                        } else if (key.includes('compute') || key.includes('inference')) {
+                            pTitle.textContent = 'Memproses Foto...';
+                            pDesc.textContent = 'AI sedang menghapus background foto Anda';
+                            pStep.textContent = `Memproses: ${pct}%`;
+                        } else {
+                            pStep.textContent = `${key}: ${pct}%`;
+                        }
+                        pFill.style.width = Math.max(pct, pFill.style.width.replace('%','')) + '%';
+                        console.log(`[BG] ${key}: ${current}/${total} (${pct}%)`);
+                    }
+                });
+
+                processedBlob = blob;
+                processedImageDataUrl = await blobToDataUrl(blob);
+                pFill.style.width = '100%';
+                pStep.textContent = 'Selesai! ✓';
+
+                setTimeout(() => { overlay.classList.remove('active'); showResult(); showToast('Background berhasil dihapus! 🎉', 'success'); }, 600);
+            } catch (err) {
+                console.error('BG removal failed:', err);
+                overlay.classList.remove('active');
+                showToast('Gagal menghapus background: ' + (err.message || 'Error'), 'error');
+            } finally { $('removeBgBtn').disabled = false; }
+        }
+
+        function blobToDataUrl(blob) { return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(blob); }); }
+
+        function showResult() {
+            $('resultBeforeImg').src = originalImageDataUrl;
+            $('resultAfterImg').src = processedImageDataUrl;
+            $('previewBefore').style.display = 'none';
+            $('resultSection').style.display = 'block';
+            $('comparisonAfter').style.width = '50%';
+            $('comparisonSlider').style.left = '50%';
+            setTimeout(() => $('resultSection').scrollIntoView({ behavior: 'smooth', block: 'center' }), 200);
+        }
+
+        // ===== COMPARISON SLIDER =====
+        const cc = $('comparisonContainer');
+        let sliding = false;
+        cc.addEventListener('mousedown', () => sliding = true);
+        cc.addEventListener('touchstart', () => sliding = true, { passive: true });
+        document.addEventListener('mousemove', e => { if (sliding) moveSlider(e); });
+        document.addEventListener('touchmove', e => { if (sliding) moveSlider(e); }, { passive: true });
+        document.addEventListener('mouseup', () => sliding = false);
+        document.addEventListener('touchend', () => sliding = false);
+
+        function moveSlider(e) {
+            const rect = cc.getBoundingClientRect();
+            const x = Math.max(0, Math.min((e.touches ? e.touches[0].clientX : e.clientX) - rect.left, rect.width));
+            const pct = (x / rect.width) * 100;
+            $('comparisonAfter').style.width = pct + '%';
+            $('comparisonSlider').style.left = pct + '%';
+        }
+
+        // ===== DOWNLOADS =====
+        $('downloadPng').addEventListener('click', () => { if (processedBlob) { dlBlob(processedBlob, 'karya-abadi-nobg.png'); showToast('Download PNG HD berhasil! ✓', 'success'); } });
+        $('downloadJpg').addEventListener('click', () => {
+            if (!processedImageDataUrl) return;
+            const img = new Image();
+            img.onload = () => {
+                const cv = $('exportCanvas'); cv.width = img.width; cv.height = img.height;
+                const ctx = cv.getContext('2d'); ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, cv.width, cv.height); ctx.drawImage(img, 0, 0);
+                cv.toBlob(b => { dlBlob(b, 'karya-abadi-whitebg.jpg'); showToast('Download JPG Putih berhasil! ✓', 'success'); }, 'image/jpeg', 0.95);
+            };
+            img.src = processedImageDataUrl;
+        });
+
+        function dlBlob(blob, name) { const u = URL.createObjectURL(blob), a = document.createElement('a'); a.href = u; a.download = name; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(() => URL.revokeObjectURL(u), 1000); }
+
+        // ===== SHARE =====
+        $('shareBtn').addEventListener('click', () => $('shareModal').classList.add('active'));
+        $('closeShareModal').addEventListener('click', () => $('shareModal').classList.remove('active'));
+        $('shareModal').addEventListener('click', e => { if (e.target === $('shareModal')) $('shareModal').classList.remove('active'); });
+
+        const sTxt = 'Hapus background foto otomatis dengan AI di Karya Abadi! Coba gratis!';
+        const sUrl = window.location.href;
+        $('shareWhatsapp').href = `https://wa.me/?text=${encodeURIComponent(sTxt+' '+sUrl)}`;
+        $('shareFacebook').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(sUrl)}`;
+        $('shareTwitter').href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(sTxt)}&url=${encodeURIComponent(sUrl)}`;
+        $('shareTelegram').href = `https://t.me/share/url?url=${encodeURIComponent(sUrl)}&text=${encodeURIComponent(sTxt)}`;
+        $('shareInstagram').addEventListener('click', e => { e.preventDefault(); showToast('Download hasilnya dan bagikan ke Instagram! 📸', 'info'); });
+
+        // ===== NEW UPLOAD =====
+        $('newUploadBtn').addEventListener('click', resetUpload);
+        $('uploadNewResult').addEventListener('click', resetUpload);
+
+        // ===== ESC KEY =====
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') { $('shareModal').classList.remove('active'); $('processingOverlay').classList.remove('active'); } });
+    </script>
+</body>
+</html>
