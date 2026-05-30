@@ -3,793 +3,540 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <img src="LOGO KARYA ABADI.png" alt="Logo" class="navbar-logo-svg" style="border-radius:12px;object-fit:contain;">
     <title>KARYA ABADI Remove Photo Background</title>
-    <meta name="description" content="Hapus background foto otomatis dengan AI. Gratis, cepat, privat.">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
+        /* ===== DARK THEME (default) ===== */
         :root {
-            --black: #000000;
-            --black-soft: #0A0A0A;
-            --black-card: #111111;
-            --black-card2: #0D0D0D;
-            --black-border: #222222;
-            --black-hover: #1A1A1A;
-            --red: #DC0000;
-            --red-dark: #B00000;
-            --red-bright: #FF0000;
-            --red-glow: rgba(220,0,0,0.4);
-            --red-soft: rgba(220,0,0,0.08);
-            --red-soft2: rgba(220,0,0,0.15);
-            --white: #FFFFFF;
-            --white-90: rgba(255,255,255,0.9);
-            --white-80: rgba(255,255,255,0.8);
-            --white-60: rgba(255,255,255,0.6);
-            --white-40: rgba(255,255,255,0.4);
-            --white-20: rgba(255,255,255,0.2);
-            --white-10: rgba(255,255,255,0.1);
-            --white-05: rgba(255,255,255,0.05);
-            --radius: 16px;
-            --radius-sm: 10px;
-            --radius-lg: 24px;
-            --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+            --bg:#000;--bg2:#0A0A0A;--card:#111;--border:#222;--hover:#1A1A1A;
+            --red:#DC0000;--red-d:#B00000;--red-b:#FF0000;
+            --red-glow:rgba(220,0,0,0.4);--red-s:rgba(220,0,0,0.08);--red-s2:rgba(220,0,0,0.15);
+            --fg:#FFF;--fg9:rgba(255,255,255,0.9);--fg8:rgba(255,255,255,0.8);
+            --fg6:rgba(255,255,255,0.6);--fg4:rgba(255,255,255,0.4);
+            --fg2:rgba(255,255,255,0.2);--fg1:rgba(255,255,255,0.1);--fg05:rgba(255,255,255,0.05);
+            --overlay:rgba(0,0,0,0.85);--check-bg:repeating-conic-gradient(var(--border) 0% 25%, var(--bg2) 0% 50%) 0 0/20px 20px;
         }
 
-        * { margin:0; padding:0; box-sizing:border-box; }
-        html { scroll-behavior: smooth; }
-        html, body { visibility: visible !important; opacity: 1 !important; }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--black);
-            color: var(--white);
-            min-height: 100vh;
-            overflow-x: hidden;
+        /* ===== LIGHT THEME ===== */
+        [data-theme="light"] {
+            --bg:#F5F5F5;--bg2:#EAEAEA;--card:#FFFFFF;--border:#D0D0D0;--hover:#E8E8E8;
+            --red-s:rgba(220,0,0,0.06);--red-s2:rgba(220,0,0,0.1);
+            --fg:#111;--fg9:rgba(0,0,0,0.9);--fg8:rgba(0,0,0,0.8);
+            --fg6:rgba(0,0,0,0.6);--fg4:rgba(0,0,0,0.4);
+            --fg2:rgba(0,0,0,0.2);--fg1:rgba(0,0,0,0.1);--fg05:rgba(0,0,0,0.05);
+            --overlay:rgba(255,255,255,0.85);--check-bg:repeating-conic-gradient(var(--border) 0% 25%, #fff 0% 50%) 0 0/20px 20px;
         }
 
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: var(--black); }
-        ::-webkit-scrollbar-thumb { background: var(--red); border-radius: 99px; }
+        *{margin:0;padding:0;box-sizing:border-box}
+        html{scroll-behavior:smooth}
+        body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;overflow-x:hidden;transition:background .35s ease,color .35s ease}
+        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--red);border-radius:99px}
 
-        /* ===== NAVBAR ===== */
-        .navbar-custom {
-            background: rgba(0,0,0,0.92);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--black-border);
-            padding: 12px 0;
-            z-index: 1050;
-            transition: var(--transition);
-        }
-        .navbar-custom.scrolled {
-            box-shadow: 0 4px 30px rgba(0,0,0,0.6), 0 1px 0 var(--red-soft2);
-        }
+        /* NAVBAR */
+        .navbar-c{background:var(--card);border-bottom:1px solid var(--border);padding:10px 0;z-index:1050;transition:background .35s,border-color .35s}
+        .nb-link{display:flex;align-items:center;gap:10px;text-decoration:none}
+        .nb-logo{height:34px;width:auto;object-fit:contain;flex-shrink:0}
+        .nb-text{font-weight:800;font-size:.88rem;color:var(--fg)!important;letter-spacing:.03em;line-height:1.15;transition:color .35s}
+        .nb-text span{color:var(--red)}
+        .dm-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--bg);color:var(--fg6);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;font-size:.9rem}
+        .dm-btn:hover{border-color:var(--red);color:var(--red);background:var(--red-s)}
 
-        .navbar-brand-link {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
-        .navbar-logo-svg { height: 38px; width: 38px; flex-shrink: 0; }
-        .navbar-brand-text {
-            font-weight: 800;
-            font-size: 1rem;
-            color: var(--white) !important;
-            letter-spacing: 0.04em;
-            line-height: 1.2;
-        }
-        .navbar-brand-text span { color: var(--red); }
+        /* MAIN */
+        .main-c{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:80px 20px 60px;position:relative}
+        .bg1{position:fixed;top:-250px;left:-150px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(220,0,0,0.06)0%,transparent 70%);pointer-events:none;z-index:0}
+        .bg2{position:fixed;bottom:-300px;right:-150px;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(220,0,0,0.04)0%,transparent 70%);pointer-events:none;z-index:0}
+        .app-c{position:relative;z-index:1;width:100%;max-width:700px}
 
-        /* ===== MAIN LAYOUT ===== */
-        .main-content {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 100px 20px 60px;
-            position: relative;
-        }
+        .card{background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;transition:background .35s,border-color .35s}
 
-        .bg-glow-1 {
-            position: fixed; top: -250px; left: -150px;
-            width: 600px; height: 600px; border-radius: 50%;
-            background: radial-gradient(circle, rgba(220,0,0,0.07) 0%, transparent 70%);
-            pointer-events: none; z-index: 0;
-        }
-        .bg-glow-2 {
-            position: fixed; bottom: -300px; right: -150px;
-            width: 700px; height: 700px; border-radius: 50%;
-            background: radial-gradient(circle, rgba(220,0,0,0.05) 0%, transparent 70%);
-            pointer-events: none; z-index: 0;
-        }
-        .bg-grid {
-            position: fixed; inset: 0;
-            background-image:
-                linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
-            background-size: 60px 60px;
-            pointer-events: none; z-index: 0;
-        }
+        /* UPLOAD */
+        .up-area{padding:56px 36px;text-align:center;cursor:pointer;transition:all .3s;border:2px dashed var(--border);border-radius:14px;margin:20px}
+        .up-area:hover,.up-area.dragover{border-color:var(--red);background:var(--red-s)}
+        .up-ic{width:64px;height:64px;border-radius:50%;background:var(--red-s);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;transition:all .3s}
+        .up-ic i{font-size:1.4rem;color:var(--red);transition:all .3s}
+        .up-area:hover .up-ic{background:var(--red)}.up-area:hover .up-ic i{color:#fff}
+        .up-t{font-size:1.3rem;font-weight:900;color:var(--fg8);margin-bottom:8px;letter-spacing:.1em;transition:color .35s}
+        .up-f1{font-size:.82rem;color:var(--fg4);margin-bottom:2px;transition:color .35s}
+        .up-f2{font-size:.78rem;color:var(--fg4);transition:color .35s}
 
-        .app-container { position: relative; z-index: 1; width: 100%; max-width: 700px; }
+        .ps{display:none}.ps.a{display:block}
+        .sbar{padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;transition:border-color .35s}
+        .sbar-t{font-weight:700;font-size:.85rem;color:var(--fg8);display:flex;align-items:center;gap:8px;transition:color .35s}
+        .sbar-t i{color:var(--red)}
+        .iw{padding:20px;text-align:center}
+        .iw img{max-width:100%;max-height:400px;border-radius:10px;display:block;margin:0 auto}
+        .fi2{font-size:.75rem;color:var(--fg4);margin-top:10px;transition:color .35s}
+        .abar{padding:12px 20px 20px;display:flex;gap:10px;flex-wrap:wrap}
 
-        /* ===== HEADER ===== */
-        .app-header { text-align: center; margin-bottom: 44px; }
+        .btn-r{background:var(--red);color:#fff;border:none;padding:12px 24px;border-radius:10px;font-weight:700;font-size:.85rem;display:inline-flex;align-items:center;gap:8px;cursor:pointer;transition:all .3s;box-shadow:0 4px 20px var(--red-glow);text-decoration:none}
+        .btn-r:hover{background:var(--red-b);transform:translateY(-2px);box-shadow:0 8px 30px var(--red-glow);color:#fff}
+        .btn-r:disabled{opacity:.5;cursor:not-allowed;transform:none}
+        .btn-d{background:var(--fg05);color:var(--fg6);border:1px solid var(--border);padding:11px 18px;border-radius:10px;font-weight:600;font-size:.8rem;display:inline-flex;align-items:center;gap:8px;cursor:pointer;transition:all .3s;text-decoration:none}
+        .btn-d:hover{border-color:var(--red);color:var(--red);background:var(--red-s)}
+        .btn-sm{padding:6px 12px;font-size:.74rem}
 
-        .app-logo-wrap {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 24px;
-            position: relative;
-        }
-        .app-logo-wrap::before {
-            content: '';
-            position: absolute;
-            inset: -12px;
-            border-radius: 50%;
-            background: radial-gradient(circle, var(--red-glow), transparent 70%);
-            filter: blur(15px);
-            z-index: -1;
-        }
-        .app-logo-svg { height: 72px; width: 72px; }
+        .rs2{display:none}.rs2.a{display:block}
+        .cc{position:relative;width:100%;overflow:hidden;border-radius:10px;cursor:ew-resize;user-select:none;background:var(--check-bg)}
+        .cc img{display:block;width:100%;height:auto}
+        .cc-a{position:absolute;top:0;left:0;width:50%;height:100%;overflow:hidden}
+        .cc-a img{width:200%;max-width:none}
+        .cc-sl{position:absolute;top:0;left:50%;width:3px;height:100%;background:var(--red);transform:translateX(-50%);z-index:10}
+        .cc-h{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:38px;height:38px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.8rem;box-shadow:0 0 20px var(--red-glow)}
+        .cc-l{position:absolute;bottom:10px;padding:3px 10px;border-radius:99px;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;z-index:5}
+        .lb{left:10px;background:rgba(0,0,0,.7);color:rgba(255,255,255,.8)}
+        .la{right:10px;background:var(--red);color:#fff}
+        .ra{padding:12px 20px 20px;display:flex;gap:10px;flex-wrap:wrap}
+        .ra .btn-r,.ra .btn-d{flex:1;min-width:90px;justify-content:center}
 
-        .app-title {
-            font-size: clamp(1.5rem, 4vw, 2.1rem);
-            font-weight: 900;
-            color: var(--white);
-            letter-spacing: 0.04em;
-            margin-bottom: 10px;
-        }
-        .app-title span { color: var(--red); }
-        .app-subtitle {
-            font-size: 0.92rem;
-            color: var(--white-40);
-            line-height: 1.6;
-            max-width: 460px;
-            margin: 0 auto;
-        }
+        /* PROCESSING */
+        .po{display:none;position:fixed;inset:0;background:var(--overlay);backdrop-filter:blur(12px);z-index:9998;align-items:center;justify-content:center}
+        .po.a{display:flex}
+        .pb2{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:40px;text-align:center;max-width:380px;width:90%;transition:background .35s,border-color .35s}
+        .psp{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--red);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .pb2 h5{font-weight:700;color:var(--fg);margin-bottom:4px;font-size:.9rem;transition:color .35s}
+        .pb2 p{font-size:.78rem;color:var(--fg4);margin-bottom:12px;transition:color .35s}
+        .ppb{height:5px;border-radius:99px;background:var(--border);overflow:hidden;transition:background .35s}
+        .ppf{height:100%;border-radius:99px;background:var(--red);transition:width .3s ease;width:0%}
+        .pps{font-size:.7rem;color:var(--fg4);margin-top:8px;transition:color .35s}
 
-        /* ===== AI STATUS ===== */
-        .ai-status {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 5px 14px; border-radius: 99px;
-            font-size: 0.72rem; font-weight: 600; margin-top: 14px;
-        }
-        .ai-status.loading { background: var(--white-05); color: var(--white-40); }
-        .ai-status.ready { background: var(--red-soft2); color: var(--red); }
-        .ai-status.error { background: rgba(255,50,50,0.12); color: #ff4444; }
-        .ai-status .dot { width: 6px; height: 6px; border-radius: 50%; }
-        .ai-status.loading .dot { background: var(--white-40); animation: pulse 1.5s infinite; }
-        .ai-status.ready .dot { background: var(--red); }
-        .ai-status.error .dot { background: #ff4444; }
-        @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+        /* SHARE */
+        .so{display:none;position:fixed;inset:0;background:var(--overlay);backdrop-filter:blur(8px);z-index:9997;align-items:center;justify-content:center}
+        .so.a{display:flex}
+        .sb2{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;text-align:center;max-width:360px;width:90%;transition:background .35s,border-color .35s}
+        .sb2 h5{font-weight:700;margin-bottom:18px;color:var(--fg);font-size:.9rem;transition:color .35s}
+        .si-r{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+        .si{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#fff;transition:all .3s;cursor:pointer;text-decoration:none}
+        .si:hover{transform:scale(1.15)}
+        .si.wa{background:#25D366}.si.fb{background:#1877F2}.si.ig{background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)}.si.tg{background:#0088CC}.si.tw{background:#1DA1F2}
+        .sc2{margin-top:16px;background:var(--fg05);border:1px solid var(--border);color:var(--fg6);padding:8px 22px;border-radius:10px;font-weight:600;font-size:.8rem;cursor:pointer;transition:all .3s}
+        .sc2:hover{border-color:var(--red);color:var(--red)}
 
-        /* ===== CARD ===== */
-        .upload-card {
-            background: var(--black-card);
-            border: 1px solid var(--black-border);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            transition: var(--transition);
-        }
+        /* TOAST */
+        .tw2{position:fixed;top:70px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+        .ti2{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:8px;font-size:.8rem;font-weight:500;color:var(--fg8);animation:tIn .3s ease;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,.3);transition:background .35s,border-color .35s}
+        .ti2.success{border-left:3px solid var(--red)}.ti2.error{border-left:3px solid #f44}.ti2.info{border-left:3px solid var(--fg4)}
+        @keyframes tIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+        @keyframes tOut{from{opacity:1}to{opacity:0;transform:translateX(30px)}}
 
-        /* ===== UPLOAD AREA ===== */
-        .upload-area {
-            padding: 60px 36px;
-            text-align: center; cursor: pointer;
-            transition: var(--transition);
-            border: 2px dashed var(--black-border);
-            border-radius: var(--radius);
-            margin: 20px;
-        }
-        .upload-area:hover, .upload-area.dragover {
-            border-color: var(--red);
-            background: var(--red-soft);
-        }
-        .upload-area.dragover { transform: scale(1.005); }
+        .ft2{position:relative;z-index:1;text-align:center;padding:16px;font-size:.7rem;color:var(--fg2);transition:color .35s}
+        .ft2 a{color:var(--fg4);text-decoration:none;transition:color .3s}.ft2 a:hover{color:var(--red)}
 
-        .upload-icon-wrap {
-            width: 68px; height: 68px; border-radius: 50%;
-            background: var(--red-soft);
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 18px; transition: var(--transition);
-        }
-        .upload-icon-wrap i { font-size: 1.5rem; color: var(--red); transition: var(--transition); }
-        .upload-area:hover .upload-icon-wrap { background: var(--red); }
-        .upload-area:hover .upload-icon-wrap i { color: var(--white); }
-
-        .upload-text { font-size: 1rem; font-weight: 600; color: var(--white-80); margin-bottom: 6px; }
-        .upload-subtext { font-size: 0.8rem; color: var(--white-40); margin-bottom: 14px; }
-
-        .format-badges { display: inline-flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
-        .format-badge {
-            background: var(--white-05); color: var(--white-40);
-            padding: 3px 10px; border-radius: 6px;
-            font-size: 0.68rem; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.06em;
-        }
-
-        /* ===== PREVIEW ===== */
-        .preview-section { display: none; }
-        .preview-section.active { display: block; }
-
-        .section-bar {
-            padding: 14px 22px;
-            border-bottom: 1px solid var(--black-border);
-            display: flex; align-items: center; justify-content: space-between;
-        }
-        .section-bar-title {
-            font-weight: 700; font-size: 0.88rem; color: var(--white-80);
-            display: flex; align-items: center; gap: 8px;
-        }
-        .section-bar-title i { color: var(--red); }
-
-        .img-wrap { padding: 22px; text-align: center; }
-        .img-wrap img {
-            max-width: 100%; max-height: 400px;
-            border-radius: var(--radius-sm); display: block; margin: 0 auto;
-        }
-        .file-info { font-size: 0.78rem; color: var(--white-40); margin-top: 10px; }
-
-        .action-bar { padding: 14px 22px 22px; display: flex; gap: 10px; flex-wrap: wrap; }
-
-        /* ===== BUTTONS ===== */
-        .btn-red {
-            background: var(--red); color: var(--white); border: none;
-            padding: 13px 26px; border-radius: var(--radius-sm);
-            font-weight: 700; font-size: 0.88rem;
-            display: inline-flex; align-items: center; gap: 8px;
-            cursor: pointer; transition: var(--transition);
-            box-shadow: 0 4px 20px var(--red-glow);
-            text-decoration: none;
-        }
-        .btn-red:hover {
-            background: var(--red-bright);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px var(--red-glow);
-            color: var(--white);
-        }
-        .btn-red:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-        .btn-dark {
-            background: var(--white-05); color: var(--white-60);
-            border: 1px solid var(--black-border);
-            padding: 12px 20px; border-radius: var(--radius-sm);
-            font-weight: 600; font-size: 0.82rem;
-            display: inline-flex; align-items: center; gap: 8px;
-            cursor: pointer; transition: var(--transition); text-decoration: none;
-        }
-        .btn-dark:hover { border-color: var(--red); color: var(--red); background: var(--red-soft); }
-        .btn-sm { padding: 7px 14px; font-size: 0.76rem; }
-
-        /* ===== RESULT ===== */
-        .result-section { display: none; }
-        .result-section.active { display: block; }
-
-        .comparison-container {
-            position: relative; width: 100%; overflow: hidden;
-            border-radius: var(--radius-sm); cursor: ew-resize; user-select: none;
-            background: repeating-conic-gradient(var(--black-border) 0% 25%, var(--black-soft) 0% 50%) 0 0 / 20px 20px;
-        }
-        .comparison-container img { display: block; width: 100%; height: auto; }
-        .comparison-after { position: absolute; top:0; left:0; width:50%; height:100%; overflow: hidden; }
-        .comparison-after img { width: 200%; max-width: none; }
-        .comparison-slider {
-            position: absolute; top:0; left:50%; width:3px; height:100%;
-            background: var(--red); transform: translateX(-50%); z-index: 10;
-        }
-        .comparison-handle {
-            position: absolute; top:50%; left:50%; transform: translate(-50%,-50%);
-            width:40px; height:40px; background: var(--red); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            color: var(--white); font-size: 0.85rem;
-            box-shadow: 0 0 20px var(--red-glow);
-        }
-        .comparison-label {
-            position: absolute; bottom: 12px; padding: 4px 12px; border-radius: 99px;
-            font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.06em; z-index: 5;
-        }
-        .lbl-before { left: 12px; background: rgba(0,0,0,0.75); color: var(--white-80); }
-        .lbl-after { right: 12px; background: var(--red); color: var(--white); }
-
-        .result-actions { padding: 14px 22px 22px; display: flex; gap: 10px; flex-wrap: wrap; }
-        .result-actions .btn-red, .result-actions .btn-dark { flex:1; min-width:100px; justify-content:center; }
-
-        /* ===== PROCESSING OVERLAY ===== */
-        .processing-overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(12px);
-            z-index: 9998; align-items: center; justify-content: center;
-        }
-        .processing-overlay.active { display: flex; }
-        .processing-box {
-            background: var(--black-card); border: 1px solid var(--black-border);
-            border-radius: var(--radius-lg); padding: 44px; text-align: center;
-            max-width: 400px; width: 90%;
-        }
-        .processing-spinner {
-            width: 48px; height: 48px;
-            border: 3px solid var(--black-border);
-            border-top-color: var(--red);
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-            margin: 0 auto 18px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .processing-box h5 { font-weight: 700; color: var(--white); margin-bottom: 6px; font-size: 0.95rem; }
-        .processing-box p { font-size: 0.8rem; color: var(--white-40); margin-bottom: 14px; }
-        .processing-bar { height: 6px; border-radius: 99px; background: var(--black-border); overflow: hidden; }
-        .processing-fill { height: 100%; border-radius: 99px; background: var(--red); transition: width 0.3s ease; width: 0%; }
-        .processing-step { font-size: 0.72rem; color: var(--white-40); margin-top: 8px; font-weight: 500; }
-
-        /* ===== SHARE MODAL ===== */
-        .share-overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
-            z-index: 9997; align-items: center; justify-content: center;
-        }
-        .share-overlay.active { display: flex; }
-        .share-box {
-            background: var(--black-card); border: 1px solid var(--black-border);
-            border-radius: var(--radius-lg); padding: 30px; text-align: center;
-            max-width: 380px; width: 90%;
-        }
-        .share-box h5 { font-weight: 700; margin-bottom: 20px; color: var(--white); font-size: 0.95rem; }
-        .share-icons-row { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
-        .share-ico {
-            width: 48px; height: 48px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; color: var(--white); transition: var(--transition);
-            cursor: pointer; text-decoration: none;
-        }
-        .share-ico:hover { transform: scale(1.15); }
-        .share-ico.wa { background: #25D366; }
-        .share-ico.fb { background: #1877F2; }
-        .share-ico.ig { background: linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); }
-        .share-ico.tg { background: #0088CC; }
-        .share-ico.tw { background: #1DA1F2; }
-        .share-close {
-            margin-top: 18px; background: var(--white-05); border: 1px solid var(--black-border);
-            color: var(--white-60); padding: 9px 24px; border-radius: var(--radius-sm);
-            font-weight: 600; font-size: 0.82rem; cursor: pointer; transition: var(--transition);
-        }
-        .share-close:hover { border-color: var(--red); color: var(--red); }
-
-        /* ===== TOAST ===== */
-        .toast-wrap { position: fixed; top: 76px; right: 16px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
-        .toast-item {
-            background: var(--black-card); border: 1px solid var(--black-border);
-            border-radius: var(--radius-sm); padding: 12px 16px;
-            display: flex; align-items: center; gap: 10px;
-            font-size: 0.82rem; font-weight: 500; color: var(--white-80);
-            animation: toastIn 0.3s ease; min-width: 250px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-        }
-        .toast-item.success { border-left: 3px solid var(--red); }
-        .toast-item.error { border-left: 3px solid #ff4444; }
-        .toast-item.info { border-left: 3px solid var(--white-40); }
-        @keyframes toastIn { from{opacity:0;transform:translateX(30px);} to{opacity:1;transform:translateX(0);} }
-        @keyframes toastOut { from{opacity:1;} to{opacity:0;transform:translateX(30px);} }
-
-        /* ===== FOOTER ===== */
-        .footer-mini {
-            text-align: center; padding: 20px;
-            font-size: 0.72rem; color: var(--white-20);
-            position: relative; z-index: 1;
-        }
-        .footer-mini a { color: var(--white-40); text-decoration: none; transition: var(--transition); }
-        .footer-mini a:hover { color: var(--red); }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 576px) {
-            .upload-area { padding: 40px 18px; margin: 14px; }
-            .action-bar, .result-actions { flex-direction: column; }
-            .action-bar .btn-red, .action-bar .btn-dark,
-            .result-actions .btn-red, .result-actions .btn-dark { width:100%; justify-content:center; }
-            .processing-box { padding: 30px 20px; }
-            .app-header { margin-bottom: 28px; }
-            .navbar-brand-text { font-size: 0.88rem; }
+        @media(max-width:576px){
+            .up-area{padding:40px 18px;margin:14px}
+            .abar,.ra{flex-direction:column}.abar .btn-r,.abar .btn-d,.ra .btn-r,.ra .btn-d{width:100%;justify-content:center}
+            .pb2{padding:28px 18px}
         }
     </style>
 </head>
 <body>
-
-    <div class="bg-glow-1"></div>
-    <div class="bg-glow-2"></div>
-    <div class="bg-grid"></div>
+    <div class="bg1"></div><div class="bg2"></div>
 
     <!-- NAVBAR -->
-    <nav class="navbar navbar-custom fixed-top" id="mainNav">
-        <div class="container">
-            <a class="navbar-brand-link" href="#">
-                <!-- INLINE SVG LOGO — Tidak pecah, tidak bergantung URL -->
-                <svg class="navbar-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="100" height="100" rx="18" fill="#000"/>
-                    <line x1="20" y1="25" x2="50" y2="75" stroke="#DC0000" stroke-width="6" stroke-linecap="round"/>
-                    <line x1="50" y1="75" x2="80" y2="25" stroke="#DC0000" stroke-width="6" stroke-linecap="round"/>
-                    <line x1="30" y1="50" x2="70" y2="50" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
-                    <line x1="35" y1="30" x2="35" y2="70" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
-                    <line x1="65" y1="30" x2="65" y2="70" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
-                    <rect x="18" y="22" width="64" height="56" rx="4" fill="none" stroke="#DC0000" stroke-width="2" opacity="0.3"/>
-                </svg>
-                <div class="navbar-brand-text">KARYA ABADI<br><span>Remove Photo Background</span></div>
+    <nav class="navbar navbar-c fixed-top" id="mainNav">
+        <div class="container d-flex align-items-center justify-content-between">
+            <a class="nb-link" href="#">
+                <img src="https://z-cdn-media.chatglm.cn/files/62242f3c-116c-484e-a5ec-0f587c90f268.png?auth_key=1880176404-45e3b7618d7e406db5bcdb4bb1275ca7-0-2541488488a0873713f7886d6e09f992" alt="Logo" class="nb-logo">
+                <div class="nb-text">KARYA ABADI<br><span>Remove Photo Background</span></div>
             </a>
+            <button class="dm-btn" id="dmToggle" title="Dark/Light Mode">
+                <i class="fa-solid fa-sun"></i>
+            </button>
         </div>
     </nav>
 
     <!-- MAIN -->
-    <div class="main-content">
-        <div class="app-container">
-
-            <!-- Header -->
-            <div class="app-header">
-                <div class="app-logo-wrap">
-                    <svg class="app-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="100" height="100" rx="18" fill="#000"/>
-                        <line x1="20" y1="25" x2="50" y2="75" stroke="#DC0000" stroke-width="6" stroke-linecap="round"/>
-                        <line x1="50" y1="75" x2="80" y2="25" stroke="#DC0000" stroke-width="6" stroke-linecap="round"/>
-                        <line x1="30" y1="50" x2="70" y2="50" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
-                        <line x1="35" y1="30" x2="35" y2="70" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
-                        <line x1="65" y1="30" x2="65" y2="70" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
-                        <rect x="18" y="22" width="64" height="56" rx="4" fill="none" stroke="#DC0000" stroke-width="2" opacity="0.3"/>
-                    </svg>
-                </div>
-                <h1 class="app-title">KARYA ABADI <span>Remove Background</span></h1>
-                <p class="app-subtitle">Hapus background foto secara otomatis dengan AI. Gratis, cepat, dan 100% diproses di browser Anda.</p>
-                <div id="aiStatus" class="ai-status loading"><span class="dot"></span> Memuat AI Engine...</div>
-            </div>
-
-            <!-- Card -->
-            <div class="upload-card" id="uploadCard">
-
-                <!-- Upload -->
+    <div class="main-c">
+        <div class="app-c">
+            <div class="card" id="uploadCard">
+                <!-- UPLOAD -->
                 <div id="uploadAreaWrap">
-                    <div class="upload-area" id="uploadArea">
-                        <div class="upload-icon-wrap"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-                        <div class="upload-text">Seret foto ke sini atau klik untuk memilih</div>
-                        <div class="upload-subtext">JPG, PNG, WEBP — Maks 20 MB</div>
-                        <div class="format-badges">
-                            <span class="format-badge">JPG</span>
-                            <span class="format-badge">PNG</span>
-                            <span class="format-badge">WEBP</span>
-                        </div>
+                    <div class="up-area" id="uploadArea">
+                        <div class="up-ic"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                        <div class="up-t">UPLOAD</div>
+                        <div class="up-f1">JPG, PNG, WEBP</div>
+                        <div class="up-f2">Maks 20 MB</div>
                         <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp" hidden>
                     </div>
                 </div>
-
-                <!-- Preview -->
-                <div id="previewSection" class="preview-section">
-                    <div class="section-bar">
-                        <div class="section-bar-title"><i class="fa-solid fa-image"></i> Preview</div>
-                        <button class="btn-dark btn-sm" id="removeBtn"><i class="fa-solid fa-xmark"></i> Hapus</button>
-                    </div>
-                    <div class="img-wrap">
-                        <img id="previewImg" src="" alt="Preview">
-                        <div id="fileInfo" class="file-info"></div>
-                    </div>
-                    <div class="action-bar">
-                        <button class="btn-red" id="removeBgBtn" style="flex:1;justify-content:center;">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i> Remove Background
-                        </button>
-                    </div>
+                <!-- PREVIEW -->
+                <div id="previewSection" class="ps">
+                    <div class="sbar"><div class="sbar-t"><i class="fa-solid fa-image"></i> Preview</div><button class="btn-d btn-sm" id="removeBtn"><i class="fa-solid fa-xmark"></i> Hapus</button></div>
+                    <div class="iw"><img id="previewImg" src="" alt="Preview"><div id="fileInfo" class="fi2"></div></div>
+                    <div class="abar"><button class="btn-r" id="removeBgBtn" style="flex:1;justify-content:center"><i class="fa-solid fa-wand-magic-sparkles"></i> Remove Background</button></div>
                 </div>
-
-                <!-- Result -->
-                <div id="resultSection" class="result-section">
-                    <div class="section-bar">
-                        <div class="section-bar-title"><i class="fa-solid fa-check-circle"></i> Hasil</div>
-                        <button class="btn-dark btn-sm" id="newUploadBtn"><i class="fa-solid fa-plus"></i> Baru</button>
-                    </div>
-                    <div class="img-wrap">
-                        <div class="comparison-container" id="comparisonContainer">
-                            <img id="resultBeforeImg" src="" alt="Before">
-                            <div class="comparison-after" id="comparisonAfter">
-                                <img id="resultAfterImg" src="" alt="After">
-                            </div>
-                            <div class="comparison-slider" id="comparisonSlider">
-                                <div class="comparison-handle"><i class="fa-solid fa-arrows-left-right"></i></div>
-                            </div>
-                            <span class="comparison-label lbl-before">Before</span>
-                            <span class="comparison-label lbl-after">After</span>
+                <!-- RESULT -->
+                <div id="resultSection" class="rs2">
+                    <div class="sbar"><div class="sbar-t"><i class="fa-solid fa-check-circle"></i> Hasil</div><button class="btn-d btn-sm" id="newUploadBtn"><i class="fa-solid fa-plus"></i> Baru</button></div>
+                    <div class="iw">
+                        <div class="cc" id="compC">
+                            <img id="resBefore" src="" alt="Before">
+                            <div class="cc-a" id="compAfter"><img id="resAfter" src="" alt="After"></div>
+                            <div class="cc-sl" id="compSlider"><div class="cc-h"><i class="fa-solid fa-arrows-left-right"></i></div></div>
+                            <span class="cc-l lb">Before</span><span class="cc-l la">After</span>
                         </div>
                     </div>
-                    <div class="result-actions">
-                        <button class="btn-red" id="downloadPng"><i class="fa-solid fa-download"></i> PNG HD</button>
-                        <button class="btn-dark" id="downloadJpg"><i class="fa-solid fa-image"></i> JPG Putih</button>
-                        <button class="btn-dark" id="shareBtn"><i class="fa-solid fa-share-nodes"></i> Share</button>
-                        <button class="btn-dark" id="uploadNewResult"><i class="fa-solid fa-cloud-arrow-up"></i> Baru</button>
+                    <div class="ra">
+                        <button class="btn-r" id="dlPng"><i class="fa-solid fa-download"></i> PNG HD</button>
+                        <button class="btn-d" id="dlJpg"><i class="fa-solid fa-image"></i> JPG Putih</button>
+                        <button class="btn-d" id="shareBtn"><i class="fa-solid fa-share-nodes"></i> Share</button>
+                        <button class="btn-d" id="upNewR"><i class="fa-solid fa-cloud-arrow-up"></i> Baru</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- FOOTER -->
-    <div class="footer-mini">© 2026 <a href="#">KARYA ABADI</a> Remove Photo Background. All Rights Reserved.</div>
+    <div class="ft2">© 2026 <a href="#">KARYA ABADI</a> Remove Photo Background. All Rights Reserved.</div>
 
     <!-- PROCESSING -->
-    <div class="processing-overlay" id="processingOverlay">
-        <div class="processing-box">
-            <div class="processing-spinner"></div>
-            <h5 id="processingTitle">Memproses Foto...</h5>
-            <p id="processingDesc">AI sedang menghapus background</p>
-            <div class="processing-bar"><div class="processing-fill" id="processingFill"></div></div>
-            <div class="processing-step" id="processingStep">Menginisialisasi...</div>
+    <div class="po" id="procOv">
+        <div class="pb2">
+            <div class="psp"></div>
+            <h5 id="pT">Memproses Foto...</h5>
+            <p id="pD">AI sedang menghapus background</p>
+            <div class="ppb"><div class="ppf" id="pF"></div></div>
+            <div class="pps" id="pS">Menginisialisasi...</div>
         </div>
     </div>
 
     <!-- SHARE -->
-    <div class="share-overlay" id="shareModal">
-        <div class="share-box">
-            <h5><i class="fa-solid fa-share-nodes me-2" style="color:var(--red);"></i>Bagikan</h5>
-            <div class="share-icons-row">
-                <a class="share-ico wa" href="#" id="shareWa" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
-                <a class="share-ico fb" href="#" id="shareFb" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
-                <a class="share-ico ig" href="#" id="shareIg"><i class="fa-brands fa-instagram"></i></a>
-                <a class="share-ico tg" href="#" id="shareTg" target="_blank"><i class="fa-brands fa-telegram"></i></a>
-                <a class="share-ico tw" href="#" id="shareTw" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+    <div class="so" id="shareM">
+        <div class="sb2">
+            <h5><i class="fa-solid fa-share-nodes me-2" style="color:var(--red)"></i>Bagikan</h5>
+            <div class="si-r">
+                <a class="si wa" href="#" id="sWa" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+                <a class="si fb" href="#" id="sFb" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
+                <a class="si ig" href="#" id="sIg"><i class="fa-brands fa-instagram"></i></a>
+                <a class="si tg" href="#" id="sTg" target="_blank"><i class="fa-brands fa-telegram"></i></a>
+                <a class="si tw" href="#" id="sTw" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
             </div>
-            <button class="share-close" id="closeShare">Tutup</button>
+            <button class="sc2" id="cShare">Tutup</button>
         </div>
     </div>
 
-    <div class="toast-wrap" id="toastWrap"></div>
-    <canvas id="exportCanvas" style="display:none;"></canvas>
-    <canvas id="refineCanvas" style="display:none;"></canvas>
+    <div class="tw2" id="toastW"></div>
+    <canvas id="expC" style="display:none"></canvas>
+    <canvas id="refC" style="display:none"></canvas>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         const $ = id => document.getElementById(id);
-        window.addEventListener('scroll', () => $('mainNav').classList.toggle('scrolled', window.scrollY > 30));
 
-        function showToast(msg, type='info') {
-            const w = $('toastWrap'), t = document.createElement('div');
-            t.className = `toast-item ${type}`;
-            const ic = {success:'fa-check-circle', error:'fa-exclamation-circle', info:'fa-info-circle'};
-            const cl = {success:'var(--red)', error:'#ff4444', info:'var(--white-40)'};
-            t.innerHTML = `<i class="fa-solid ${ic[type]}" style="color:${cl[type]};"></i> ${msg}`;
-            w.appendChild(t);
-            setTimeout(() => { t.style.animation='toastOut 0.3s ease forwards'; setTimeout(()=>t.remove(),300); }, 3500);
+        /* ═══════════════════════════════════
+           DARK MODE — Fully Working
+           ═══════════════════════════════════ */
+        const html = document.documentElement;
+        const dmBtn = $('dmToggle');
+        const stored = localStorage.getItem('ka-theme');
+
+        // Set initial theme
+        if (stored) {
+            html.setAttribute('data-theme', stored);
+        } else {
+            html.setAttribute('data-theme', 'dark');
+        }
+        updateDmIcon();
+
+        dmBtn.addEventListener('click', function() {
+            const current = html.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('ka-theme', next);
+            updateDmIcon();
+        });
+
+        function updateDmIcon() {
+            const theme = html.getAttribute('data-theme');
+            if (theme === 'dark') {
+                dmBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
+            } else {
+                dmBtn.innerHTML = '<i class="fa-solid fa-moon"></i>';
+            }
         }
 
-        document.addEventListener('keydown', e => {
-            if (e.key==='Escape') { $('shareModal').classList.remove('active'); $('processingOverlay').classList.remove('active'); }
+        /* ═══════════════════════════════════
+           TOAST
+           ═══════════════════════════════════ */
+        function showToast(m, t) {
+            t = t || 'info';
+            var w = $('toastW'), e = document.createElement('div');
+            e.className = 'ti2 ' + t;
+            var icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
+            var colors = { success: 'var(--red)', error: '#f44', info: 'var(--fg4)' };
+            e.innerHTML = '<i class="fa-solid ' + icons[t] + '" style="color:' + colors[t] + '"></i> ' + m;
+            w.appendChild(e);
+            setTimeout(function() {
+                e.style.animation = 'tOut .3s ease forwards';
+                setTimeout(function() { e.remove(); }, 300);
+            }, 3500);
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                $('shareM').classList.remove('a');
+                $('procOv').classList.remove('a');
+            }
         });
     </script>
 
     <script type="module">
         const $ = id => document.getElementById(id);
-        let removeBackgroundFn = null, aiReady = false;
-        let uploadedFile = null, originalImageDataUrl = null, processedBlob = null, processedImageDataUrl = null;
-        const aiStatusEl = $('aiStatus');
+        let rBFn = null, aiOK = false, uFile = null, origDu = null, pBlob = null, pDu = null;
 
-        loadAIEngine();
-
-        async function loadAIEngine() {
+        // Load AI Engine silently
+        (async function() {
             try {
-                aiStatusEl.className = 'ai-status loading';
-                aiStatusEl.innerHTML = '<span class="dot"></span> Memuat AI Engine...';
-                const mod = await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm');
-                removeBackgroundFn = mod.default || mod.removeBackground || mod;
-                if (typeof removeBackgroundFn !== 'function') {
-                    for (const k of Object.keys(mod)) { if (typeof mod[k]==='function') { removeBackgroundFn = mod[k]; break; } }
+                const m = await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm');
+                rBFn = m.default || m.removeBackground || m;
+                if (typeof rBFn !== 'function') {
+                    for (const k of Object.keys(m)) { if (typeof m[k] === 'function') { rBFn = m[k]; break; } }
                 }
-                aiReady = true;
-                aiStatusEl.className = 'ai-status ready';
-                aiStatusEl.innerHTML = '<span class="dot"></span> AI Siap ✓';
-            } catch(e) {
+                aiOK = true;
+                console.log('✅ AI ready');
+            } catch (e) {
                 console.error('AI failed:', e);
-                aiStatusEl.className = 'ai-status error';
-                aiStatusEl.innerHTML = '<span class="dot"></span> Gagal — Reload halaman';
+                showToast('AI gagal dimuat — Reload halaman', 'error');
             }
-        }
+        })();
 
         // UPLOAD
         $('uploadArea').addEventListener('click', () => $('fileInput').click());
-        $('fileInput').addEventListener('change', e => { if (e.target.files.length) handleFile(e.target.files[0]); });
-        const ua = $('uploadArea');
+        $('fileInput').addEventListener('change', e => { if (e.target.files.length) hFile(e.target.files[0]); });
+        var ua = $('uploadArea');
         ua.addEventListener('dragover', e => { e.preventDefault(); ua.classList.add('dragover'); });
         ua.addEventListener('dragleave', () => ua.classList.remove('dragover'));
-        ua.addEventListener('drop', e => { e.preventDefault(); ua.classList.remove('dragover'); if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]); });
+        ua.addEventListener('drop', e => { e.preventDefault(); ua.classList.remove('dragover'); if (e.dataTransfer.files.length) hFile(e.dataTransfer.files[0]); });
 
-        function handleFile(file) {
-            if (!['image/jpeg','image/png','image/webp'].includes(file.type)) { showToast('Format tidak didukung.','error'); return; }
-            if (file.size > 20*1024*1024) { showToast('File melebihi 20 MB.','error'); return; }
-            uploadedFile = file;
-            const reader = new FileReader();
-            reader.onload = e => {
-                originalImageDataUrl = e.target.result;
-                $('previewImg').src = originalImageDataUrl;
-                $('fileInfo').textContent = `${file.name} • ${(file.size/1024/1024).toFixed(2)} MB`;
+        function hFile(f) {
+            if (!['image/jpeg', 'image/png', 'image/webp'].includes(f.type)) { showToast('Format tidak didukung.', 'error'); return; }
+            if (f.size > 20 * 1024 * 1024) { showToast('File melebihi 20 MB.', 'error'); return; }
+            uFile = f;
+            var r = new FileReader();
+            r.onload = e => {
+                origDu = e.target.result; $('previewImg').src = origDu;
+                $('fileInfo').textContent = f.name + ' • ' + (f.size / 1024 / 1024).toFixed(2) + ' MB';
                 $('uploadAreaWrap').style.display = 'none';
-                $('previewSection').classList.add('active');
-                $('resultSection').classList.remove('active');
-                showToast('Foto berhasil diupload!','success');
+                $('previewSection').classList.add('a'); $('resultSection').classList.remove('a');
+                showToast('Foto berhasil diupload!', 'success');
             };
-            reader.readAsDataURL(file);
+            r.readAsDataURL(f);
         }
 
-        function resetUpload() {
-            uploadedFile=null; originalImageDataUrl=null; processedBlob=null; processedImageDataUrl=null;
-            $('fileInput').value='';
-            $('uploadAreaWrap').style.display='block';
-            $('previewSection').classList.remove('active');
-            $('resultSection').classList.remove('active');
+        function reset() {
+            uFile = null; origDu = null; pBlob = null; pDu = null;
+            $('fileInput').value = ''; $('uploadAreaWrap').style.display = 'block';
+            $('previewSection').classList.remove('a'); $('resultSection').classList.remove('a');
         }
-        $('removeBtn').addEventListener('click', resetUpload);
-        $('newUploadBtn').addEventListener('click', resetUpload);
-        $('uploadNewResult').addEventListener('click', resetUpload);
+        $('removeBtn').addEventListener('click', reset);
+        $('newUploadBtn').addEventListener('click', reset);
+        $('upNewR').addEventListener('click', reset);
 
         // PROCESS
-        $('removeBgBtn').addEventListener('click', processImage);
-
-        async function processImage() {
-            if (!uploadedFile) return;
-            if (!aiReady||!removeBackgroundFn) { showToast('AI belum siap. Tunggu atau reload.','error'); return; }
-
-            const ov=$('processingOverlay'), pF=$('processingFill'), pS=$('processingStep'), pT=$('processingTitle'), pD=$('processingDesc');
-            ov.classList.add('active'); pF.style.width='0%'; pS.textContent='Mempersiapkan...';
-            $('removeBgBtn').disabled = true;
-
+        $('removeBgBtn').addEventListener('click', process);
+        async function process() {
+            if (!uFile) return;
+            if (!aiOK || !rBFn) { showToast('AI belum siap. Tunggu atau reload.', 'error'); return; }
+            var ov = $('procOv'), pF = $('pF'), pS = $('pS'), pT = $('pT'), pD = $('pD');
+            ov.classList.add('a'); pF.style.width = '0%'; pS.textContent = 'Mempersiapkan...'; $('removeBgBtn').disabled = true;
             try {
-                const blob = await removeBackgroundFn(uploadedFile, {
-                    model: 'large',
-                    output: { format: 'image/png', quality: 1.0 },
-                    progress: (key, cur, tot) => {
-                        const pct = tot>0 ? Math.round((cur/tot)*100) : 0;
-                        if (key.includes('fetch')||key.includes('download')) {
-                            pT.textContent='Mengunduh AI Model...';
-                            pD.textContent='Model besar (~70MB) untuk hasil lebih bersih. Akan di-cache.';
-                            pS.textContent=`Download: ${pct}%`;
-                        } else if (key.includes('compute')||key.includes('inference')) {
-                            pT.textContent='Memproses Foto...';
-                            pD.textContent='AI sedang menghapus background';
-                            pS.textContent=`Proses: ${pct}%`;
-                        } else { pS.textContent=`${key}: ${pct}%`; }
-                        const c = parseInt(pF.style.width)||0;
-                        pF.style.width = Math.max(pct,c)+'%';
+                var blob = await rBFn(uFile, {
+                    model: 'large', output: { format: 'image/png', quality: 1 },
+                    progress: function(k, c, t) {
+                        var p = t > 0 ? Math.round(c / t * 100) : 0;
+                        if (k.includes('fetch') || k.includes('download')) { pT.textContent = 'Mengunduh AI Model...'; pD.textContent = 'Model besar. Akan di-cache.'; pS.textContent = 'Download: ' + p + '%'; }
+                        else if (k.includes('compute') || k.includes('inference')) { pT.textContent = 'Memproses Foto...'; pD.textContent = 'AI menghapus background'; pS.textContent = 'Proses: ' + p + '%'; }
+                        else { pS.textContent = k + ': ' + p + '%'; }
+                        var cu = parseInt(pF.style.width) || 0; pF.style.width = Math.max(p, cu) + '%';
                     }
                 });
-
-                pT.textContent='Memperhalus Tepi...'; pD.textContent='Menyempurnakan hasil'; pS.textContent='Refining...'; pF.style.width='95%';
-                const refined = await refineEdges(blob);
-                processedBlob = refined||blob;
-                processedImageDataUrl = await blobToDataUrl(processedBlob);
-                pF.style.width='100%'; pS.textContent='Selesai! ✓';
-
-                setTimeout(()=>{ ov.classList.remove('active'); showResult(); showToast('Background berhasil dihapus! 🎉','success'); }, 500);
-            } catch(e) {
-                console.error(e); ov.classList.remove('active');
-                showToast('Gagal: '+(e.message||'Error'),'error');
-            } finally { $('removeBgBtn').disabled=false; }
+                pT.textContent = 'Memperhalus Tepi...'; pD.textContent = '7-tahap refinement'; pS.textContent = 'Refining...'; pF.style.width = '92%';
+                var ref = await refine7(blob);
+                pBlob = ref || blob; pDu = await b2d(pBlob); pF.style.width = '100%'; pS.textContent = 'Selesai! ✓';
+                setTimeout(function() { ov.classList.remove('a'); showR(); showToast('Background berhasil dihapus! 🎉', 'success'); }, 500);
+            } catch (e) { console.error(e); ov.classList.remove('a'); showToast('Gagal: ' + (e.message || 'Error'), 'error'); }
+            finally { $('removeBgBtn').disabled = false; }
         }
 
-        // EDGE REFINEMENT
-        async function refineEdges(blob) {
-            return new Promise(resolve => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas=$('refineCanvas'), ctx=canvas.getContext('2d',{willReadFrequently:true});
-                    const w=img.width, h=img.height;
-                    const maxD=2048; let sc=1;
-                    if (w>maxD||h>maxD) sc=maxD/Math.max(w,h);
-                    const sw=Math.round(w*sc), sh=Math.round(h*sc);
-                    canvas.width=sw; canvas.height=sh;
-                    ctx.drawImage(img,0,0,sw,sh);
-                    const imageData=ctx.getImageData(0,0,sw,sh), data=imageData.data;
+        // ═══════════════════════════════════════
+        // 7-TAHAP POST-PROCESSING
+        // ═══════════════════════════════════════
+        async function refine7(blob) {
+            return new Promise(function(resolve) {
+                var img = new Image();
+                img.onload = function() {
+                    var cv = $('refC'), ctx = cv.getContext('2d', { willReadFrequently: true });
+                    var ow = img.width, oh = img.height, mx = 2048, sc = 1;
+                    if (ow > mx || oh > mx) sc = mx / Math.max(ow, oh);
+                    var w = Math.round(ow * sc), h = Math.round(oh * sc);
+                    cv.width = w; cv.height = h; ctx.drawImage(img, 0, 0, w, h);
+                    var id = ctx.getImageData(0, 0, w, h), d = id.data, len = w * h;
 
-                    // 1. Remove fringe
-                    for (let i=0;i<data.length;i+=4) {
-                        const a=data[i+3];
-                        if (a>0&&a<25) data[i+3]=0;
-                        else if (a>=25&&a<70) { data[i]=Math.round(data[i]*0.5); data[i+1]=Math.round(data[i+1]*0.5); data[i+2]=Math.round(data[i+2]*0.5); data[i+3]=Math.round(a*0.5); }
+                    // 1) Extract alpha
+                    var alpha = new Float32Array(len);
+                    for (var i = 0; i < len; i++) alpha[i] = d[i * 4 + 3];
+
+                    // 2) Aggressive threshold
+                    for (var i = 0; i < len; i++) { if (alpha[i] < 128) alpha[i] = 0; else alpha[i] = 255; }
+
+                    // 3) Morphological closing (3 pass)
+                    for (var pass = 0; pass < 3; pass++) {
+                        var dil = new Uint8Array(len);
+                        for (var y = 1; y < h - 1; y++) for (var x = 1; x < w - 1; x++) {
+                            var m = 0; for (var dy = -1; dy <= 1; dy++) for (var dx = -1; dx <= 1; dx++) m = Math.max(m, alpha[(y + dy) * w + (x + dx)]);
+                            dil[y * w + x] = m;
+                        }
+                        var ero = new Uint8Array(len);
+                        for (var y = 1; y < h - 1; y++) for (var x = 1; x < w - 1; x++) {
+                            var m = 255; for (var dy = -1; dy <= 1; dy++) for (var dx = -1; dx <= 1; dx++) m = Math.min(m, dil[(y + dy) * w + (x + dx)]);
+                            ero[y * w + x] = m;
+                        }
+                        for (var i = 0; i < len; i++) { if (alpha[i] === 0 && ero[i] > 0) alpha[i] = ero[i]; }
                     }
 
-                    // 2. Morphological closing
-                    const al=new Uint8Array(sw*sh);
-                    for (let i=0;i<sw*sh;i++) al[i]=data[i*4+3]>128?1:0;
-                    const dil=new Uint8Array(sw*sh);
-                    for (let y=1;y<sh-1;y++) for (let x=1;x<sw-1;x++) {
-                        let s=0; for (let dy=-1;dy<=1;dy++) for (let dx=-1;dx<=1;dx++) s+=al[(y+dy)*sw+(x+dx)];
-                        dil[y*sw+x]=s>=3?1:0;
-                    }
-                    const cls=new Uint8Array(sw*sh);
-                    for (let y=1;y<sh-1;y++) for (let x=1;x<sw-1;x++) {
-                        let all=1; for (let dy=-1;dy<=1;dy++) for (let dx=-1;dx<=1;dx++) if(!dil[(y+dy)*sw+(x+dx)]) all=0;
-                        cls[y*sw+x]=all;
-                    }
-                    for (let i=0;i<sw*sh;i++) {
-                        if (data[i*4+3]===0&&cls[i]===1) {
-                            const x=i%sw, y=Math.floor(i/sw);
-                            let rS=0,gS=0,bS=0,cnt=0;
-                            for (let dy=-2;dy<=2;dy++) for (let dx=-2;dx<=2;dx++) {
-                                const nx=x+dx,ny=y+dy;
-                                if (nx>=0&&nx<sw&&ny>=0&&ny<sh) { const ni=(ny*sw+nx)*4; if(data[ni+3]>128){rS+=data[ni];gS+=data[ni+1];bS+=data[ni+2];cnt++;} }
+                    // 4) Remove small isolated regions
+                    (function() {
+                        var vis = new Uint8Array(len), stk = [], MIN = 50;
+                        for (var y2 = 0; y2 < h; y2++) for (var x2 = 0; x2 < w; x2++) {
+                            var idx = y2 * w + x2;
+                            if (alpha[idx] > 0 && !vis[idx]) {
+                                var reg = []; stk.push(idx); vis[idx] = 1;
+                                while (stk.length) {
+                                    var ci = stk.pop(); reg.push(ci);
+                                    var cx = ci % w, cy = Math.floor(ci / w);
+                                    [[cx - 1, cy], [cx + 1, cy], [cx, cy - 1], [cx, cy + 1]].forEach(function(n) {
+                                        var nx = n[0], ny = n[1];
+                                        if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
+                                            var ni = ny * w + nx; if (!vis[ni] && alpha[ni] > 0) { vis[ni] = 1; stk.push(ni); }
+                                        }
+                                    });
+                                }
+                                if (reg.length < MIN) for (var j = 0; j < reg.length; j++) alpha[reg[j]] = 0;
                             }
-                            if (cnt>0) { data[i*4]=Math.round(rS/cnt); data[i*4+1]=Math.round(gS/cnt); data[i*4+2]=Math.round(bS/cnt); data[i*4+3]=255; }
                         }
+                    })();
+
+                    // 5) Edge feathering (3 pass)
+                    for (var pass = 0; pass < 3; pass++) {
+                        var sm = new Float32Array(len);
+                        for (var y = 0; y < h; y++) for (var x = 0; x < w; x++) {
+                            var idx = y * w + x, a = alpha[idx], isB = false;
+                            if (y > 0 && y < h - 1 && x > 0 && x < w - 1) {
+                                var u = alpha[(y - 1) * w + x], dn = alpha[(y + 1) * w + x], lt = alpha[y * w + x - 1], rt = alpha[y * w + x + 1];
+                                if ((a > 0 && (u === 0 || dn === 0 || lt === 0 || rt === 0)) || (a === 0 && (u > 0 || dn > 0 || lt > 0 || rt > 0))) isB = true;
+                            }
+                            if (isB) {
+                                var s = a * 4, wt = 4;
+                                [[-1, 0, 2], [1, 0, 2], [0, -1, 2], [0, 1, 2], [-1, -1, 1], [1, -1, 1], [-1, 1, 1], [1, 1, 1]].forEach(function(n) {
+                                    var ny = y + n[0], nx = x + n[1], ww = n[2];
+                                    if (ny >= 0 && ny < h && nx >= 0 && nx < w) { s += alpha[ny * w + nx] * ww; wt += ww; }
+                                });
+                                sm[idx] = s / wt;
+                            } else sm[idx] = a;
+                        }
+                        for (var i = 0; i < len; i++) alpha[i] = sm[i];
                     }
 
-                    // 3. Alpha edge smoothing
-                    const fA=new Uint8Array(sw*sh);
-                    for (let y=0;y<sh;y++) for (let x=0;x<sw;x++) {
-                        const idx=y*sw+x, a=data[idx*4+3]; let near=false;
-                        if (y>0&&y<sh-1&&x>0&&x<sw-1) {
-                            const u=data[((y-1)*sw+x)*4+3],d2=data[((y+1)*sw+x)*4+3],l=data[(y*sw+x-1)*4+3],r=data[(y*sw+x+1)*4+3];
-                            if ((a>128&&(u<128||d2<128||l<128||r<128))||(a<=128&&(u>128||d2>128||l>128||r>128))) near=true;
-                        }
-                        if (near) {
-                            let sm=a*4,wt=4;
-                            const nb=[[-1,0,2],[1,0,2],[0,-1,2],[0,1,2],[-1,-1,1],[1,-1,1],[-1,1,1],[1,1,1]];
-                            for (const [dy,dx,w2] of nb) { const ny=y+dy,nx=x+dx; if(ny>=0&&ny<sh&&nx>=0&&nx<sw){sm+=data[(ny*sw+nx)*4+3]*w2;wt+=w2;} }
-                            fA[idx]=Math.round(sm/wt);
-                        } else fA[idx]=a;
+                    // 6) Color decontamination
+                    for (var y = 0; y < h; y++) for (var x = 0; x < w; x++) {
+                        var idx = y * w + x, a = alpha[idx];
+                        if (a > 0 && a < 255) {
+                            var bR = 0, bG = 0, bB = 0, bC = 0;
+                            for (var dy = -8; dy <= 8; dy++) for (var dx = -8; dx <= 8; dx++) {
+                                var ny = y + dy, nx = x + dx;
+                                if (ny >= 0 && ny < h && nx >= 0 && nx < w) {
+                                    var ni = ny * w + nx;
+                                    if (alpha[ni] === 0) { bR += d[ni * 4]; bG += d[ni * 4 + 1]; bB += d[ni * 4 + 2]; bC++; }
+                                }
+                            }
+                            if (bC > 3) {
+                                bR /= bC; bG /= bC; bB /= bC;
+                                var f = a / 255, inv = 1 - f;
+                                d[idx * 4] = Math.max(0, Math.min(255, Math.round((d[idx * 4] - bR * inv) / f)));
+                                d[idx * 4 + 1] = Math.max(0, Math.min(255, Math.round((d[idx * 4 + 1] - bG * inv) / f)));
+                                d[idx * 4 + 2] = Math.max(0, Math.min(255, Math.round((d[idx * 4 + 2] - bB * inv) / f)));
+                            }
+                            d[idx * 4 + 3] = Math.round(a);
+                        } else if (a === 0) { d[idx * 4 + 3] = 0; } else { d[idx * 4 + 3] = 255; }
                     }
-                    for (let i=0;i<sw*sh;i++) data[i*4+3]=fA[i];
-                    ctx.putImageData(imageData,0,0);
-                    canvas.toBlob(b=>resolve(b),'image/png');
+
+                    // 7) Final anti-aliasing
+                    (function() {
+                        var fA = new Uint8Array(len);
+                        for (var y3 = 1; y3 < h - 1; y3++) for (var x3 = 1; x3 < w - 1; x3++) {
+                            var idx = y3 * w + x3, a = d[idx * 4 + 3];
+                            var u = d[((y3 - 1) * w + x3) * 4 + 3], dn = d[((y3 + 1) * w + x3) * 4 + 3];
+                            var lt = d[(y3 * w + x3 - 1) * 4 + 3], rt = d[(y3 * w + x3 + 1) * 4 + 3];
+                            var isE = (a > 0 && a < 255) || (a === 255 && (u === 0 || dn === 0 || lt === 0 || rt === 0)) || (a === 0 && ((u > 0 && dn > 0) || (lt > 0 && rt > 0)));
+                            if (isE) {
+                                var sa = a * 4, sw = 4;
+                                [[-1, 0, 2], [1, 0, 2], [0, -1, 2], [0, 1, 2]].forEach(function(n) {
+                                    var ny = y3 + n[0], nx = x3 + n[1], ww = n[2];
+                                    if (ny >= 0 && ny < h && nx >= 0 && nx < w) { sa += d[(ny * w + nx) * 4 + 3] * ww; sw += ww; }
+                                });
+                                fA[idx] = Math.round(sa / sw);
+                            } else fA[idx] = a;
+                        }
+                        for (var i = 0; i < len; i++) if (fA[i] > 0) d[i * 4 + 3] = fA[i];
+                    })();
+
+                    ctx.putImageData(id, 0, 0);
+                    cv.toBlob(function(b) { resolve(b); }, 'image/png');
                 };
-                img.onerror=()=>resolve(null);
-                img.src=URL.createObjectURL(blob);
+                img.onerror = function() { resolve(null); };
+                img.src = URL.createObjectURL(blob);
             });
         }
 
-        function blobToDataUrl(b) { return new Promise((r,j)=>{const rd=new FileReader();rd.onload=()=>r(rd.result);rd.onerror=j;rd.readAsDataURL(b);}); }
+        function b2d(b) { return new Promise(function(r, j) { var rd = new FileReader(); rd.onload = function() { r(rd.result); }; rd.onerror = j; rd.readAsDataURL(b); }); }
 
-        function showResult() {
-            $('resultBeforeImg').src=originalImageDataUrl;
-            $('resultAfterImg').src=processedImageDataUrl;
-            $('previewSection').classList.remove('active');
-            $('resultSection').classList.add('active');
-            $('comparisonAfter').style.width='50%';
-            $('comparisonSlider').style.left='50%';
-            setTimeout(()=>$('resultSection').scrollIntoView({behavior:'smooth',block:'center'}),200);
+        function showR() {
+            $('resBefore').src = origDu; $('resAfter').src = pDu;
+            $('previewSection').classList.remove('a'); $('resultSection').classList.add('a');
+            $('compAfter').style.width = '50%'; $('compSlider').style.left = '50%';
+            setTimeout(function() { $('resultSection').scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 200);
         }
 
         // SLIDER
-        const cc=$('comparisonContainer'); let sliding=false;
-        cc.addEventListener('mousedown',()=>sliding=true);
-        cc.addEventListener('touchstart',()=>sliding=true,{passive:true});
-        document.addEventListener('mousemove',e=>{if(sliding)mS(e);});
-        document.addEventListener('touchmove',e=>{if(sliding)mS(e);},{passive:true});
-        document.addEventListener('mouseup',()=>sliding=false);
-        document.addEventListener('touchend',()=>sliding=false);
-        function mS(e) {
-            const r=cc.getBoundingClientRect();
-            const x=Math.max(0,Math.min((e.touches?e.touches[0].clientX:e.clientX)-r.left,r.width));
-            const p=(x/r.width)*100;
-            $('comparisonAfter').style.width=p+'%';
-            $('comparisonSlider').style.left=p+'%';
+        var cc = $('compC'), sl = false;
+        cc.addEventListener('mousedown', function() { sl = true; });
+        cc.addEventListener('touchstart', function() { sl = true; }, { passive: true });
+        document.addEventListener('mousemove', function(e) { if (sl) mSl(e); });
+        document.addEventListener('touchmove', function(e) { if (sl) mSl(e); }, { passive: true });
+        document.addEventListener('mouseup', function() { sl = false; });
+        document.addEventListener('touchend', function() { sl = false; });
+        function mSl(e) {
+            var r = cc.getBoundingClientRect();
+            var x = Math.max(0, Math.min((e.touches ? e.touches[0].clientX : e.clientX) - r.left, r.width));
+            var p = x / r.width * 100;
+            $('compAfter').style.width = p + '%'; $('compSlider').style.left = p + '%';
         }
 
         // DOWNLOADS
-        $('downloadPng').addEventListener('click',()=>{ if(processedBlob){dLB(processedBlob,'karya-abadi-nobg.png');showToast('PNG HD berhasil!','success');} });
-        $('downloadJpg').addEventListener('click',()=>{
-            if(!processedImageDataUrl) return;
-            const img=new Image(); img.onload=()=>{
-                const cv=$('exportCanvas');cv.width=img.width;cv.height=img.height;
-                const ctx=cv.getContext('2d');ctx.fillStyle='#FFF';ctx.fillRect(0,0,cv.width,cv.height);ctx.drawImage(img,0,0);
-                cv.toBlob(b=>{dLB(b,'karya-abadi-whitebg.jpg');showToast('JPG berhasil!','success');},'image/jpeg',0.95);
-            }; img.src=processedImageDataUrl;
+        $('dlPng').addEventListener('click', function() { if (pBlob) { dLB(pBlob, 'karya-abadi-nobg.png'); showToast('PNG HD berhasil!', 'success'); } });
+        $('dlJpg').addEventListener('click', function() {
+            if (!pDu) return;
+            var img = new Image(); img.onload = function() {
+                var cv = $('expC'); cv.width = img.width; cv.height = img.height;
+                var ctx = cv.getContext('2d'); ctx.fillStyle = '#FFF'; ctx.fillRect(0, 0, cv.width, cv.height); ctx.drawImage(img, 0, 0);
+                cv.toBlob(function(b) { dLB(b, 'karya-abadi-whitebg.jpg'); showToast('JPG berhasil!', 'success'); }, 'image/jpeg', 0.95);
+            }; img.src = pDu;
         });
-        function dLB(blob,name) { const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(()=>URL.revokeObjectURL(u),1000); }
+        function dLB(b, n) { var u = URL.createObjectURL(b), a = document.createElement('a'); a.href = u; a.download = n; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(function() { URL.revokeObjectURL(u); }, 1000); }
 
         // SHARE
-        $('shareBtn').addEventListener('click',()=>$('shareModal').classList.add('active'));
-        $('closeShare').addEventListener('click',()=>$('shareModal').classList.remove('active'));
-        $('shareModal').addEventListener('click',e=>{if(e.target===$('shareModal'))$('shareModal').classList.remove('active');});
-        const sT='Hapus background foto otomatis dengan AI di KARYA ABADI!',sU=window.location.href;
-        $('shareWa').href=`https://wa.me/?text=${encodeURIComponent(sT+' '+sU)}`;
-        $('shareFb').href=`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(sU)}`;
-        $('shareTw').href=`https://twitter.com/intent/tweet?text=${encodeURIComponent(sT)}&url=${encodeURIComponent(sU)}`;
-        $('shareTg').href=`https://t.me/share/url?url=${encodeURIComponent(sU)}&text=${encodeURIComponent(sT)}`;
-        $('shareIg').addEventListener('click',e=>{e.preventDefault();showToast('Download hasil lalu share ke Instagram! 📸','info');});
+        $('shareBtn').addEventListener('click', function() { $('shareM').classList.add('a'); });
+        $('cShare').addEventListener('click', function() { $('shareM').classList.remove('a'); });
+        $('shareM').addEventListener('click', function(e) { if (e.target === $('shareM')) $('shareM').classList.remove('a'); });
+        var sT = 'Hapus background foto otomatis dengan AI di KARYA ABADI!', sU = window.location.href;
+        $('sWa').href = 'https://wa.me/?text=' + encodeURIComponent(sT + ' ' + sU);
+        $('sFb').href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(sU);
+        $('sTw').href = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(sT) + '&url=' + encodeURIComponent(sU);
+        $('sTg').href = 'https://t.me/share/url?url=' + encodeURIComponent(sU) + '&text=' + encodeURIComponent(sT);
+        $('sIg').addEventListener('click', function(e) { e.preventDefault(); showToast('Download hasil lalu share ke Instagram! 📸', 'info'); });
     </script>
 </body>
 </html>
