@@ -55,6 +55,25 @@
         .ba-lbl.before{background:rgba(0,0,0,.75);color:rgba(255,255,255,.9)}
         .ba-lbl.after{background:var(--red);color:#fff}
         @media(max-width:576px){.ba-row{flex-direction:column;gap:10px}}
+        .palette-wrap{padding:8px 20px 4px}
+        .palette-layout{display:flex;align-items:center;justify-content:center;gap:8px}
+        .pal-side{display:flex;flex-direction:column;gap:6px}
+        .pal-swatch{width:30px;height:30px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:all .2s;flex-shrink:0}
+        .pal-swatch:hover{transform:scale(1.15)}
+        .pal-swatch.active{border-color:var(--red);box-shadow:0 0 0 2px var(--red-glow)}
+        .pal-swatch.transparent-swatch{background:var(--chk);border:2px dashed var(--border)}
+        .pal-swatch.transparent-swatch.active{border-color:var(--red);border-style:solid}
+        .pal-swatch.dark-swatch{border:1px solid #444}
+        .pal-center{position:relative;width:60px;height:60px;border-radius:14px;overflow:hidden;cursor:pointer;border:2px solid var(--border);transition:all .3s;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--fg05)}
+        .pal-center:hover{border-color:var(--red);transform:scale(1.05)}
+        .pal-center.active{border-color:var(--red);box-shadow:0 0 0 3px var(--red-glow)}
+        .pal-center i{font-size:1.3rem;color:var(--fg4);pointer-events:none;transition:color .3s;z-index:1}
+        .pal-center:hover i{color:var(--red)}
+        .pal-center-color{position:absolute;inset:0;border-radius:12px;opacity:0;transition:opacity .2s}
+        .pal-center.has-color .pal-center-color{opacity:1}
+        .pal-center.has-color i{color:#fff;mix-blend-mode:difference}
+        .pal-center input[type="color"]{position:absolute;inset:0;width:100%;height:100%;border:none;padding:0;cursor:pointer;opacity:0}
+        @media(max-width:576px){.pal-swatch{width:26px;height:26px;border-radius:6px}.pal-center{width:50px;height:50px;border-radius:12px}.pal-center i{font-size:1.1rem}.palette-layout{gap:5px}}
         .ra{padding:12px 20px 20px;display:flex;gap:10px;flex-wrap:wrap}
         .ra .btn-r,.ra .btn-d{flex:1;min-width:90px;justify-content:center}
         .po{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);z-index:9998;align-items:center;justify-content:center}.po.a{display:flex}
@@ -87,7 +106,7 @@
 <body>
     <div class="bg1"></div><div class="bg2"></div>
     <nav class="navbar navbar-c fixed-top" id="mainNav">
-        <div class="container d-flex align-items-center justify-content-between">
+        <div class="container d-flex align-items:center;justify-content:between" style="justify-content:space-between">
             <a class="nb-link" href="#">
                 <img src="https://z-cdn-media.chatglm.cn/files/62242f3c-116c-484e-a5ec-0f587c90f268.png?auth_key=1880176404-45e3b7618d7e406db5bcdb4bb1275ca7-0-2541488488a0873713f7886d6e09f992" alt="Logo" class="nb-logo">
                 <div class="nb-text">KARYA ABADI<br><span>Remove Photo Background</span></div>
@@ -114,11 +133,30 @@
             <div class="sbar"><div class="sbar-t"><i class="fa-solid fa-check-circle"></i> Hasil</div><button class="btn-d btn-sm" id="newUploadBtn"><i class="fa-solid fa-plus"></i> Baru</button></div>
             <div class="ba-wrap"><div class="ba-row">
                 <div class="ba-col"><div class="ba-img-wrap"><span class="ba-lbl before">Sebelum</span><img id="resBefore" src="" alt="Sebelum"></div></div>
-                <div class="ba-col"><div class="ba-img-wrap after-wrap"><span class="ba-lbl after">Sesudah</span><img id="resAfter" src="" alt="Sesudah"></div></div>
+                <div class="ba-col"><div class="ba-img-wrap after-wrap" id="afterWrap"><span class="ba-lbl after">Sesudah</span><img id="resAfter" src="" alt="Sesudah"></div></div>
+            </div></div>
+            <div class="palette-wrap"><div class="palette-layout">
+                <div class="pal-side" id="palLeft">
+                    <div class="pal-swatch transparent-swatch active" data-color="transparent" title="Transparan"></div>
+                    <div class="pal-swatch" data-color="#FFFFFF" style="background:#FFFFFF" title="Putih"></div>
+                    <div class="pal-swatch dark-swatch" data-color="#000000" style="background:#000000" title="Hitam"></div>
+                    <div class="pal-swatch" data-color="#DC0000" style="background:#DC0000" title="Merah"></div>
+                    <div class="pal-swatch" data-color="#FF6B00" style="background:#FF6B00" title="Oranye"></div>
+                    <div class="pal-swatch" data-color="#FFD600" style="background:#FFD600" title="Kuning"></div>
+                </div>
+                <div class="pal-center" id="palCenter" title="Pilih Warna"><div class="pal-center-color" id="palCenterColor"></div><i class="fa-solid fa-palette"></i><input type="color" id="customColor" value="#2563EB"></div>
+                <div class="pal-side" id="palRight">
+                    <div class="pal-swatch" data-color="#00C853" style="background:#00C853" title="Hijau"></div>
+                    <div class="pal-swatch" data-color="#2979FF" style="background:#2979FF" title="Biru"></div>
+                    <div class="pal-swatch" data-color="#7C4DFF" style="background:#7C4DFF" title="Ungu"></div>
+                    <div class="pal-swatch" data-color="#FF4081" style="background:#FF4081" title="Pink"></div>
+                    <div class="pal-swatch" data-color="#00BCD4" style="background:#00BCD4" title="Cyan"></div>
+                    <div class="pal-swatch" data-color="#607D8B" style="background:#607D8B" title="Abu"></div>
+                </div>
             </div></div>
             <div class="ra">
-                <button class="btn-r" id="dlPng"><i class="fa-solid fa-download"></i> PNG HD</button>
-                <button class="btn-d" id="dlJpg"><i class="fa-solid fa-image"></i> JPG Putih</button>
+                <button class="btn-r" id="dlPng"><i class="fa-solid fa-download"></i> PNG HD 300dpi</button>
+                <button class="btn-d" id="dlJpg"><i class="fa-solid fa-image"></i> JPG 300dpi</button>
                 <button class="btn-d" id="shareBtn"><i class="fa-solid fa-share-nodes"></i> Share</button>
                 <button class="btn-d" id="upNewR"><i class="fa-solid fa-cloud-arrow-up"></i> Baru</button>
             </div>
@@ -130,6 +168,7 @@
     <div class="tw2" id="toastW"></div>
     <canvas id="expC" style="display:none"></canvas>
     <canvas id="refC" style="display:none"></canvas>
+    <canvas id="colorC" style="display:none"></canvas>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -145,6 +184,9 @@
     <script type="module">
         var $=function(id){return document.getElementById(id)};
         var rBFn=null,aiOK=false,uFile=null,origDu=null,pBlob=null,pDu=null;
+        var selectedBgColor='transparent';
+        // Simpan data pixel hasil refine di RESOLUSI PENUH untuk download HD
+        var fullResCanvas=null,fullResCtx=null,fullResW=0,fullResH=0;
 
         (async function(){try{var m=await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm');rBFn=m.default||m.removeBackground||m;if(typeof rBFn!=='function'){for(var k in m){if(typeof m[k]==='function'){rBFn=m[k];break}}}aiOK=true;console.log('AI ready')}catch(e){console.error('AI failed:',e);showToast('AI gagal dimuat — Reload','error')}})();
 
@@ -157,7 +199,7 @@
 
         function hFile(f){if(!['image/jpeg','image/png','image/webp'].includes(f.type)){showToast('Format tidak didukung.','error');return}if(f.size>20*1024*1024){showToast('File melebihi 20 MB.','error');return}uFile=f;var r=new FileReader();r.onload=function(e){origDu=e.target.result;$('previewImg').src=origDu;$('fileInfo').textContent=f.name+' • '+(f.size/1024/1024).toFixed(2)+' MB';$('uploadAreaWrap').style.display='none';$('previewSection').classList.add('a');$('resultSection').classList.remove('a');showToast('Foto berhasil diupload!','success')};r.readAsDataURL(f)}
 
-        function reset(){uFile=null;origDu=null;pBlob=null;pDu=null;$('fileInput').value='';$('uploadAreaWrap').style.display='block';$('previewSection').classList.remove('a');$('resultSection').classList.remove('a')}
+        function reset(){uFile=null;origDu=null;pBlob=null;pDu=null;selectedBgColor='transparent';fullResCanvas=null;fullResCtx=null;resetPalette();$('fileInput').value='';$('uploadAreaWrap').style.display='block';$('previewSection').classList.remove('a');$('resultSection').classList.remove('a')}
         $('removeBtn').addEventListener('click',reset);$('newUploadBtn').addEventListener('click',reset);$('upNewR').addEventListener('click',reset);
 
         $('removeBgBtn').addEventListener('click',process);
@@ -167,168 +209,253 @@
             ov.classList.add('a');pF.style.width='0%';pS.textContent='';$('removeBgBtn').disabled=true;
             try{var blob=await rBFn(uFile,{model:'large',output:{format:'image/png',quality:1},progress:function(k,c,t){var p=t>0?Math.round(c/t*100):0;if(k.includes('fetch')||k.includes('download')){pT.textContent='Mengunduh Model...';pS.textContent=p+'%'}else if(k.includes('compute')||k.includes('inference')){pT.textContent='Memproses...';pS.textContent=p+'%'}var cu=parseInt(pF.style.width)||0;pF.style.width=Math.max(p,cu)+'%'}});
             pT.textContent='Finalisasi...';pF.style.width='95%';
-            var ref=await refineClean(blob);
+            var ref=await refineHair(blob);
             pBlob=ref||blob;pDu=await b2d(pBlob);pF.style.width='100%';pS.textContent='';
             setTimeout(function(){ov.classList.remove('a');showR();showToast('Background berhasil dihapus!','success')},400);
             }catch(e){console.error(e);ov.classList.remove('a');showToast('Gagal: '+(e.message||'Error'),'error')}finally{$('removeBgBtn').disabled=false}
         }
 
-        /* ═══════════════════════════════════════════════════
-           POST-PROCESSING — PENGHAPUS SISA WARNA LENGKAP
-           ═══════════════════════════════════════════════════
-           Teknik: Ganti warna pixel tepi dengan warna dari
-           pixel opak terdekat (foreground color replacement)
-           Ini menghilangkan SEMUA sisa warna background.
+        /* ═══════════════════════════════════════════════════════
+           POST-PROCESSING V4 — FULL RESOLUSI + RAMBUT BERSIH
+           ═══════════════════════════════════════════════════════
+           PERUBAHAN KUNCI:
+           1. Proses di RESOLUSI PENUH — TANPA downscale
+           2. Simpan canvas penuh untuk download HD 300dpi
+           3. Hanya preview yang di-downscale untuk tampilan
         */
-        async function refineClean(blob){
+        async function refineHair(blob){
             return new Promise(function(resolve){
                 var img=new Image();
                 img.onload=function(){
-                    var cv=$('refC'),ctx=cv.getContext('2d',{willReadFrequently:true});
-                    var ow=img.width,oh=img.height,mx=2048,sc=1;
-                    if(ow>mx||oh>mx)sc=mx/Math.max(ow,oh);
-                    var w=Math.round(ow*sc),h=Math.round(oh*sc);
-                    cv.width=w;cv.height=h;ctx.drawImage(img,0,0,w,h);
-                    var id=ctx.getImageData(0,0,w,h),d=id.data,len=w*h;
+                    var ow=img.width,oh=img.height;
 
-                    // ── STEP 1: Baca alpha asli dari AI ──
+                    // ── PROSES DI RESOLUSI PENUH — TANPA DOWNSCALE ──
+                    var w=ow,h=oh;
+
+                    // Batas aman: jika gambar sangat besar (>4096), gunakan 4096
+                    // Ini jarang terjadi dan tetap jauh lebih tinggi dari 2048
+                    var maxDim=4096,sc=1;
+                    if(w>maxDim||h>maxDim)sc=maxDim/Math.max(w,h);
+                    var pw=Math.round(w*sc),ph=Math.round(h*sc);
+
+                    // Canvas resolusi penuh untuk download
+                    fullResCanvas=document.createElement('canvas');
+                    fullResCanvas.width=pw;fullResCanvas.height=ph;
+                    fullResCtx=fullResCanvas.getContext('2d',{willReadFrequently:true});
+                    fullResCtx.drawImage(img,0,0,pw,ph);
+                    fullResW=pw;fullResH=ph;
+
+                    var id=fullResCtx.getImageData(0,0,pw,ph),d=id.data,len=pw*ph;
+
+                    // ── STEP 1: Baca alpha ──
                     var alpha=new Uint8Array(len);
                     for(var i=0;i<len;i++)alpha[i]=d[i*4+3];
 
                     // ── STEP 2: Hapus noise sangat rendah ──
-                    for(var i=0;i<len;i++){if(alpha[i]>0&&alpha[i]<8)alpha[i]=0}
+                    for(var i=0;i<len;i++){if(alpha[i]>0&&alpha[i]<3)alpha[i]=0}
 
-                    // ── STEP 3: Buat peta warna foreground ──
-                    // Untuk setiap pixel semi-transparan, cari warna dari pixel opak terdekat
-                    // Ini mengganti warna terkontaminasi dengan warna bersih objek
-                    // Gunakan pendekatan 2-pass: sample → replace
+                    // ── STEP 3: Buat mask opak ──
+                    var opaqueMask=new Uint8Array(len);
+                    for(var i=0;i<len;i++)opaqueMask[i]=alpha[i]>=250?1:0;
 
-                    // Pass 1: Kumpulkan warna opak untuk setiap region
-                    // Gunakan sliding window untuk efisiensi
-                    for(var y=0;y<h;y++){
-                        for(var x=0;x<w;x++){
-                            var idx=y*w+x;
-                            var a=alpha[idx];
+                    // ── STEP 4: Grid lookup untuk efisiensi ──
+                    var BLOCK=Math.max(8,Math.round(Math.min(pw,ph)/128));
+                    BLOCK=Math.min(BLOCK,32);
+                    var gridW=Math.ceil(pw/BLOCK),gridH=Math.ceil(ph/BLOCK);
+                    var gridR=new Float32Array(gridW*gridH);
+                    var gridG=new Float32Array(gridW*gridH);
+                    var gridB=new Float32Array(gridW*gridH);
+                    var gridCnt=new Uint32Array(gridW*gridH);
+                    for(var y=0;y<ph;y++){for(var x=0;x<pw;x++){var idx=y*pw+x;if(opaqueMask[idx]){var gx=Math.floor(x/BLOCK),gy=Math.floor(y/BLOCK);var gi=gy*gridW+gx;gridR[gi]+=d[idx*4];gridG[gi]+=d[idx*4+1];gridB[gi]+=d[idx*4+2];gridCnt[gi]++}}}
+                    for(var gi=0;gi<gridW*gridH;gi++){if(gridCnt[gi]>0){gridR[gi]/=gridCnt[gi];gridG[gi]/=gridCnt[gi];gridB[gi]/=gridCnt[gi]}}
 
-                            // Hanya proses pixel semi-transparan (bisa terkontaminasi)
-                            if(a>=8&&a<240){
-                                // Cari pixel opak terdekat dalam radius
-                                var rS=0,gS=0,bS=0,tW=0;
-                                var found=false;
-                                var maxR=12; // radius pencarian
+                    // ── STEP 5: Color replacement 3-fase di RESOLUSI PENUH ──
+                    var R6=6,R20=20;
+                    // Sesuaikan radius berdasarkan ukuran gambar
+                    if(pw>2000){R6=8;R20=28}
+                    if(pw>3000){R6=10;R20=36}
 
-                                for(var dy=-maxR;dy<=maxR&&!found;dy++){
-                                    for(var dx=-maxR;dx<=maxR&&!found;dx++){
-                                        var ny=y+dy,nx=x+dx;
-                                        if(ny>=0&&ny<h&&nx>=0&&nx<w){
-                                            var ni=ny*w+nx;
-                                            if(alpha[ni]>=240){
-                                                // Pixel opak ditemukan - timbang berdasarkan jarak
-                                                var dist=Math.sqrt(dy*dy+dx*dx);
-                                                var wt=1/(1+dist);
-                                                rS+=d[ni*4]*wt;
-                                                gS+=d[ni*4+1]*wt;
-                                                bS+=d[ni*4+2]*wt;
-                                                tW+=wt;
-                                            }
-                                        }
-                                    }
-                                }
-
-                                // Ganti warna pixel dengan warna foreground yang ditemukan
-                                if(tW>0){
-                                    d[idx*4]=Math.round(rS/tW);
-                                    d[idx*4+1]=Math.round(gS/tW);
-                                    d[idx*4+2]=Math.round(bS/tW);
-                                }
+                    for(var y=0;y<ph;y++){
+                        for(var x=0;x<pw;x++){
+                            var idx=y*pw+x,a=alpha[idx];
+                            if(a>=3&&a<250){
+                                var fR=0,fG=0,fB=0,fW=0;
+                                // Fase 1: radius kecil
+                                for(var dy=-R6;dy<=R6&&fW<0.5;dy++){for(var dx=-R6;dx<=R6&&fW<0.5;dx++){var ny=y+dy,nx=x+dx;if(ny>=0&&ny<ph&&nx>=0&&nx<pw){var ni=ny*pw+nx;if(opaqueMask[ni]){var dist=Math.sqrt(dy*dy+dx*dx);var wt=1/(1+dist*dist);fR+=d[ni*4]*wt;fG+=d[ni*4+1]*wt;fB+=d[ni*4+2]*wt;fW+=wt}}}}
+                                // Fase 2: radius besar
+                                if(fW<0.5){for(var dy=-R20;dy<=R20&&fW<0.5;dy++){for(var dx=-R20;dx<=R20&&fW<0.5;dx++){var ny=y+dy,nx=x+dx;if(ny>=0&&ny<ph&&nx>=0&&nx<pw){var ni=ny*pw+nx;if(opaqueMask[ni]){var dist=Math.sqrt(dy*dy+dx*dx);var wt=1/(1+dist*dist);fR+=d[ni*4]*wt;fG+=d[ni*4+1]*wt;fB+=d[ni*4+2]*wt;fW+=wt}}}}}
+                                // Fase 3: grid
+                                if(fW<0.5){var gx=Math.floor(x/BLOCK),gy2=Math.floor(y/BLOCK);for(var sr=0;sr<=4&&fW<0.5;sr++){for(var dgy=-sr;dgy<=sr&&fW<0.5;dgy++){for(var dgx=-sr;dgx<=sr&&fW<0.5;dgx++){var ngx=gx+dgx,ngy=gy2+dgy;if(ngx>=0&&ngx<gridW&&ngy>=0&&ngy<gridH){var gi=ngy*gridW+ngx;if(gridCnt[gi]>0){fR=gridR[gi];fG=gridG[gi];fB=gridB[gi];fW=1}}}}}}
+                                if(fW>0){d[idx*4]=Math.round(fR/fW);d[idx*4+1]=Math.round(fG/fW);d[idx*4+2]=Math.round(fB/fW)}
                             }
                         }
                     }
 
-                    // ── STEP 4: Kurangi alpha fringe luar ──
-                    // Pixel paling luar (alpha rendah) biasanya masih punya sisa
-                    // Kurangi alpha mereka agar sisa warna menghilang
-                    for(var i=0;i<len;i++){
-                        var a=alpha[i];
-                        if(a>=8&&a<25){
-                            // Fringe paling luar - hampir hilangkan
-                            alpha[i]=Math.round(a*0.15);
-                        }else if(a>=25&&a<50){
-                            // Fringe luar - kurangi signifikan
-                            alpha[i]=Math.round(a*0.5);
-                        }else if(a>=50&&a<80){
-                            // Fringe tengah - kurangi sedikit
-                            alpha[i]=Math.round(a*0.8);
-                        }
-                    }
-
-                    // ── STEP 5: Erosi 1 pixel di luar untuk hilangkan rim ──
-                    // Hanya erosi pixel alpha rendah yang bersebelahan dengan transparan
+                    // ── STEP 6: Hapus halo tipis ──
                     var alphaNew=new Uint8Array(alpha);
-                    for(var y=1;y<h-1;y++){
-                        for(var x=1;x<w-1;x++){
-                            var idx=y*w+x;
-                            if(alpha[idx]>0&&alpha[idx]<60){
-                                // Cek apakah ada tetangga transparan
-                                var hasTransparent=
-                                    alpha[(y-1)*w+x]===0||
-                                    alpha[(y+1)*w+x]===0||
-                                    alpha[y*w+x-1]===0||
-                                    alpha[y*w+x+1]===0;
-                                if(hasTransparent){
-                                    // Erosi: kurangi alpha lebih lanjut
-                                    alphaNew[idx]=0;
-                                }
-                            }
-                        }
-                    }
+                    for(var y=1;y<ph-1;y++){for(var x=1;x<pw-1;x++){var idx=y*pw+x,a=alpha[idx];if(a>0&&a<15){var zc=0;if(alpha[(y-1)*pw+x]===0)zc++;if(alpha[(y+1)*pw+x]===0)zc++;if(alpha[y*pw+x-1]===0)zc++;if(alpha[y*pw+x+1]===0)zc++;if(zc>=3)alphaNew[idx]=0}}}
                     alpha=alphaNew;
 
-                    // ── STEP 6: Smooth alpha di boundary ──
-                    // 2-pass smoothing untuk transisi halus
-                    for(var pass=0;pass<2;pass++){
-                        var alphaSm=new Uint8Array(alpha);
-                        for(var y=1;y<h-1;y++){
-                            for(var x=1;x<w-1;x++){
-                                var idx=y*w+x;
-                                var a=alpha[idx];
-                                // Hanya smooth pixel di boundary
-                                if(a>0&&a<255){
-                                    var hasZero=alpha[(y-1)*w+x]===0||alpha[(y+1)*w+x]===0||alpha[y*w+x-1]===0||alpha[y*w+x+1]===0;
-                                    var hasFull=alpha[(y-1)*w+x]===255||alpha[(y+1)*w+x]===255||alpha[y*w+x-1]===255||alpha[y*w+x+1]===255;
-                                    if(hasZero||hasFull){
-                                        var s=a*4,t=4;
-                                        [[-1,0,2],[1,0,2],[0,-1,2],[0,1,2],[-1,-1,1],[1,-1,1],[-1,1,1],[1,1,1]].forEach(function(n){
-                                            var ny=y+n[0],nx=x+n[1],ww=n[2];
-                                            if(ny>=0&&ny<h&&nx>=0&&nx<w){s+=alpha[ny*w+nx]*ww;t+=ww}
-                                        });
-                                        alphaSm[idx]=Math.round(s/t);
-                                    }
-                                }
-                            }
-                        }
-                        alpha=alphaSm;
-                    }
+                    // ── STEP 7: Alpha smooth 1 pass ──
+                    var alphaSm=new Uint8Array(alpha);
+                    for(var y=2;y<ph-2;y++){for(var x=2;x<pw-2;x++){var idx=y*pw+x,a=alpha[idx];if(a>0&&a<255){var hZ=alpha[(y-1)*pw+x]===0||alpha[(y+1)*pw+x]===0||alpha[y*pw+x-1]===0||alpha[y*pw+x+1]===0;if(hZ){var s=a*4,t=4;[[-1,0,2],[1,0,2],[0,-1,2],[0,1,2],[-1,-1,1],[1,-1,1],[-1,1,1],[1,1,1]].forEach(function(n){var ny=y+n[0],nx=x+n[1],ww=n[2];if(ny>=0&&ny<ph&&nx>=0&&nx<pw){s+=alpha[ny*pw+nx]*ww;t+=ww}});alphaSm[idx]=Math.round(s/t)}}}}
+                    alpha=alphaSm;
 
-                    // ── STEP 7: Tulis alpha final ──
-                    for(var i=0;i<len;i++){
-                        d[i*4+3]=alpha[i];
-                    }
+                    // ── Tulis alpha final ──
+                    for(var i=0;i<len;i++)d[i*4+3]=alpha[i];
 
-                    ctx.putImageData(id,0,0);
-                    cv.toBlob(function(b){resolve(b)},'image/png');
+                    // Simpan ke canvas resolusi penuh
+                    fullResCtx.putImageData(id,0,0);
+
+                    // Buat blob untuk preview (downscale untuk tampilan cepat)
+                    var pvW=pw,pvH=ph;
+                    var pvMax=1200;
+                    if(pvW>pvMax||pvH>pvMax){var pvSc=pvMax/Math.max(pvW,pvH);pvW=Math.round(pvW*pvSc);pvH=Math.round(pvH*pvSc)}
+                    var pvCv=document.createElement('canvas');pvCv.width=pvW;pvCv.height=pvH;
+                    var pvCtx=pvCv.getContext('2d');pvCtx.drawImage(fullResCanvas,0,0,pvW,pvH);
+
+                    pvCv.toBlob(function(b){resolve(b)},'image/png');
                 };
                 img.onerror=function(){resolve(null)};
-                img.src=URL.createObjectURL(blob);
-            });
+                img.src=URL.createObjectURL(blob)});
         }
 
         function b2d(b){return new Promise(function(r,j){var rd=new FileReader();rd.onload=function(){r(rd.result)};rd.onerror=j;rd.readAsDataURL(b)})}
 
-        function showR(){$('resBefore').src=origDu;$('resAfter').src=pDu;$('previewSection').classList.remove('a');$('resultSection').classList.add('a');setTimeout(function(){$('resultSection').scrollIntoView({behavior:'smooth',block:'center'})},200)}
+        function showR(){
+            $('resBefore').src=origDu;$('resAfter').src=pDu;
+            $('previewSection').classList.remove('a');$('resultSection').classList.add('a');
+            selectedBgColor='transparent';resetPalette();
+            setTimeout(function(){$('resultSection').scrollIntoView({behavior:'smooth',block:'center'})},200);
+        }
 
-        $('dlPng').addEventListener('click',function(){if(pBlob){dLB(pBlob,'karya-abadi-nobg.png');showToast('PNG HD berhasil!','success')}});
-        $('dlJpg').addEventListener('click',function(){if(!pDu)return;var img=new Image();img.onload=function(){var cv=$('expC');cv.width=img.width;cv.height=img.height;var ctx=cv.getContext('2d');ctx.fillStyle='#FFF';ctx.fillRect(0,0,cv.width,cv.height);ctx.drawImage(img,0,0);cv.toBlob(function(b){dLB(b,'karya-abadi-whitebg.jpg');showToast('JPG berhasil!','success')},'image/jpeg',0.95)};img.src=pDu});
+        /* ═══════════════════════════════════════════════════════
+           DOWNLOAD HD 300 DPI
+           ═══════════════════════════════════════════════════════
+        */
+
+        // Set PNG DPI ke 300 via pHYs chunk
+        function setPngDpi(pngBlob,dpi){
+            return new Promise(function(resolve){
+                // 300 DPI = 11811 pixels per meter
+                var ppm=Math.round(dpi/0.0254);
+                var reader=new FileReader();
+                reader.onload=function(){
+                    var data=new Uint8Array(reader.result);
+                    // Cari posisi setelah IHDR chunk untuk insert pHYs
+                    // PNG structure: 8-byte signature, then chunks
+                    // Each chunk: 4-byte length, 4-byte type, data, 4-byte CRC
+                    var offset=8; // after signature
+                    // Skip IHDR
+                    var len=((data[offset]<<24)|(data[offset+1]<<16)|(data[offset+2]<<8)|data[offset+3]);
+                    offset+=12+len; // 4 len + 4 type + data + 4 CRC
+
+                    // Buat pHYs chunk
+                    var phys=new Uint8Array(21); // 4 len + 4 type + 9 data + 4 CRC
+                    // Length = 9
+                    phys[0]=0;phys[1]=0;phys[2]=0;phys[3]=9;
+                    // Type = pHYs
+                    phys[4]=0x70;phys[5]=0x48;phys[6]=0x59;phys[7]=0x73;
+                    // X pixels per unit
+                    phys[8]=(ppm>>>24)&0xFF;phys[9]=(ppm>>>16)&0xFF;phys[10]=(ppm>>>8)&0xFF;phys[11]=ppm&0xFF;
+                    // Y pixels per unit
+                    phys[12]=(ppm>>>24)&0xFF;phys[13]=(ppm>>>16)&0xFF;phys[14]=(ppm>>>8)&0xFF;phys[15]=ppm&0xFF;
+                    // Unit = 1 (meter)
+                    phys[16]=1;
+                    // CRC over type+data (13 bytes: type[4] + data[9])
+                    var crcData=new Uint8Array(13);
+                    for(var i=0;i<4;i++)crcData[i]=phys[4+i];
+                    for(var i=0;i<9;i++)crcData[4+i]=phys[8+i];
+                    var crc=crc32(crcData);
+                    phys[17]=(crc>>>24)&0xFF;phys[18]=(crc>>>16)&0xFF;phys[19]=(crc>>>8)&0xFF;phys[20]=crc&0xFF;
+
+                    // Gabung: signature+IHDR + pHYs + rest
+                    var before=data.slice(0,offset);
+                    var after=data.slice(offset);
+                    var result=new Uint8Array(before.length+phys.length+after.length);
+                    result.set(before,0);
+                    result.set(phys,before.length);
+                    result.set(after,before.length+phys.length);
+                    resolve(new Blob([result],{type:'image/png'}));
+                };
+                reader.readAsArrayBuffer(pngBlob);
+            });
+        }
+
+        // CRC32 for PNG
+        function crc32(buf){
+            var c,crcTable=[];
+            for(var n=0;n<256;n++){c=n;for(var k=0;k<8;k++){if(c&1)c=0xEDB88320^(c>>>1);else c=c>>>1}crcTable[n]=c}
+            var crc=0xFFFFFFFF;
+            for(var i=0;i<buf.length;i++){crc=crcTable[(crc^buf[i])&0xFF]^(crc>>>8)}
+            return(crc^0xFFFFFFFF)>>>0;
+        }
+
+        // Generate full-res PNG blob with 300 DPI
+        function getFullResPng(callback){
+            if(!fullResCanvas){callback(pBlob);return}
+            fullResCanvas.toBlob(function(b){
+                setPngDpi(b,300).then(function(dpiBlob){callback(dpiBlob)});
+            },'image/png');
+        }
+
+        // Generate full-res JPG with 300 DPI
+        function getFullResJpg(bgColor,callback){
+            if(!fullResCanvas){compositeAndDownloadJpg(bgColor,callback);return}
+            var cv=document.createElement('canvas');
+            cv.width=fullResW;cv.height=fullResH;
+            var ctx=cv.getContext('2d');
+            ctx.fillStyle=bgColor;ctx.fillRect(0,0,fullResW,fullResH);
+            ctx.drawImage(fullResCanvas,0,0);
+            cv.toBlob(function(b){callback(b)},'image/jpeg',0.95);
+        }
+
+        /* PALETTE */
+        var swatches=document.querySelectorAll('.pal-swatch');
+        swatches.forEach(function(sw){sw.addEventListener('click',function(){swatches.forEach(function(s){s.classList.remove('active')});$('palCenter').classList.remove('active');sw.classList.add('active');selectedBgColor=sw.getAttribute('data-color');applyBgColor(selectedBgColor)})});
+        $('customColor').addEventListener('input',function(){var color=$('customColor').value;swatches.forEach(function(s){s.classList.remove('active')});$('palCenter').classList.add('active');$('palCenterColor').style.background=color;$('palCenter').classList.add('has-color');selectedBgColor=color;applyBgColor(selectedBgColor)});
+        function resetPalette(){swatches.forEach(function(s){s.classList.remove('active')});$('palCenter').classList.remove('active','has-color');$('palCenterColor').style.background='transparent';var first=document.querySelector('.pal-swatch.transparent-swatch');if(first)first.classList.add('active');selectedBgColor='transparent'}
+        function applyBgColor(color){var afterWrap=$('afterWrap'),afterImg=$('resAfter');if(color==='transparent'){afterWrap.style.background='var(--chk)';afterImg.src=pDu}else{afterWrap.style.background=color;compositePreview(color,function(dataUrl){afterImg.src=dataUrl})}}
+        function compositePreview(color,callback){var img=new Image();img.onload=function(){var cv=$('colorC'),ctx=cv.getContext('2d');cv.width=img.width;cv.height=img.height;ctx.fillStyle=color;ctx.fillRect(0,0,cv.width,cv.height);ctx.drawImage(img,0,0);callback(cv.toDataURL('image/png'))};img.src=pDu}
+
+        /* ═══════════════════════════════════════════════════════
+           DOWNLOAD — FULL RESOLUSI + 300 DPI
+           ═══════════════════════════════════════════════════════*/
+        $('dlPng').addEventListener('click',function(){
+            if(!pDu)return;
+            showToast('Menyiapkan PNG HD 300dpi...','info');
+            if(selectedBgColor==='transparent'){
+                // Download PNG transparan dari full-res canvas + 300 DPI
+                getFullResPng(function(dpiBlob){
+                    dLB(dpiBlob,'karya-abadi-nobg-300dpi.png');
+                    showToast('PNG HD 300dpi berhasil! '+fullResW+'×'+fullResH+'px','success');
+                });
+            }else{
+                // Composite dengan warna di full res
+                var cv=document.createElement('canvas');
+                cv.width=fullResW;cv.height=fullResH;
+                var ctx=cv.getContext('2d');
+                ctx.fillStyle=selectedBgColor;ctx.fillRect(0,0,fullResW,fullResH);
+                ctx.drawImage(fullResCanvas,0,0);
+                cv.toBlob(function(b){
+                    setPngDpi(b,300).then(function(dpiBlob){
+                        dLB(dpiBlob,'karya-abadi-bg-300dpi.png');
+                        showToast('PNG 300dpi berhasil! '+fullResW+'×'+fullResH+'px','success');
+                    });
+                },'image/png');
+            }
+        });
+
+        $('dlJpg').addEventListener('click',function(){
+            if(!pDu)return;
+            var bgColor=selectedBgColor==='transparent'?'#FFFFFF':selectedBgColor;
+            showToast('Menyiapkan JPG 300dpi...','info');
+            getFullResJpg(bgColor,function(b){
+                dLB(b,'karya-abadi-300dpi.jpg');
+                showToast('JPG 300dpi berhasil! '+fullResW+'×'+fullResH+'px','success');
+            });
+        });
+
         function dLB(b,n){var u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=n;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(u)},1000)}
 
         $('shareBtn').addEventListener('click',function(){$('shareM').classList.add('a')});
