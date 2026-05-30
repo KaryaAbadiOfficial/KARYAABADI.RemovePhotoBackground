@@ -13,21 +13,16 @@
         *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
         body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;overflow-x:hidden;transition:background .35s,color .35s}
         ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--red);border-radius:99px}
-
-        .navbar-c{background:var(--card);border-bottom:1px solid var(--border);padding:10px 0;z-index:1050;transition:background .35s,border-color .35s}
+        .navbar-c{background:#000!important;border-bottom:1px solid #222;padding:10px 0;z-index:1050}.navbar-c.scrolled{box-shadow:0 4px 30px rgba(220,0,0,0.15)}
         .nb-link{display:flex;align-items:center;gap:10px;text-decoration:none}
         .nb-logo{height:34px;width:auto;object-fit:contain;flex-shrink:0}
-        .nb-text{font-weight:800;font-size:.88rem;color:var(--fg)!important;letter-spacing:.03em;line-height:1.15;transition:color .35s}
-        .nb-text span{color:var(--red)}
-        .dm-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--bg);color:var(--fg6);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;font-size:.9rem}
-        .dm-btn:hover{border-color:var(--red);color:var(--red);background:var(--red-s)}
-
+        .nb-text{font-weight:800;font-size:.88rem;color:#FFF!important;letter-spacing:.03em;line-height:1.15}.nb-text span{color:var(--red)}
+        .dm-btn{width:36px;height:36px;border-radius:50%;border:1px solid #333;background:#111;color:rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;font-size:.9rem}.dm-btn:hover{border-color:var(--red);color:var(--red);background:rgba(220,0,0,0.1)}
         .main-c{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:80px 20px 60px;position:relative}
         .bg1{position:fixed;top:-250px;left:-150px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(220,0,0,0.06)0%,transparent 70%);pointer-events:none;z-index:0}
         .bg2{position:fixed;bottom:-300px;right:-150px;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(220,0,0,0.04)0%,transparent 70%);pointer-events:none;z-index:0}
         .app-c{position:relative;z-index:1;width:100%;max-width:700px}
         .card{background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;transition:background .35s,border-color .35s}
-
         .up-area{padding:56px 36px;text-align:center;cursor:pointer;transition:all .3s;border:2px dashed var(--border);border-radius:14px;margin:20px}
         .up-area:hover,.up-area.dragover{border-color:var(--red);background:var(--red-s)}
         .up-ic{width:64px;height:64px;border-radius:50%;background:var(--red-s);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;transition:all .3s}
@@ -36,52 +31,41 @@
         .up-t{font-size:1.3rem;font-weight:900;color:var(--fg8);margin-bottom:8px;letter-spacing:.1em;transition:color .35s}
         .up-f1{font-size:.82rem;color:var(--fg4);margin-bottom:2px;transition:color .35s}
         .up-f2{font-size:.78rem;color:var(--fg4);transition:color .35s}
-
         .ps{display:none}.ps.a{display:block}
         .sbar{padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;transition:border-color .35s}
-        .sbar-t{font-weight:700;font-size:.85rem;color:var(--fg8);display:flex;align-items:center;gap:8px;transition:color .35s}
-        .sbar-t i{color:var(--red)}
+        .sbar-t{font-weight:700;font-size:.85rem;color:var(--fg8);display:flex;align-items:center;gap:8px;transition:color .35s}.sbar-t i{color:var(--red)}
         .iw{padding:20px;text-align:center}
         .iw img{max-width:100%;max-height:400px;border-radius:10px;display:block;margin:0 auto}
         .fi2{font-size:.75rem;color:var(--fg4);margin-top:10px;transition:color .35s}
         .abar{padding:12px 20px 20px;display:flex;gap:10px;flex-wrap:wrap}
-
         .btn-r{background:var(--red);color:#fff;border:none;padding:12px 24px;border-radius:10px;font-weight:700;font-size:.85rem;display:inline-flex;align-items:center;gap:8px;cursor:pointer;transition:all .3s;box-shadow:0 4px 20px var(--red-glow);text-decoration:none}
         .btn-r:hover{background:var(--red-b);transform:translateY(-2px);box-shadow:0 8px 30px var(--red-glow);color:#fff}
         .btn-r:disabled{opacity:.5;cursor:not-allowed;transform:none}
         .btn-d{background:var(--fg05);color:var(--fg6);border:1px solid var(--border);padding:11px 18px;border-radius:10px;font-weight:600;font-size:.8rem;display:inline-flex;align-items:center;gap:8px;cursor:pointer;transition:all .3s;text-decoration:none}
         .btn-d:hover{border-color:var(--red);color:var(--red);background:var(--red-s)}
         .btn-sm{padding:6px 12px;font-size:.74rem}
-
         .rs2{display:none}.rs2.a{display:block}
-
-        /* BEFORE / AFTER - SIDE BY SIDE */
-        .ba-wrap{padding:16px 20px 20px}
-        .ba-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-        .ba-col{position:relative;border-radius:10px;overflow:hidden}
-        .ba-col img{width:100%;height:100%;object-fit:cover;display:block;border-radius:10px}
-        .ba-col.after-col{background:var(--chk)}
-        .ba-lbl{position:absolute;top:8px;left:8px;padding:3px 10px;border-radius:6px;font-size:.62rem;font-weight:700;letter-spacing:.06em;z-index:2;text-transform:uppercase}
-        .ba-lbl.before{background:rgba(0,0,0,.7);color:rgba(255,255,255,.85)}
+        .ba-wrap{padding:16px 20px 8px}
+        .ba-row{display:flex;gap:12px}
+        .ba-col{flex:1;min-width:0;position:relative}
+        .ba-img-wrap{border-radius:10px;overflow:hidden;border:1px solid var(--border);transition:border-color .35s;position:relative}
+        .ba-img-wrap img{width:100%;display:block;border-radius:9px}
+        .ba-img-wrap.after-wrap{background:var(--chk)}
+        .ba-lbl{position:absolute;top:8px;left:8px;padding:4px 12px;border-radius:6px;font-size:.65rem;font-weight:700;letter-spacing:.06em;z-index:2;text-transform:uppercase}
+        .ba-lbl.before{background:rgba(0,0,0,.75);color:rgba(255,255,255,.9)}
         .ba-lbl.after{background:var(--red);color:#fff}
-        @media(max-width:576px){.ba-grid{grid-template-columns:1fr}.ba-col img{max-height:300px;object-fit:contain}}
-
+        @media(max-width:576px){.ba-row{flex-direction:column;gap:10px}}
         .ra{padding:12px 20px 20px;display:flex;gap:10px;flex-wrap:wrap}
         .ra .btn-r,.ra .btn-d{flex:1;min-width:90px;justify-content:center}
-
-        .po{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);z-index:9998;align-items:center;justify-content:center}
-        .po.a{display:flex}
-        .pb2{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:40px;text-align:center;max-width:380px;width:90%;transition:background .35s,border-color .35s}
-        .psp{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--red);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px}
+        .po{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);z-index:9998;align-items:center;justify-content:center}.po.a{display:flex}
+        .pb2{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:44px;text-align:center;max-width:340px;width:90%;transition:background .35s,border-color .35s}
+        .psp{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--red);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 20px}
         @keyframes spin{to{transform:rotate(360deg)}}
-        .pb2 h5{font-weight:700;color:var(--fg);margin-bottom:4px;font-size:.9rem;transition:color .35s}
-        .pb2 p{font-size:.78rem;color:var(--fg4);margin-bottom:12px;transition:color .35s}
-        .ppb{height:5px;border-radius:99px;background:var(--border);overflow:hidden;transition:background .35s}
+        .pb2 h5{font-weight:700;color:var(--fg);font-size:.95rem;transition:color .35s}
+        .ppb{height:5px;border-radius:99px;background:var(--border);overflow:hidden;transition:background .35s;margin-top:14px}
         .ppf{height:100%;border-radius:99px;background:var(--red);transition:width .3s ease;width:0%}
-        .pps{font-size:.7rem;color:var(--fg4);margin-top:8px;transition:color .35s}
-
-        .so{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:9997;align-items:center;justify-content:center}
-        .so.a{display:flex}
+        .pps{font-size:.72rem;color:var(--fg4);margin-top:8px;transition:color .35s}
+        .so{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:9997;align-items:center;justify-content:center}.so.a{display:flex}
         .sb2{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;text-align:center;max-width:360px;width:90%;transition:background .35s,border-color .35s}
         .sb2 h5{font-weight:700;margin-bottom:18px;color:var(--fg);font-size:.9rem;transition:color .35s}
         .si-r{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
@@ -90,22 +74,18 @@
         .si.wa{background:#25D366}.si.fb{background:#1877F2}.si.ig{background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)}.si.tg{background:#0088CC}.si.tw{background:#1DA1F2}
         .sc2{margin-top:16px;background:var(--fg05);border:1px solid var(--border);color:var(--fg6);padding:8px 22px;border-radius:10px;font-weight:600;font-size:.8rem;cursor:pointer;transition:all .3s}
         .sc2:hover{border-color:var(--red);color:var(--red)}
-
         .tw2{position:fixed;top:70px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px}
         .ti2{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:8px;font-size:.8rem;font-weight:500;color:var(--fg8);animation:tIn .3s ease;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,.3);transition:background .35s,border-color .35s}
         .ti2.success{border-left:3px solid var(--red)}.ti2.error{border-left:3px solid #f44}.ti2.info{border-left:3px solid var(--fg4)}
         @keyframes tIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
         @keyframes tOut{from{opacity:1}to{opacity:0;transform:translateX(30px)}}
-
         .ft2{position:relative;z-index:1;text-align:center;padding:16px;font-size:.7rem;color:var(--fg2);transition:color .35s}
         .ft2 a{color:var(--fg4);text-decoration:none;transition:color .3s}.ft2 a:hover{color:var(--red)}
-
-        @media(max-width:576px){.up-area{padding:40px 18px;margin:14px}.abar,.ra{flex-direction:column}.abar .btn-r,.abar .btn-d,.ra .btn-r,.ra .btn-d{width:100%;justify-content:center}.pb2{padding:28px 18px}}
+        @media(max-width:576px){.up-area{padding:40px 18px;margin:14px}.abar,.ra{flex-direction:column}.abar .btn-r,.abar .btn-d,.ra .btn-r,.ra .btn-d{width:100%;justify-content:center}.pb2{padding:32px 20px}}
     </style>
 </head>
 <body>
     <div class="bg1"></div><div class="bg2"></div>
-
     <nav class="navbar navbar-c fixed-top" id="mainNav">
         <div class="container d-flex align-items-center justify-content-between">
             <a class="nb-link" href="#">
@@ -115,88 +95,47 @@
             <button class="dm-btn" id="dmToggle" title="Dark/Light Mode"><i class="fa-solid fa-sun"></i></button>
         </div>
     </nav>
-
-    <div class="main-c">
-        <div class="app-c">
-            <div class="card">
-                <div id="uploadAreaWrap">
-                    <div class="up-area" id="uploadArea">
-                        <div class="up-ic"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-                        <div class="up-t">UPLOAD</div>
-                        <div class="up-f1">JPG, PNG, WEBP</div>
-                        <div class="up-f2">Maks 20 MB</div>
-                        <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp" hidden>
-                    </div>
-                </div>
-
-                <div id="previewSection" class="ps">
-                    <div class="sbar"><div class="sbar-t"><i class="fa-solid fa-image"></i> Preview</div><button class="btn-d btn-sm" id="removeBtn"><i class="fa-solid fa-xmark"></i> Hapus</button></div>
-                    <div class="iw"><img id="previewImg" src="" alt="Preview"><div id="fileInfo" class="fi2"></div></div>
-                    <div class="abar"><button class="btn-r" id="removeBgBtn" style="flex:1;justify-content:center"><i class="fa-solid fa-wand-magic-sparkles"></i> Remove Background</button></div>
-                </div>
-
-                <div id="resultSection" class="rs2">
-                    <div class="sbar"><div class="sbar-t"><i class="fa-solid fa-check-circle"></i> Hasil</div><button class="btn-d btn-sm" id="newUploadBtn"><i class="fa-solid fa-plus"></i> Baru</button></div>
-                    <div class="ba-wrap">
-                        <div class="ba-grid">
-                            <div class="ba-col before-col">
-                                <span class="ba-lbl before">Sebelum</span>
-                                <img id="resBefore" src="" alt="Sebelum">
-                            </div>
-                            <div class="ba-col after-col">
-                                <span class="ba-lbl after">Sesudah</span>
-                                <img id="resAfter" src="" alt="Sesudah">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ra">
-                        <button class="btn-r" id="dlPng"><i class="fa-solid fa-download"></i> PNG HD</button>
-                        <button class="btn-d" id="dlJpg"><i class="fa-solid fa-image"></i> JPG Putih</button>
-                        <button class="btn-d" id="shareBtn"><i class="fa-solid fa-share-nodes"></i> Share</button>
-                        <button class="btn-d" id="upNewR"><i class="fa-solid fa-cloud-arrow-up"></i> Baru</button>
-                    </div>
-                </div>
+    <div class="main-c"><div class="app-c"><div class="card">
+        <div id="uploadAreaWrap">
+            <div class="up-area" id="uploadArea">
+                <div class="up-ic"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                <div class="up-t">UPLOAD</div>
+                <div class="up-f1">JPG, PNG, WEBP</div>
+                <div class="up-f2">Maks 20 MB</div>
+                <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp" hidden>
             </div>
         </div>
-    </div>
-
+        <div id="previewSection" class="ps">
+            <div class="sbar"><div class="sbar-t"><i class="fa-solid fa-image"></i> Preview</div><button class="btn-d btn-sm" id="removeBtn"><i class="fa-solid fa-xmark"></i> Hapus</button></div>
+            <div class="iw"><img id="previewImg" src="" alt="Preview"><div id="fileInfo" class="fi2"></div></div>
+            <div class="abar"><button class="btn-r" id="removeBgBtn" style="flex:1;justify-content:center"><i class="fa-solid fa-wand-magic-sparkles"></i> Remove Background</button></div>
+        </div>
+        <div id="resultSection" class="rs2">
+            <div class="sbar"><div class="sbar-t"><i class="fa-solid fa-check-circle"></i> Hasil</div><button class="btn-d btn-sm" id="newUploadBtn"><i class="fa-solid fa-plus"></i> Baru</button></div>
+            <div class="ba-wrap"><div class="ba-row">
+                <div class="ba-col"><div class="ba-img-wrap"><span class="ba-lbl before">Sebelum</span><img id="resBefore" src="" alt="Sebelum"></div></div>
+                <div class="ba-col"><div class="ba-img-wrap after-wrap"><span class="ba-lbl after">Sesudah</span><img id="resAfter" src="" alt="Sesudah"></div></div>
+            </div></div>
+            <div class="ra">
+                <button class="btn-r" id="dlPng"><i class="fa-solid fa-download"></i> PNG HD</button>
+                <button class="btn-d" id="dlJpg"><i class="fa-solid fa-image"></i> JPG Putih</button>
+                <button class="btn-d" id="shareBtn"><i class="fa-solid fa-share-nodes"></i> Share</button>
+                <button class="btn-d" id="upNewR"><i class="fa-solid fa-cloud-arrow-up"></i> Baru</button>
+            </div>
+        </div>
+    </div></div></div>
     <div class="ft2">© 2026 <a href="#">KARYA ABADI</a> Remove Photo Background. All Rights Reserved.</div>
-
-    <div class="po" id="procOv">
-        <div class="pb2">
-            <div class="psp"></div>
-            <h5 id="pT">Memproses...</h5>
-            <div class="ppb"><div class="ppf" id="pF"></div></div>
-            <div class="pps" id="pS"></div>
-        </div>
-    </div>
-
-    <div class="so" id="shareM">
-        <div class="sb2">
-            <h5><i class="fa-solid fa-share-nodes me-2" style="color:var(--red)"></i>Bagikan</h5>
-            <div class="si-r">
-                <a class="si wa" href="#" id="sWa" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
-                <a class="si fb" href="#" id="sFb" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
-                <a class="si ig" href="#" id="sIg"><i class="fa-brands fa-instagram"></i></a>
-                <a class="si tg" href="#" id="sTg" target="_blank"><i class="fa-brands fa-telegram"></i></a>
-                <a class="si tw" href="#" id="sTw" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
-            </div>
-            <button class="sc2" id="cShare">Tutup</button>
-        </div>
-    </div>
-
+    <div class="po" id="procOv"><div class="pb2"><div class="psp"></div><h5 id="pT">Memproses...</h5><div class="ppb"><div class="ppf" id="pF"></div></div><div class="pps" id="pS"></div></div></div>
+    <div class="so" id="shareM"><div class="sb2"><h5><i class="fa-solid fa-share-nodes me-2" style="color:var(--red)"></i>Bagikan</h5><div class="si-r"><a class="si wa" href="#" id="sWa" target="_blank"><i class="fa-brands fa-whatsapp"></i></a><a class="si fb" href="#" id="sFb" target="_blank"><i class="fa-brands fa-facebook-f"></i></a><a class="si ig" href="#" id="sIg"><i class="fa-brands fa-instagram"></i></a><a class="si tg" href="#" id="sTg" target="_blank"><i class="fa-brands fa-telegram"></i></a><a class="si tw" href="#" id="sTw" target="_blank"><i class="fa-brands fa-x-twitter"></i></a></div><button class="sc2" id="cShare">Tutup</button></div></div>
     <div class="tw2" id="toastW"></div>
     <canvas id="expC" style="display:none"></canvas>
     <canvas id="refC" style="display:none"></canvas>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
     <script>
         var $=function(id){return document.getElementById(id)};
         var html=document.documentElement,dmBtn=$('dmToggle');
-        var stored=localStorage.getItem('ka-theme');
-        if(stored){html.setAttribute('data-theme',stored)}else{html.setAttribute('data-theme','dark')}
-        updateDmIcon();
+        var stored=localStorage.getItem('ka-theme');if(stored){html.setAttribute('data-theme',stored)}else{html.setAttribute('data-theme','dark')}updateDmIcon();
         dmBtn.addEventListener('click',function(){var c=html.getAttribute('data-theme');var n=c==='dark'?'light':'dark';html.setAttribute('data-theme',n);localStorage.setItem('ka-theme',n);updateDmIcon()});
         function updateDmIcon(){dmBtn.innerHTML=html.getAttribute('data-theme')==='dark'?'<i class="fa-solid fa-sun"></i>':'<i class="fa-solid fa-moon"></i>'}
         function showToast(m,t){t=t||'info';var w=$('toastW'),e=document.createElement('div');e.className='ti2 '+t;var ic={success:'fa-check-circle',error:'fa-exclamation-circle',info:'fa-info-circle'};var cl={success:'var(--red)',error:'#f44',info:'var(--fg4)'};e.innerHTML='<i class="fa-solid '+ic[t]+'" style="color:'+cl[t]+'"></i> '+m;w.appendChild(e);setTimeout(function(){e.style.animation='tOut .3s ease forwards';setTimeout(function(){e.remove()},300)},3500)}
@@ -207,17 +146,8 @@
         var $=function(id){return document.getElementById(id)};
         var rBFn=null,aiOK=false,uFile=null,origDu=null,pBlob=null,pDu=null;
 
-        /* ── LOAD AI ── */
-        (async function(){
-            try{
-                var m=await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm');
-                rBFn=m.default||m.removeBackground||m;
-                if(typeof rBFn!=='function'){for(var k in m){if(typeof m[k]==='function'){rBFn=m[k];break}}}
-                aiOK=true;console.log('AI ready');
-            }catch(e){console.error('AI failed:',e);showToast('AI gagal dimuat — Reload','error')}
-        })();
+        (async function(){try{var m=await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm');rBFn=m.default||m.removeBackground||m;if(typeof rBFn!=='function'){for(var k in m){if(typeof m[k]==='function'){rBFn=m[k];break}}}aiOK=true;console.log('AI ready')}catch(e){console.error('AI failed:',e);showToast('AI gagal dimuat — Reload','error')}})();
 
-        /* ── UPLOAD ── */
         $('uploadArea').addEventListener('click',function(){$('fileInput').click()});
         $('fileInput').addEventListener('change',function(e){if(e.target.files.length)hFile(e.target.files[0])});
         var ua=$('uploadArea');
@@ -225,139 +155,164 @@
         ua.addEventListener('dragleave',function(){ua.classList.remove('dragover')});
         ua.addEventListener('drop',function(e){e.preventDefault();ua.classList.remove('dragover');if(e.dataTransfer.files.length)hFile(e.dataTransfer.files[0])});
 
-        function hFile(f){
-            if(!['image/jpeg','image/png','image/webp'].includes(f.type)){showToast('Format tidak didukung.','error');return}
-            if(f.size>20*1024*1024){showToast('File melebihi 20 MB.','error');return}
-            uFile=f;var r=new FileReader();
-            r.onload=function(e){origDu=e.target.result;$('previewImg').src=origDu;$('fileInfo').textContent=f.name+' • '+(f.size/1024/1024).toFixed(2)+' MB';$('uploadAreaWrap').style.display='none';$('previewSection').classList.add('a');$('resultSection').classList.remove('a');showToast('Foto berhasil diupload!','success')};
-            r.readAsDataURL(f);
-        }
+        function hFile(f){if(!['image/jpeg','image/png','image/webp'].includes(f.type)){showToast('Format tidak didukung.','error');return}if(f.size>20*1024*1024){showToast('File melebihi 20 MB.','error');return}uFile=f;var r=new FileReader();r.onload=function(e){origDu=e.target.result;$('previewImg').src=origDu;$('fileInfo').textContent=f.name+' • '+(f.size/1024/1024).toFixed(2)+' MB';$('uploadAreaWrap').style.display='none';$('previewSection').classList.add('a');$('resultSection').classList.remove('a');showToast('Foto berhasil diupload!','success')};r.readAsDataURL(f)}
 
         function reset(){uFile=null;origDu=null;pBlob=null;pDu=null;$('fileInput').value='';$('uploadAreaWrap').style.display='block';$('previewSection').classList.remove('a');$('resultSection').classList.remove('a')}
-        $('removeBtn').addEventListener('click',reset);
-        $('newUploadBtn').addEventListener('click',reset);
-        $('upNewR').addEventListener('click',reset);
+        $('removeBtn').addEventListener('click',reset);$('newUploadBtn').addEventListener('click',reset);$('upNewR').addEventListener('click',reset);
 
-        /* ── PROCESS ── */
         $('removeBgBtn').addEventListener('click',process);
         async function process(){
-            if(!uFile)return;
-            if(!aiOK||!rBFn){showToast('AI belum siap.','error');return}
+            if(!uFile)return;if(!aiOK||!rBFn){showToast('AI belum siap.','error');return}
             var ov=$('procOv'),pF=$('pF'),pS=$('pS'),pT=$('pT');
             ov.classList.add('a');pF.style.width='0%';pS.textContent='';$('removeBgBtn').disabled=true;
-            try{
-                var blob=await rBFn(uFile,{
-                    model:'large',
-                    output:{format:'image/png',quality:1},
-                    progress:function(k,c,t){
-                        var p=t>0?Math.round(c/t*100):0;
-                        if(k.includes('fetch')||k.includes('download')){pT.textContent='Mengunduh Model...';pS.textContent=p+'%'}
-                        else if(k.includes('compute')||k.includes('inference')){pT.textContent='Memproses...';pS.textContent=p+'%'}
-                        var cu=parseInt(pF.style.width)||0;pF.style.width=Math.max(p,cu)+'%';
-                    }
-                });
-                pT.textContent='Finalisasi...';pF.style.width='95%';
-                var ref=await refineClean(blob);
-                pBlob=ref||blob;pDu=await b2d(pBlob);pF.style.width='100%';pS.textContent='';
-                setTimeout(function(){ov.classList.remove('a');showR();showToast('Background berhasil dihapus!','success')},400);
-            }catch(e){console.error(e);ov.classList.remove('a');showToast('Gagal: '+(e.message||'Error'),'error')}
-            finally{$('removeBgBtn').disabled=false}
+            try{var blob=await rBFn(uFile,{model:'large',output:{format:'image/png',quality:1},progress:function(k,c,t){var p=t>0?Math.round(c/t*100):0;if(k.includes('fetch')||k.includes('download')){pT.textContent='Mengunduh Model...';pS.textContent=p+'%'}else if(k.includes('compute')||k.includes('inference')){pT.textContent='Memproses...';pS.textContent=p+'%'}var cu=parseInt(pF.style.width)||0;pF.style.width=Math.max(p,cu)+'%'}});
+            pT.textContent='Finalisasi...';pF.style.width='95%';
+            var ref=await refineClean(blob);
+            pBlob=ref||blob;pDu=await b2d(pBlob);pF.style.width='100%';pS.textContent='';
+            setTimeout(function(){ov.classList.remove('a');showR();showToast('Background berhasil dihapus!','success')},400);
+            }catch(e){console.error(e);ov.classList.remove('a');showToast('Gagal: '+(e.message||'Error'),'error')}finally{$('removeBgBtn').disabled=false}
         }
 
-        /* ═══════════════════════════════════════════
-           POST-PROCESSING — Gentle & Preserves Object
-           ═══════════════════════════════════════════
-           Problem sebelumnya:
-           - Threshold 128 menghapus bagian objek yang semi-transparan
-           - Morphological closing menutup celah yang seharusnya terbuka
-           - Small region removal menghapus bagian objek yang kecil
-           
-           Solusi: PERCAYAI output AI, hanya bersihkan fringe minimal
+        /* ═══════════════════════════════════════════════════
+           POST-PROCESSING — PENGHAPUS SISA WARNA LENGKAP
+           ═══════════════════════════════════════════════════
+           Teknik: Ganti warna pixel tepi dengan warna dari
+           pixel opak terdekat (foreground color replacement)
+           Ini menghilangkan SEMUA sisa warna background.
         */
         async function refineClean(blob){
             return new Promise(function(resolve){
                 var img=new Image();
                 img.onload=function(){
                     var cv=$('refC'),ctx=cv.getContext('2d',{willReadFrequently:true});
-                    var w=img.width,h=img.height;
-                    // Batas resolusi untuk performa
-                    var mx=2048,sc=1;
-                    if(w>mx||h>mx)sc=mx/Math.max(w,h);
-                    var sw=Math.round(w*sc),sh=Math.round(h*sc);
-                    cv.width=sw;cv.height=sh;
-                    ctx.drawImage(img,0,0,sw,sh);
-                    var id=ctx.getImageData(0,0,sw,sh),d=id.data,len=sw*sh;
+                    var ow=img.width,oh=img.height,mx=2048,sc=1;
+                    if(ow>mx||oh>mx)sc=mx/Math.max(ow,oh);
+                    var w=Math.round(ow*sc),h=Math.round(oh*sc);
+                    cv.width=w;cv.height=h;ctx.drawImage(img,0,0,w,h);
+                    var id=ctx.getImageData(0,0,w,h),d=id.data,len=w*h;
 
-                    // ── STEP 1: Simpan alpha asli dari AI ──
-                    var alpha=new Float32Array(len);
+                    // ── STEP 1: Baca alpha asli dari AI ──
+                    var alpha=new Uint8Array(len);
                     for(var i=0;i<len;i++)alpha[i]=d[i*4+3];
 
-                    // ── STEP 2: Hapus noise alpha sangat rendah (< 5) ──
-                    // Ini HANYA menghapus pixel yang jelas-jelas bukan objek
-                    // TIDAK mengubah alpha di atas 5 — mempertahankan detail objek
-                    for(var i=0;i<len;i++){
-                        if(alpha[i]>0&&alpha[i]<5)alpha[i]=0;
-                    }
+                    // ── STEP 2: Hapus noise sangat rendah ──
+                    for(var i=0;i<len;i++){if(alpha[i]>0&&alpha[i]<8)alpha[i]=0}
 
-                    // ── STEP 3: Color decontamination ringan ──
-                    // HANYA untuk pixel dengan alpha rendah (5-80) di tepi objek
-                    // Ini menghilangkan warna background yang "bocor" ke tepi objek
-                    // TANPA mengubah pixel yang sudah solid (alpha > 80)
-                    for(var y=0;y<sh;y++){
-                        for(var x=0;x<sw;x++){
-                            var idx=y*sw+x;
+                    // ── STEP 3: Buat peta warna foreground ──
+                    // Untuk setiap pixel semi-transparan, cari warna dari pixel opak terdekat
+                    // Ini mengganti warna terkontaminasi dengan warna bersih objek
+                    // Gunakan pendekatan 2-pass: sample → replace
+
+                    // Pass 1: Kumpulkan warna opak untuk setiap region
+                    // Gunakan sliding window untuk efisiensi
+                    for(var y=0;y<h;y++){
+                        for(var x=0;x<w;x++){
+                            var idx=y*w+x;
                             var a=alpha[idx];
-                            
-                            if(a>=5&&a<80){
-                                // Cari warna background dari sekitar (pixel transparan)
-                                var bgR=0,bgG=0,bgB=0,bgC=0;
-                                for(var dy=-6;dy<=6;dy++){
-                                    for(var dx=-6;dx<=6;dx++){
+
+                            // Hanya proses pixel semi-transparan (bisa terkontaminasi)
+                            if(a>=8&&a<240){
+                                // Cari pixel opak terdekat dalam radius
+                                var rS=0,gS=0,bS=0,tW=0;
+                                var found=false;
+                                var maxR=12; // radius pencarian
+
+                                for(var dy=-maxR;dy<=maxR&&!found;dy++){
+                                    for(var dx=-maxR;dx<=maxR&&!found;dx++){
                                         var ny=y+dy,nx=x+dx;
-                                        if(ny>=0&&ny<sh&&nx>=0&&nx<sw){
-                                            var ni=ny*sw+nx;
-                                            if(alpha[ni]===0){
-                                                bgR+=d[ni*4];bgG+=d[ni*4+1];bgB+=d[ni*4+2];bgC++;
+                                        if(ny>=0&&ny<h&&nx>=0&&nx<w){
+                                            var ni=ny*w+nx;
+                                            if(alpha[ni]>=240){
+                                                // Pixel opak ditemukan - timbang berdasarkan jarak
+                                                var dist=Math.sqrt(dy*dy+dx*dx);
+                                                var wt=1/(1+dist);
+                                                rS+=d[ni*4]*wt;
+                                                gS+=d[ni*4+1]*wt;
+                                                bS+=d[ni*4+2]*wt;
+                                                tW+=wt;
                                             }
                                         }
                                     }
                                 }
-                                if(bgC>2){
-                                    bgR/=bgC;bgG/=bgC;bgB/=bgC;
-                                    var f=Math.max(a/255,0.15); // min 15% supaya tidak over-correct
-                                    var inv=1-f;
-                                    d[idx*4]=Math.max(0,Math.min(255,Math.round((d[idx*4]-bgR*inv)/f)));
-                                    d[idx*4+1]=Math.max(0,Math.min(255,Math.round((d[idx*4+1]-bgG*inv)/f)));
-                                    d[idx*4+2]=Math.max(0,Math.min(255,Math.round((d[idx*4+2]-bgB*inv)/f)));
+
+                                // Ganti warna pixel dengan warna foreground yang ditemukan
+                                if(tW>0){
+                                    d[idx*4]=Math.round(rS/tW);
+                                    d[idx*4+1]=Math.round(gS/tW);
+                                    d[idx*4+2]=Math.round(bS/tW);
                                 }
                             }
                         }
                     }
 
-                    // ── STEP 4: Gentle alpha smoothing di boundary ──
-                    // Smooth alpha hanya di tepi (bukan di interior objek)
-                    // 1 pass saja, sangat ringan
-                    for(var y=1;y<sh-1;y++){
-                        for(var x=1;x<sw-1;x++){
-                            var idx=y*sw+x;
-                            var a=alpha[idx];
-                            
-                            // Hanya proses pixel di boundary (alpha antara 1-254)
-                            if(a>0&&a<255){
-                                var sa=a*4,wt=4;
-                                // 4-connected neighbors dengan weight
-                                var nb=[[-1,0,2],[1,0,2],[0,-1,2],[0,1,2]];
-                                for(var n=0;n<nb.length;n++){
-                                    var ny=y+nb[n][0],nx=x+nb[n][1],ww=nb[n][2];
-                                    if(ny>=0&&ny<sh&&nx>=0&&nx<sw){
-                                        sa+=alpha[ny*sw+nx]*ww;wt+=ww;
-                                    }
+                    // ── STEP 4: Kurangi alpha fringe luar ──
+                    // Pixel paling luar (alpha rendah) biasanya masih punya sisa
+                    // Kurangi alpha mereka agar sisa warna menghilang
+                    for(var i=0;i<len;i++){
+                        var a=alpha[i];
+                        if(a>=8&&a<25){
+                            // Fringe paling luar - hampir hilangkan
+                            alpha[i]=Math.round(a*0.15);
+                        }else if(a>=25&&a<50){
+                            // Fringe luar - kurangi signifikan
+                            alpha[i]=Math.round(a*0.5);
+                        }else if(a>=50&&a<80){
+                            // Fringe tengah - kurangi sedikit
+                            alpha[i]=Math.round(a*0.8);
+                        }
+                    }
+
+                    // ── STEP 5: Erosi 1 pixel di luar untuk hilangkan rim ──
+                    // Hanya erosi pixel alpha rendah yang bersebelahan dengan transparan
+                    var alphaNew=new Uint8Array(alpha);
+                    for(var y=1;y<h-1;y++){
+                        for(var x=1;x<w-1;x++){
+                            var idx=y*w+x;
+                            if(alpha[idx]>0&&alpha[idx]<60){
+                                // Cek apakah ada tetangga transparan
+                                var hasTransparent=
+                                    alpha[(y-1)*w+x]===0||
+                                    alpha[(y+1)*w+x]===0||
+                                    alpha[y*w+x-1]===0||
+                                    alpha[y*w+x+1]===0;
+                                if(hasTransparent){
+                                    // Erosi: kurangi alpha lebih lanjut
+                                    alphaNew[idx]=0;
                                 }
-                                d[idx*4+3]=Math.round(sa/wt);
-                            }else{
-                                d[idx*4+3]=Math.round(a);
                             }
                         }
+                    }
+                    alpha=alphaNew;
+
+                    // ── STEP 6: Smooth alpha di boundary ──
+                    // 2-pass smoothing untuk transisi halus
+                    for(var pass=0;pass<2;pass++){
+                        var alphaSm=new Uint8Array(alpha);
+                        for(var y=1;y<h-1;y++){
+                            for(var x=1;x<w-1;x++){
+                                var idx=y*w+x;
+                                var a=alpha[idx];
+                                // Hanya smooth pixel di boundary
+                                if(a>0&&a<255){
+                                    var hasZero=alpha[(y-1)*w+x]===0||alpha[(y+1)*w+x]===0||alpha[y*w+x-1]===0||alpha[y*w+x+1]===0;
+                                    var hasFull=alpha[(y-1)*w+x]===255||alpha[(y+1)*w+x]===255||alpha[y*w+x-1]===255||alpha[y*w+x+1]===255;
+                                    if(hasZero||hasFull){
+                                        var s=a*4,t=4;
+                                        [[-1,0,2],[1,0,2],[0,-1,2],[0,1,2],[-1,-1,1],[1,-1,1],[-1,1,1],[1,1,1]].forEach(function(n){
+                                            var ny=y+n[0],nx=x+n[1],ww=n[2];
+                                            if(ny>=0&&ny<h&&nx>=0&&nx<w){s+=alpha[ny*w+nx]*ww;t+=ww}
+                                        });
+                                        alphaSm[idx]=Math.round(s/t);
+                                    }
+                                }
+                            }
+                        }
+                        alpha=alphaSm;
+                    }
+
+                    // ── STEP 7: Tulis alpha final ──
+                    for(var i=0;i<len;i++){
+                        d[i*4+3]=alpha[i];
                     }
 
                     ctx.putImageData(id,0,0);
@@ -370,22 +325,12 @@
 
         function b2d(b){return new Promise(function(r,j){var rd=new FileReader();rd.onload=function(){r(rd.result)};rd.onerror=j;rd.readAsDataURL(b)})}
 
-        function showR(){
-            $('resBefore').src=origDu;$('resAfter').src=pDu;
-            $('previewSection').classList.remove('a');$('resultSection').classList.add('a');
-            setTimeout(function(){$('resultSection').scrollIntoView({behavior:'smooth',block:'center'})},200);
-        }
+        function showR(){$('resBefore').src=origDu;$('resAfter').src=pDu;$('previewSection').classList.remove('a');$('resultSection').classList.add('a');setTimeout(function(){$('resultSection').scrollIntoView({behavior:'smooth',block:'center'})},200)}
 
-        /* ── DOWNLOADS ── */
         $('dlPng').addEventListener('click',function(){if(pBlob){dLB(pBlob,'karya-abadi-nobg.png');showToast('PNG HD berhasil!','success')}});
-        $('dlJpg').addEventListener('click',function(){
-            if(!pDu)return;var img=new Image();img.onload=function(){
-            var cv=$('expC');cv.width=img.width;cv.height=img.height;var ctx=cv.getContext('2d');
-            ctx.fillStyle='#FFF';ctx.fillRect(0,0,cv.width,cv.height);ctx.drawImage(img,0,0);
-            cv.toBlob(function(b){dLB(b,'karya-abadi-whitebg.jpg');showToast('JPG berhasil!','success')},'image/jpeg',0.95)};img.src=pDu});
+        $('dlJpg').addEventListener('click',function(){if(!pDu)return;var img=new Image();img.onload=function(){var cv=$('expC');cv.width=img.width;cv.height=img.height;var ctx=cv.getContext('2d');ctx.fillStyle='#FFF';ctx.fillRect(0,0,cv.width,cv.height);ctx.drawImage(img,0,0);cv.toBlob(function(b){dLB(b,'karya-abadi-whitebg.jpg');showToast('JPG berhasil!','success')},'image/jpeg',0.95)};img.src=pDu});
         function dLB(b,n){var u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=n;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(u)},1000)}
 
-        /* ── SHARE ── */
         $('shareBtn').addEventListener('click',function(){$('shareM').classList.add('a')});
         $('cShare').addEventListener('click',function(){$('shareM').classList.remove('a')});
         $('shareM').addEventListener('click',function(e){if(e.target===$('shareM'))$('shareM').classList.remove('a')});
