@@ -204,7 +204,7 @@
             var ov=$('procOv'),pF=$('pF'),pS=$('pS'),pT=$('pT');
             ov.classList.add('a');pF.style.width='0%';pS.textContent='';$('removeBgBtn').disabled=true;
             try{var blob=await rBFn(uFile,{model:'large',output:{format:'image/png',quality:1},progress:function(k,c,t){var p=t>0?Math.round(c/t*100):0;if(k.includes('fetch')||k.includes('download')){pT.textContent='Mengunduh Model...';pS.textContent=p+'%'}else if(k.includes('compute')||k.includes('inference')){pT.textContent='Memproses...';pS.textContent=p+'%'}var cu=parseInt(pF.style.width)||0;pF.style.width=Math.max(p,cu)+'%'}});
-            pT.textContent='Membersihkan Tepi...';pF.style.width='95%';
+            pT.textContent='Memperbaiki Tepi Objek...';pF.style.width='95%';
             var ref=await refineEdge(blob);
             pBlob=ref||blob;pDu=await b2d(pBlob);pF.style.width='100%';pS.textContent='';
             setTimeout(function(){ov.classList.remove('a');showR();showToast('Background berhasil dihapus!','success')},400);
@@ -221,41 +221,77 @@
                     fullResCtx=fullResCanvas.getContext('2d',{willReadFrequently:true});fullResCtx.drawImage(img,0,0,pw,ph);fullResW=pw;fullResH=ph;
                     var id=fullResCtx.getImageData(0,0,pw,ph),d=id.data,len=pw*ph;
                     
-                    // 1. Extract Alpha & Hard Cleanup (Remove faint halo pixels)
+                    // 1. Extract Alpha & Clean faint noise
                     var alpha=new Uint8Array(len);
                     for(var i=0;i<len;i++){
                         var a=d[i*4+3];
-                        if(a < 30) a = 0;       // Kill faint background residue aggressively
-                        if(a > 235) a = 255;     // Solidify strong object pixels
+                        if(a < 15) a = 0; 
                         alpha[i] = a;
                     }
                     
-                    // 2. Create Deep Foreground Mask (Erode 3px) 
-                    // We sample colors from here because deep inside the object, there is NO background color spill
-                    var temp1=new Uint8Array(alpha);
-                    for(var e=0;e<3;e++){ // 3 pixels deep
-                        var temp2=new Uint8Array(len);
+                    // 2. Create Solid Mask (Thresholded to separate definite foreground)
+                    var solidMask=new Uint8Array(len);
+                    for(var i=0;i<len;i++){
+                        solidMask[i] = alpha[i] > 20 ? 1 : 0;
+                    }
+                    
+                    // 3. Morphological Closing (Dilate then Erode by 2px)
+                    // This fixes broken gaps in neck/jacket without destroying hair like erosion does
+                    var dilated=new Uint8Array(solidMask);
+                    for(var pass=0; pass<2; pass++){
+                        var temp=new Uint8Array(len);
                         for(var y=1;y<ph-1;y++){for(var x=1;x<pw-1;x++){
                             var idx=y*pw+x;
-                            if(temp1[idx]===255 && temp1[(y-1)*pw+x]===255 && temp1[(y+1)*pw+x]===255 && temp1[y*pw+x-1]===255 && temp1[y*pw+x+1]===255){
-                                temp2[idx]=255;
+                            if(dilated[idx]===1 || dilated[(y-1)*pw+x]===1 || dilated[(y+1)*pw+x]===1 || dilated[y*pw+x-1]===1 || dilated[y*pw+x+1]===1){
+                                temp[idx]=1;
                             }
                         }}
-                        temp1=temp2;
+                        dilated=temp;
                     }
-                    var deepMask=temp1;
                     
-                    // 3. Aggressive Color Decontamination (Defringe)
-                    // Replace RGB of ALL edge pixels with colors from the deep mask
+                    var closedMask=new Uint8Array(dilated);
+                    for(var pass=0; pass<2; pass++){
+                        var temp=new Uint8Array(len);
+                        for(var y=1;y<ph-1;y++){for(var x=1;x<pw-1;x++){
+                            var idx=y*pw+x;
+                            if(closedMask[idx]===1 && closedMask[(y-1)*pw+x]===1 && closedMask[(y+1)*pw+x]===1 && closedMask[y*pw+x-1]===1 && closedMask[y*pw+x+1]===1){
+                                temp[idx]=1;
+                            }
+                        }}
+                        closedMask=temp;
+                    }
+                    
+                    // 4. Merge original alpha with closed mask
+                    var finalAlpha=new Uint8Array(len);
+                    for(var i=0;i<len;i++){
+                        finalAlpha[i] = Math.max(alpha[i], closedMask[i]*255);
+                        if(finalAlpha[i] > 250) finalAlpha[i] = 255; // Solidify definite foreground
+                    }
+                    
+                    // 5. Create Deep Interior Mask for Color Decontamination (Erode 4px)
+                    var deepMask = new Uint8Array(closedMask);
+                    for(var pass=0; pass<4; pass++){
+                        var temp=new Uint8Array(len);
+                        for(var y=1;y<ph-1;y++){for(var x=1;x<pw-1;x++){
+                            var idx=y*pw+x;
+                            if(deepMask[idx]===1 && deepMask[(y-1)*pw+x]===1 && deepMask[(y+1)*pw+x]===1 && deepMask[y*pw+x-1]===1 && deepMask[y*pw+x+1]===1){
+                                temp[idx]=1;
+                            }
+                        }}
+                        deepMask=temp;
+                    }
+                    
+                    // 6. Color Decontamination (Defringing)
+                    // Remove background color fringe by replacing RGB with deep interior color
                     for(var y=0;y<ph;y++){for(var x=0;x<pw;x++){
                         var idx=y*pw+x;
-                        if(alpha[idx]>0 && deepMask[idx]===0){ // It's an edge/spill pixel
+                        if(finalAlpha[idx] > 0 && deepMask[idx]===0){ // It's an edge or filled-gap pixel
                             var fR=0,fG=0,fB=0,fW=0;
-                            for(var dy=-7;dy<=7;dy++){for(var dx=-7;dx<=7;dx++){
+                            for(var dy=-6;dy<=6;dy++){for(var dx=-6;dx<=6;dx++){
                                 var ny=y+dy,nx=x+dx;
                                 if(ny>=0&&ny<ph&&nx>=0&&nx<pw){
                                     var ni=ny*pw+nx;
-                                    if(deepMask[ni]===255){ // Only sample from pure interior object
+                                    if(deepMask[ni]===1){ // Sample from pure interior object
                                         var dist=Math.sqrt(dy*dy+dx*dx);
                                         var wt=1/(1+dist*dist);
                                         fR+=d[ni*4]*wt;fG+=d[ni*4+1]*wt;fB+=d[ni*4+2]*wt;fW+=wt;
@@ -270,43 +306,27 @@
                         }
                     }}
                     
-                    // 4. Alpha Contraction (Shave off 1px outer ring to cut the physical spill completely)
-                    var contracted=new Uint8Array(alpha);
+                    // 7. Smooth Alpha slightly for anti-aliasing
+                    var alphaSm=new Uint8Array(finalAlpha);
                     for(var y=1;y<ph-1;y++){for(var x=1;x<pw-1;x++){
-                        var idx=y*pw+x;
-                        if(alpha[idx]>0){
-                            var tNeighbors=0;
-                            if(alpha[(y-1)*pw+x]===0)tNeighbors++;
-                            if(alpha[(y+1)*pw+x]===0)tNeighbors++;
-                            if(alpha[y*pw+x-1]===0)tNeighbors++;
-                            if(alpha[y*pw+x+1]===0)tNeighbors++;
-                            // If it's the very outer edge touching background, delete it
-                            if(tNeighbors>=2) contracted[idx]=0; 
-                        }
-                    }}
-                    alpha=contracted;
-                    
-                    // 5. Alpha Smoothing (Anti-alias the jagged edges caused by contraction)
-                    var alphaSm=new Uint8Array(alpha);
-                    for(var y=2;y<ph-2;y++){for(var x=2;x<pw-2;x++){
-                        var idx=y*pw+x,a=alpha[idx];
-                        if(a>0&&a<255){
+                        var idx=y*pw+x,a=finalAlpha[idx];
+                        if(a>0 && a<255){
                             var s=a*4,t=4;
-                            var neighbors=[[-1,0,2],[1,0,2],[0,-1,2],[0,1,2],[-1,-1,1],[1,-1,1],[-1,1,1],[1,1,1]];
+                            var neighbors=[[-1,0,2],[1,0,2],[0,-1,2],[0,1,2]];
                             for(var n=0;n<neighbors.length;n++){
-                                var ny=y+neighbors[n][0],nx=x+neighbors[n][1],ww=neighbors[n][2];
-                                if(ny>=0&&ny<ph&&nx>=0&&nx<pw){s+=alpha[ny*pw+nx]*ww;t+=ww;}
+                                var ny=y+neighbors[n][0],nx=x+neighbors[n][1];
+                                if(ny>=0&&ny<ph&&nx>=0&&nx<pw){s+=finalAlpha[ny*pw+nx];t++;}
                             }
                             alphaSm[idx]=Math.round(s/t);
                         }
                     }}
-                    alpha=alphaSm;
+                    finalAlpha=alphaSm;
                     
-                    // Apply final alpha back to image data
-                    for(var i=0;i<len;i++)d[i*4+3]=alpha[i];
+                    // Apply final alpha
+                    for(var i=0;i<len;i++)d[i*4+3]=finalAlpha[i];
+                    
                     fullResCtx.putImageData(id,0,0);
                     
-                    // Create preview
                     var pvW=pw,pvH=ph,pvMax=1200;if(pvW>pvMax||pvH>pvMax){var pvSc=pvMax/Math.max(pvW,pvH);pvW=Math.round(pvW*pvSc);pvH=Math.round(pvH*pvSc)}
                     var pvCv=document.createElement('canvas');pvCv.width=pvW;pvCv.height=pvH;var pvCtx=pvCv.getContext('2d');pvCtx.drawImage(fullResCanvas,0,0,pvW,pvH);
                     pvCv.toBlob(function(b){resolve(b)},'image/png')};
