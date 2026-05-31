@@ -137,4 +137,218 @@
             </div></div>
             <div class="palette-wrap">
                 <div class="palette-layout">
-                    <div class="pal-side" id
+                    <div class="pal-side" id="palLeft">
+                        <div class="pal-swatch transparent-swatch active" data-color="transparent" title="Transparan"></div>
+                        <div class="pal-swatch" data-color="#FFFFFF" style="background:#FFFFFF" title="Putih"></div>
+                    </div>
+                    <div class="pal-center" id="palCenter" title="Pilih Warna">
+                        <div class="pal-center-color" id="palCenterColor"></div>
+                        <i class="fa-solid fa-palette"></i>
+                        <input type="color" id="customColor" value="#2563EB">
+                    </div>
+                    <div class="pal-side" id="palRight">
+                        <div class="pal-swatch" data-color="#0b00a3" style="background:#0b00a3" title="Biru"></div>
+                        <div class="pal-swatch" data-color="#db1514" style="background:#db1514" title="Merah"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="ra">
+                <button class="btn-r" id="dlPng"><i class="fa-solid fa-download"></i> PNG HD</button>
+                <button class="btn-d" id="dlJpg"><i class="fa-solid fa-image"></i> JPG</button>
+                <button class="btn-d" id="shareBtn"><i class="fa-solid fa-share-nodes"></i> Share</button>
+                <button class="btn-d" id="upNewR"><i class="fa-solid fa-cloud-arrow-up"></i> Baru</button>
+            </div>
+        </div>
+    </div></div></div>
+    <div class="ft2">© 2026 <a href="#">KARYA ABADI</a> Remove Photo Background. All Rights Reserved.</div>
+    <div class="po" id="procOv"><div class="pb2"><div class="psp"></div><h5 id="pT">Memproses...</h5><div class="ppb"><div class="ppf" id="pF"></div></div><div class="pps" id="pS"></div></div></div>
+    <div class="so" id="shareM"><div class="sb2"><h5><i class="fa-solid fa-share-nodes me-2" style="color:var(--red)"></i>Bagikan</h5><div class="si-r"><a class="si wa" href="#" id="sWa" target="_blank"><i class="fa-brands fa-whatsapp"></i></a><a class="si fb" href="#" id="sFb" target="_blank"><i class="fa-brands fa-facebook-f"></i></a><a class="si ig" href="#" id="sIg"><i class="fa-brands fa-instagram"></i></a><a class="si tg" href="#" id="sTg" target="_blank"><i class="fa-brands fa-telegram"></i></a><a class="si tw" href="#" id="sTw" target="_blank"><i class="fa-brands fa-x-twitter"></i></a></div><button class="sc2" id="cShare">Tutup</button></div></div>
+    <div class="tw2" id="toastW"></div>
+    <canvas id="expC" style="display:none"></canvas>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        var $=function(id){return document.getElementById(id)};
+        var html=document.documentElement,dmBtn=$('dmToggle');
+        var stored=localStorage.getItem('ka-theme');if(stored){html.setAttribute('data-theme',stored)}else{html.setAttribute('data-theme','dark')}updateDmIcon();
+        dmBtn.addEventListener('click',function(){var c=html.getAttribute('data-theme');var n=c==='dark'?'light':'dark';html.setAttribute('data-theme',n);localStorage.setItem('ka-theme',n);updateDmIcon()});
+        function updateDmIcon(){dmBtn.innerHTML=html.getAttribute('data-theme')==='dark'?'<i class="fa-solid fa-sun"></i>':'<i class="fa-solid fa-moon"></i>'}
+        function showToast(m,t){t=t||'info';var w=$('toastW'),e=document.createElement('div');e.className='ti2 '+t;var ic={success:'fa-check-circle',error:'fa-exclamation-circle',info:'fa-info-circle'};var cl={success:'var(--red)',error:'#f44',info:'var(--fg4)'};e.innerHTML='<i class="fa-solid '+ic[t]+'" style="color:'+cl[t]+'"></i> '+m;w.appendChild(e);setTimeout(function(){e.style.animation='tOut .3s ease forwards';setTimeout(function(){e.remove()},300)},3500)}
+        document.addEventListener('keydown',function(e){if(e.key==='Escape'){$('shareM').classList.remove('a');$('procOv').classList.remove('a')}});
+    </script>
+
+    <script type="module">
+        var $=function(id){return document.getElementById(id)};
+        var rBFn=null,aiOK=false,uFile=null,origDu=null,pBlob=null,pDu=null;
+        var selectedBgColor='transparent';
+        var fullResCanvas=null,fullResCtx=null,fullResW=0,fullResH=0;
+
+        (async function(){try{var m=await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm');rBFn=m.default||m.removeBackground||m;if(typeof rBFn!=='function'){for(var k in m){if(typeof m[k]==='function'){rBFn=m[k];break}}}aiOK=true;console.log('AI ready')}catch(e){console.error('AI failed:',e);showToast('AI gagal dimuat — Reload','error')}})();
+
+        $('uploadArea').addEventListener('click',function(){$('fileInput').click()});
+        $('fileInput').addEventListener('change',function(e){if(e.target.files.length)hFile(e.target.files[0])});
+        var ua=$('uploadArea');
+        ua.addEventListener('dragover',function(e){e.preventDefault();ua.classList.add('dragover')});
+        ua.addEventListener('dragleave',function(){ua.classList.remove('dragover')});
+        ua.addEventListener('drop',function(e){e.preventDefault();ua.classList.remove('dragover');if(e.dataTransfer.files.length)hFile(e.dataTransfer.files[0])});
+
+        function hFile(f){if(!['image/jpeg','image/png','image/webp'].includes(f.type)){showToast('Format tidak didukung.','error');return}if(f.size>20*1024*1024){showToast('File melebihi 20 MB.','error');return}uFile=f;var r=new FileReader();r.onload=function(e){origDu=e.target.result;$('previewImg').src=origDu;$('fileInfo').textContent=f.name+' • '+(f.size/1024/1024).toFixed(2)+' MB';$('uploadAreaWrap').style.display='none';$('previewSection').classList.add('a');$('resultSection').classList.remove('a');showToast('Foto berhasil diupload!','success')};r.readAsDataURL(f)}
+
+        function reset(){uFile=null;origDu=null;pBlob=null;pDu=null;selectedBgColor='transparent';fullResCanvas=null;fullResCtx=null;resetPalette();$('fileInput').value='';$('uploadAreaWrap').style.display='block';$('previewSection').classList.remove('a');$('resultSection').classList.remove('a')}
+        $('removeBtn').addEventListener('click',reset);$('newUploadBtn').addEventListener('click',reset);$('upNewR').addEventListener('click',reset);
+
+        $('removeBgBtn').addEventListener('click',process);
+        async function process(){
+            if(!uFile)return;if(!aiOK||!rBFn){showToast('AI belum siap.','error');return}
+            var ov=$('procOv'),pF=$('pF'),pS=$('pS'),pT=$('pT');
+            ov.classList.add('a');pF.style.width='0%';pS.textContent='';$('removeBgBtn').disabled=true;
+            try{var blob=await rBFn(uFile,{model:'large',output:{format:'image/png',quality:1},progress:function(k,c,t){var p=t>0?Math.round(c/t*100):0;if(k.includes('fetch')||k.includes('download')){pT.textContent='Mengunduh Model...';pS.textContent=p+'%'}else if(k.includes('compute')||k.includes('inference')){pT.textContent='Memproses...';pS.textContent=p+'%'}var cu=parseInt(pF.style.width)||0;pF.style.width=Math.max(p,cu)+'%'}});
+            pT.textContent='Finalisasi...';pF.style.width='95%';
+            var ref=await refineHair(blob);
+            pBlob=ref||blob;pDu=await b2d(pBlob);pF.style.width='100%';pS.textContent='';
+            setTimeout(function(){ov.classList.remove('a');showR();showToast('Background berhasil dihapus!','success')},400);
+            }catch(e){console.error(e);ov.classList.remove('a');showToast('Gagal: '+(e.message||'Error'),'error')}finally{$('removeBgBtn').disabled=false}
+        }
+
+        async function refineHair(blob){
+            return new Promise(function(resolve){
+                var img=new Image();img.onload=function(){
+                    var ow=img.width,oh=img.height,maxDim=4096,sc=1;
+                    if(ow>maxDim||oh>maxDim)sc=maxDim/Math.max(ow,oh);
+                    var pw=Math.round(ow*sc),ph=Math.round(oh*sc);
+                    fullResCanvas=document.createElement('canvas');fullResCanvas.width=pw;fullResCanvas.height=ph;
+                    fullResCtx=fullResCanvas.getContext('2d',{willReadFrequently:true});fullResCtx.drawImage(img,0,0,pw,ph);fullResW=pw;fullResH=ph;
+                    var id=fullResCtx.getImageData(0,0,pw,ph),d=id.data,len=pw*ph;
+                    
+                    // 1. Extract Alpha Mask
+                    var alpha=new Uint8Array(len);for(var i=0;i<len;i++)alpha[i]=d[i*4+3];
+                    
+                    // 2. Clean very low alpha pixels (noise)
+                    for(var i=0;i<len;i++){if(alpha[i]>0&&alpha[i]<3)alpha[i]=0}
+                    
+                    // 3. Create Hard Mask for reference (Opaques)
+                    var opaqueMask=new Uint8Array(len);for(var i=0;i<len;i++)opaqueMask[i]=alpha[i]>=250?1:0;
+                    
+                    // 4. Morphological Closing to fix broken neck/outer curves
+                    // Dilate
+                    var dilated=new Uint8Array(len);
+                    for(var y=1;y<ph-1;y++){for(var x=1;x<pw-1;x++){
+                        if(alpha[y*pw+x]>0||alpha[(y-1)*pw+x]>0||alpha[(y+1)*pw+x]>0||alpha[y*pw+x-1]>0||alpha[y*pw+x+1]>0){
+                            dilated[y*pw+x]=1;
+                        }
+                    }}
+                    // Erode
+                    var closed=new Uint8Array(len);
+                    for(var y=1;y<ph-1;y++){for(var x=1;x<pw-1;x++){
+                        if(dilated[y*pw+x]===1&&dilated[(y-1)*pw+x]===1&&dilated[(y+1)*pw+x]===1&&dilated[y*pw+x-1]===1&&dilated[y*pw+x+1]===1){
+                            closed[y*pw+x]=1;
+                        }
+                    }}
+                    
+                    // Merge closed mask with original alpha to fix broken gaps smoothly
+                    for(var i=0;i<len;i++){
+                        if(closed[i]===1 && alpha[i]<250) alpha[i] = 255; 
+                    }
+                    
+                    // 5. Alpha Smoothing (Anti-aliasing / Feathering)
+                    var alphaSm=new Uint8Array(alpha);
+                    for(var y=2;y<ph-2;y++){for(var x=2;x<pw-2;x++){
+                        var idx=y*pw+x,a=alpha[idx];
+                        if(a>0&&a<255){
+                            var s=a*4,t=4;
+                            var neighbors=[[-1,0,2],[1,0,2],[0,-1,2],[0,1,2],[-1,-1,1],[1,-1,1],[-1,1,1],[1,1,1]];
+                            for(var n=0;n<neighbors.length;n++){
+                                var ny=y+neighbors[n][0],nx=x+neighbors[n][1],ww=neighbors[n][2];
+                                if(ny>=0&&ny<ph&&nx>=0&&nx<pw){
+                                    s+=alpha[ny*pw+nx]*ww;t+=ww;
+                                }
+                            }
+                            alphaSm[idx]=Math.round(s/t);
+                        }
+                    }}
+                    alpha=alphaSm;
+                    
+                    // 6. Color Decontamination (Remove background color fringe on edges)
+                    for(var y=0;y<ph;y++){for(var x=0;x<pw;x++){
+                        var idx=y*pw+x,a=alpha[idx];
+                        if(a>=3&&a<250){
+                            var fR=0,fG=0,fB=0,fW=0;
+                            // Search for nearby opaque pixels
+                            for(var dy=-6;dy<=6&&fW<0.5;dy++){for(var dx=-6;dx<=6&&fW<0.5;dx++){
+                                var ny=y+dy,nx=x+dx;
+                                if(ny>=0&&ny<ph&&nx>=0&&nx<pw){
+                                    var ni=ny*pw+nx;
+                                    if(opaqueMask[ni]||closed[ni]===1){ // Use closed mask to get correct skin color
+                                        var dist=Math.sqrt(dy*dy+dx*dx);
+                                        var wt=1/(1+dist*dist);
+                                        fR+=d[ni*4]*wt;fG+=d[ni*4+1]*wt;fB+=d[ni*4+2]*wt;fW+=wt;
+                                    }
+                                }
+                            }}
+                            if(fW>0){
+                                d[idx*4]=Math.round(fR/fW);
+                                d[idx*4+1]=Math.round(fG/fW);
+                                d[idx*4+2]=Math.round(fB/fW);
+                            }
+                        }
+                    }}
+                    
+                    // Apply final alpha
+                    for(var i=0;i<len;i++)d[i*4+3]=alpha[i];
+                    
+                    fullResCtx.putImageData(id,0,0);
+                    var pvW=pw,pvH=ph,pvMax=1200;if(pvW>pvMax||pvH>pvMax){var pvSc=pvMax/Math.max(pvW,pvH);pvW=Math.round(pvW*pvSc);pvH=Math.round(pvH*pvSc)}
+                    var pvCv=document.createElement('canvas');pvCv.width=pvW;pvCv.height=pvH;var pvCtx=pvCv.getContext('2d');pvCtx.drawImage(fullResCanvas,0,0,pvW,pvH);
+                    pvCv.toBlob(function(b){resolve(b)},'image/png')};
+                img.onerror=function(){resolve(null)};img.src=URL.createObjectURL(blob)})
+        }
+
+        function b2d(b){return new Promise(function(r,j){var rd=new FileReader();rd.onload=function(){r(rd.result)};rd.onerror=j;rd.readAsDataURL(b)})}
+
+        function showR(){$('resBefore').src=origDu;$('resAfter').src=pDu;$('previewSection').classList.remove('a');$('resultSection').classList.add('a');selectedBgColor='transparent';resetPalette();setTimeout(function(){$('resultSection').scrollIntoView({behavior:'smooth',block:'center'})},200)}
+
+        /* PALETTE LOGIC */
+        var swatches=document.querySelectorAll('.pal-swatch');
+        swatches.forEach(function(sw){sw.addEventListener('click',function(){swatches.forEach(function(s){s.classList.remove('active')});$('palCenter').classList.remove('active');sw.classList.add('active');selectedBgColor=sw.getAttribute('data-color');applyBgColor(selectedBgColor)})});
+        $('customColor').addEventListener('input',function(){var color=$('customColor').value;swatches.forEach(function(s){s.classList.remove('active')});$('palCenter').classList.add('active');$('palCenterColor').style.background=color;$('palCenter').classList.add('has-color');selectedBgColor=color;applyBgColor(selectedBgColor)});
+        function resetPalette(){swatches.forEach(function(s){s.classList.remove('active')});$('palCenter').classList.remove('active','has-color');$('palCenterColor').style.background='transparent';var first=document.querySelector('.pal-swatch.transparent-swatch');if(first)first.classList.add('active');selectedBgColor='transparent'}
+        function applyBgColor(color){var afterWrap=$('afterWrap'),afterImg=$('resAfter');if(color==='transparent'){afterWrap.style.background='var(--chk)';afterImg.src=pDu}else{afterWrap.style.background=color;compositePreview(color,function(dataUrl){afterImg.src=dataUrl})}}
+        function compositePreview(color,callback){var img=new Image();img.onload=function(){var cv=document.createElement('canvas'),ctx=cv.getContext('2d');cv.width=img.width;cv.height=img.height;ctx.fillStyle=color;ctx.fillRect(0,0,cv.width,cv.height);ctx.drawImage(img,0,0);callback(cv.toDataURL('image/png'))};img.src=pDu}
+
+        /* 300 DPI INJECTOR */
+        function setPngDpi(pngBlob,dpi){return new Promise(function(resolve){var ppm=Math.round(dpi/0.0254);var reader=new FileReader();reader.onload=function(){var data=new Uint8Array(reader.result);var offset=8;var len=((data[offset]<<24)|(data[offset+1]<<16)|(data[offset+2]<<8)|data[offset+3]);offset+=12+len;var phys=new Uint8Array(21);phys[0]=0;phys[1]=0;phys[2]=0;phys[3]=9;phys[4]=0x70;phys[5]=0x48;phys[6]=0x59;phys[7]=0x73;phys[8]=(ppm>>>24)&0xFF;phys[9]=(ppm>>>16)&0xFF;phys[10]=(ppm>>>8)&0xFF;phys[11]=ppm&0xFF;phys[12]=(ppm>>>24)&0xFF;phys[13]=(ppm>>>16)&0xFF;phys[14]=(ppm>>>8)&0xFF;phys[15]=ppm&0xFF;phys[16]=1;var crcData=new Uint8Array(13);for(var i=0;i<4;i++)crcData[i]=phys[4+i];for(var i=0;i<9;i++)crcData[4+i]=phys[8+i];var crc=crc32(crcData);phys[17]=(crc>>>24)&0xFF;phys[18]=(crc>>>16)&0xFF;phys[19]=(crc>>>8)&0xFF;phys[20]=crc&0xFF;var before=data.slice(0,offset);var after=data.slice(offset);var result=new Uint8Array(before.length+phys.length+after.length);result.set(before,0);result.set(phys,before.length);result.set(after,before.length+phys.length);resolve(new Blob([result],{type:'image/png'}))};reader.readAsArrayBuffer(pngBlob)})}
+        function crc32(buf){var c,crcTable=[];for(var n=0;n<256;n++){c=n;for(var k=0;k<8;k++){if(c&1)c=0xEDB88320^(c>>>1);else c=c>>>1}crcTable[n]=c}var crc=0xFFFFFFFF;for(var i=0;i<buf.length;i++){crc=crcTable[(crc^buf[i])&0xFF]^(crc>>>8)}return(crc^0xFFFFFFFF)>>>0}
+
+        /* DOWNLOAD HD 300 DPI */
+        $('dlPng').addEventListener('click',function(){
+            if(!pDu)return;showToast('Menyiapkan PNG HD 300dpi...','info');
+            if(selectedBgColor==='transparent'){
+                if(fullResCanvas){fullResCanvas.toBlob(function(b){setPngDpi(b,300).then(function(dpiBlob){dLB(dpiBlob,'karya-abadi-nobg.png');showToast('PNG HD 300dpi berhasil! '+fullResW+'×'+fullResH+'px','success')})},'image/png')}
+                else{dLB(pBlob,'karya-abadi-nobg.png');showToast('PNG berhasil!','success')}
+            }else{
+                if(fullResCanvas){var cv=document.createElement('canvas');cv.width=fullResW;cv.height=fullResH;var ctx=cv.getContext('2d');ctx.fillStyle=selectedBgColor;ctx.fillRect(0,0,fullResW,fullResH);ctx.drawImage(fullResCanvas,0,0);cv.toBlob(function(b){setPngDpi(b,300).then(function(dpiBlob){dLB(dpiBlob,'karya-abadi-bg.png');showToast('PNG 300dpi berhasil! '+fullResW+'×'+fullResH+'px','success')})},'image/png')}
+                else{compositePreview(selectedBgColor,function(dataUrl){fetch(dataUrl).then(function(r){return r.blob()}).then(function(b){dLB(b,'karya-abadi-bg.png');showToast('PNG berhasil!','success')})})}
+            }
+        });
+
+        $('dlJpg').addEventListener('click',function(){
+            if(!pDu)return;var bgColor=selectedBgColor==='transparent'?'#FFFFFF':selectedBgColor;showToast('Menyiapkan JPG 300dpi...','info');
+            if(fullResCanvas){var cv=$('expC');cv.width=fullResW;cv.height=fullResH;var ctx=cv.getContext('2d');ctx.fillStyle=bgColor;ctx.fillRect(0,0,fullResW,fullResH);ctx.drawImage(fullResCanvas,0,0);cv.toBlob(function(b){dLB(b,'karya-abadi.jpg');showToast('JPG 300dpi berhasil! '+fullResW+'×'+fullResH+'px','success')},'image/jpeg',1.0)}
+            else{var img=new Image();img.onload=function(){var cv=$('expC');cv.width=img.width;cv.height=img.height;var ctx=cv.getContext('2d');ctx.fillStyle=bgColor;ctx.fillRect(0,0,cv.width,cv.height);ctx.drawImage(img,0,0);cv.toBlob(function(b){dLB(b,'karya-abadi.jpg');showToast('JPG berhasil!','success')},'image/jpeg',1.0)};img.src=pDu}
+        });
+
+        function dLB(b,n){var u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=n;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(u)},1000)}
+
+        /* SHARE LOGIC */
+        $('shareBtn').addEventListener('click',function(){$('shareM').classList.add('a')});
+        $('cShare').addEventListener('click',function(){$('shareM').classList.remove('a')});
+        $('shareM').addEventListener('click',function(e){if(e.target===$('shareM'))$('shareM').classList.remove('a')});
+        var sT='Hapus background foto otomatis dengan AI di KARYA ABADI!',sU=window.location.href;
+        $('sWa').href='https://wa.me/?text='+encodeURIComponent(sT+' '+sU);
+        $('sFb').href='https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(sU);
+        $('sTw').href='https://twitter.com/intent/tweet?text='+encodeURIComponent(sT)+'&url='+encodeURIComponent(sU);
+        $('sTg').href='https://t.me/share/url?url='+encodeURIComponent(sU)+'&text='+encodeURIComponent(sT);
+        $('sIg').addEventListener('click',function(e){e.preventDefault();showToast('Download hasil lalu share ke Instagram! 📸','info')});
+    </script>
+</body>
+</html>
