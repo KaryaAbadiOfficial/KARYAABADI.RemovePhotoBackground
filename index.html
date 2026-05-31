@@ -204,7 +204,7 @@
             var ov=$('procOv'),pF=$('pF'),pS=$('pS'),pT=$('pT');
             ov.classList.add('a');pF.style.width='0%';pS.textContent='';$('removeBgBtn').disabled=true;
             try{var blob=await rBFn(uFile,{model:'large',output:{format:'image/png',quality:1},progress:function(k,c,t){var p=t>0?Math.round(c/t*100):0;if(k.includes('fetch')||k.includes('download')){pT.textContent='Mengunduh Model...';pS.textContent=p+'%'}else if(k.includes('compute')||k.includes('inference')){pT.textContent='Memproses...';pS.textContent=p+'%'}var cu=parseInt(pF.style.width)||0;pF.style.width=Math.max(p,cu)+'%'}});
-            pT.textContent='Finalisasi...';pF.style.width='95%';
+            pT.textContent='Membersihkan Tepi...';pF.style.width='95%';
             var ref=await refineEdge(blob);
             pBlob=ref||blob;pDu=await b2d(pBlob);pF.style.width='100%';pS.textContent='';
             setTimeout(function(){ov.classList.remove('a');showR();showToast('Background berhasil dihapus!','success')},400);
@@ -221,33 +221,41 @@
                     fullResCtx=fullResCanvas.getContext('2d',{willReadFrequently:true});fullResCtx.drawImage(img,0,0,pw,ph);fullResW=pw;fullResH=ph;
                     var id=fullResCtx.getImageData(0,0,pw,ph),d=id.data,len=pw*ph;
                     
-                    // 1. Extract Alpha
-                    var alpha=new Uint8Array(len);for(var i=0;i<len;i++)alpha[i]=d[i*4+3];
-                    for(var i=0;i<len;i++){if(alpha[i]>0&&alpha[i]<10)alpha[i]=0} // Clean noise
+                    // 1. Extract Alpha & Hard Cleanup (Remove faint halo pixels)
+                    var alpha=new Uint8Array(len);
+                    for(var i=0;i<len;i++){
+                        var a=d[i*4+3];
+                        if(a < 30) a = 0;       // Kill faint background residue aggressively
+                        if(a > 235) a = 255;     // Solidify strong object pixels
+                        alpha[i] = a;
+                    }
                     
-                    // 2. Create Opaque Mask
-                    var opaqueMask=new Uint8Array(len);for(var i=0;i<len;i++)opaqueMask[i]=alpha[i]>=20?1:0;
+                    // 2. Create Deep Foreground Mask (Erode 3px) 
+                    // We sample colors from here because deep inside the object, there is NO background color spill
+                    var temp1=new Uint8Array(alpha);
+                    for(var e=0;e<3;e++){ // 3 pixels deep
+                        var temp2=new Uint8Array(len);
+                        for(var y=1;y<ph-1;y++){for(var x=1;x<pw-1;x++){
+                            var idx=y*pw+x;
+                            if(temp1[idx]===255 && temp1[(y-1)*pw+x]===255 && temp1[(y+1)*pw+x]===255 && temp1[y*pw+x-1]===255 && temp1[y*pw+x+1]===255){
+                                temp2[idx]=255;
+                            }
+                        }}
+                        temp1=temp2;
+                    }
+                    var deepMask=temp1;
                     
-                    // 3. Erode to find PURE Foreground (1px inside)
-                    var pureFg=new Uint8Array(len);
-                    for(var y=1;y<ph-1;y++){for(var x=1;x<pw-1;x++){
-                        var idx=y*pw+x;
-                        if(opaqueMask[idx]&&opaqueMask[(y-1)*pw+x]&&opaqueMask[(y+1)*pw+x]&&opaqueMask[y*pw+x-1]&&opaqueMask[y*pw+x+1]){
-                            pureFg[idx]=1;
-                        }
-                    }}
-                    
-                    // 4. Defringe / Color Decontamination (Aggressive)
-                    // Replace color of edge pixels with nearest pure interior color to remove background halo
+                    // 3. Aggressive Color Decontamination (Defringe)
+                    // Replace RGB of ALL edge pixels with colors from the deep mask
                     for(var y=0;y<ph;y++){for(var x=0;x<pw;x++){
                         var idx=y*pw+x;
-                        if(opaqueMask[idx] && !pureFg[idx]){ // It's a fringe pixel
+                        if(alpha[idx]>0 && deepMask[idx]===0){ // It's an edge/spill pixel
                             var fR=0,fG=0,fB=0,fW=0;
-                            for(var dy=-4;dy<=4;dy++){for(var dx=-4;dx<=4;dx++){
+                            for(var dy=-7;dy<=7;dy++){for(var dx=-7;dx<=7;dx++){
                                 var ny=y+dy,nx=x+dx;
                                 if(ny>=0&&ny<ph&&nx>=0&&nx<pw){
                                     var ni=ny*pw+nx;
-                                    if(pureFg[ni]){ // Sample from pure interior
+                                    if(deepMask[ni]===255){ // Only sample from pure interior object
                                         var dist=Math.sqrt(dy*dy+dx*dx);
                                         var wt=1/(1+dist*dist);
                                         fR+=d[ni*4]*wt;fG+=d[ni*4+1]*wt;fB+=d[ni*4+2]*wt;fW+=wt;
@@ -262,22 +270,23 @@
                         }
                     }}
                     
-                    // 5. Morphological Close to fix broken gaps (neck/shoulders)
-                    var dilated=new Uint8Array(len);
+                    // 4. Alpha Contraction (Shave off 1px outer ring to cut the physical spill completely)
+                    var contracted=new Uint8Array(alpha);
                     for(var y=1;y<ph-1;y++){for(var x=1;x<pw-1;x++){
-                        if(alpha[y*pw+x]>0||alpha[(y-1)*pw+x]>0||alpha[(y+1)*pw+x]>0||alpha[y*pw+x-1]>0||alpha[y*pw+x+1]>0){
-                            dilated[y*pw+x]=1;
+                        var idx=y*pw+x;
+                        if(alpha[idx]>0){
+                            var tNeighbors=0;
+                            if(alpha[(y-1)*pw+x]===0)tNeighbors++;
+                            if(alpha[(y+1)*pw+x]===0)tNeighbors++;
+                            if(alpha[y*pw+x-1]===0)tNeighbors++;
+                            if(alpha[y*pw+x+1]===0)tNeighbors++;
+                            // If it's the very outer edge touching background, delete it
+                            if(tNeighbors>=2) contracted[idx]=0; 
                         }
                     }}
-                    var closed=new Uint8Array(len);
-                    for(var y=1;y<ph-1;y++){for(var x=1;x<pw-1;x++){
-                        if(dilated[y*pw+x]===1&&dilated[(y-1)*pw+x]===1&&dilated[(y+1)*pw+x]===1&&dilated[y*pw+x-1]===1&&dilated[y*pw+x+1]===1){
-                            closed[y*pw+x]=1;
-                        }
-                    }}
-                    for(var i=0;i<len;i++){if(closed[i]===1 && alpha[i]<250) alpha[i] = 255;}
+                    alpha=contracted;
                     
-                    // 6. Alpha Smoothing
+                    // 5. Alpha Smoothing (Anti-alias the jagged edges caused by contraction)
                     var alphaSm=new Uint8Array(alpha);
                     for(var y=2;y<ph-2;y++){for(var x=2;x<pw-2;x++){
                         var idx=y*pw+x,a=alpha[idx];
@@ -293,9 +302,11 @@
                     }}
                     alpha=alphaSm;
                     
+                    // Apply final alpha back to image data
                     for(var i=0;i<len;i++)d[i*4+3]=alpha[i];
                     fullResCtx.putImageData(id,0,0);
                     
+                    // Create preview
                     var pvW=pw,pvH=ph,pvMax=1200;if(pvW>pvMax||pvH>pvMax){var pvSc=pvMax/Math.max(pvW,pvH);pvW=Math.round(pvW*pvSc);pvH=Math.round(pvH*pvSc)}
                     var pvCv=document.createElement('canvas');pvCv.width=pvW;pvCv.height=pvH;var pvCtx=pvCv.getContext('2d');pvCtx.drawImage(fullResCanvas,0,0,pvW,pvH);
                     pvCv.toBlob(function(b){resolve(b)},'image/png')};
@@ -343,7 +354,7 @@
         function applyGrayscaleToCtx(ctx, w, h){
             var id=ctx.getImageData(0,0,w,h),d=id.data;
             for(var i=0;i<d.length;i+=4){
-                if(d[i+3]>0){ // Only visible pixels
+                if(d[i+3]>0){
                     var gray=Math.round(0.299*d[i]+0.587*d[i+1]+0.114*d[i+2]);
                     d[i]=gray;d[i+1]=gray;d[i+2]=gray;
                 }
