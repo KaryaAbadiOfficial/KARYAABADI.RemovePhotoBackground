@@ -8,7 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        :root{--bg:#000;--bg2:#0A0A0A;--card:#111;--border:#222;--red:#db1514;--red-b:#FF0000;--red-glow:rgba(219,21,20,0.4);--red-s:rgba(219,21,20,0.08);--red-s2:rgba(219,21,20,0.15);--blue:#0b00a3;--fg:#FFF;--fg8:rgba(255,255,255,0.8);--fg6:rgba(255,255,255,0.6);--fg4:rgba(255,255,255,0.4);--fg2:rgba(255,255,255,0.2);--fg05:rgba(255,255,255,0.05);--chk:repeating-conic-gradient(var(--border)0% 25%,var(--bg2)0% 50%)0 0/20px 20px}
+        :root{--bg:#000;--bg2:#0A0A0A;--card:#111;--border:#222;--red:#db1514;--red-b:#ef2020;--red-glow:rgba(219,21,20,0.4);--red-s:rgba(219,21,20,0.08);--red-s2:rgba(219,21,20,0.15);--fg:#FFF;--fg8:rgba(255,255,255,0.8);--fg6:rgba(255,255,255,0.6);--fg4:rgba(255,255,255,0.4);--fg2:rgba(255,255,255,0.2);--fg05:rgba(255,255,255,0.05);--chk:repeating-conic-gradient(var(--border)0% 25%,var(--bg2)0% 50%)0 0/20px 20px}
         [data-theme="light"]{--bg:#F5F5F5;--bg2:#EAEAEA;--card:#FFF;--border:#D0D0D0;--red-s:rgba(219,21,20,0.06);--red-s2:rgba(219,21,20,0.1);--fg:#111;--fg8:rgba(0,0,0,0.8);--fg6:rgba(0,0,0,0.6);--fg4:rgba(0,0,0,0.4);--fg2:rgba(0,0,0,0.2);--fg05:rgba(0,0,0,0.05);--chk:repeating-conic-gradient(var(--border)0% 25%,#fff 0% 50%)0 0/20px 20px}
         *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
         body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;overflow-x:hidden;transition:background .35s,color .35s}
@@ -20,7 +20,7 @@
         .dm-btn{width:36px;height:36px;border-radius:50%;border:1px solid #333;background:#111;color:rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;font-size:.9rem}.dm-btn:hover{border-color:var(--red);color:var(--red);background:rgba(219,21,20,0.1)}
         .main-c{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:80px 20px 60px;position:relative}
         .bg1{position:fixed;top:-250px;left:-150px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(219,21,20,0.06)0%,transparent 70%);pointer-events:none;z-index:0}
-        .bg2{position:fixed;bottom:-300px;right:-150px;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(11,0,163,0.04)0%,transparent 70%);pointer-events:none;z-index:0}
+        .bg2{position:fixed;bottom:-300px;right:-150px;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(219,21,20,0.04)0%,transparent 70%);pointer-events:none;z-index:0}
         .app-c{position:relative;z-index:1;width:100%;max-width:700px}
         .card{background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;transition:background .35s,border-color .35s}
         .up-area{padding:56px 36px;text-align:center;cursor:pointer;transition:all .3s;border:2px dashed var(--border);border-radius:14px;margin:20px}
@@ -135,7 +135,6 @@
                 <div class="ba-col"><div class="ba-img-wrap"><span class="ba-lbl before">Sebelum</span><img id="resBefore" src="" alt="Sebelum"></div></div>
                 <div class="ba-col"><div class="ba-img-wrap after-wrap" id="afterWrap"><span class="ba-lbl after">Sesudah</span><img id="resAfter" src="" alt="Sesudah"></div></div>
             </div></div>
-            <div class="palette-wrap"><div class="palette-layout">
-                <div class="pal-side" id="palLeft">
-                    <div class="pal-swatch transparent-swatch active" data-color="transparent" title="Transparan"></div>
-                    <div class="pal-swatch" data-color="#FFFFFF
+            <div class="palette-wrap">
+                <div class="palette-layout">
+                    <div class="pal-side" id
