@@ -127,7 +127,10 @@
         <div id="previewSection" class="ps">
             <div class="sbar"><div class="sbar-t"><i class="fa-solid fa-image"></i> Preview</div><button class="btn-d btn-sm" id="removeBtn"><i class="fa-solid fa-xmark"></i> Hapus</button></div>
             <div class="iw"><img id="previewImg" src="" alt="Preview"><div id="fileInfo" class="fi2"></div></div>
-            <div class="abar"><button class="btn-r" id="removeBgBtn" style="flex:1;justify-content:center"><i class="fa-solid fa-wand-magic-sparkles"></i> Remove Background</button></div>
+            <div class="abar">
+                <button class="btn-r" id="removeBgBtn" style="flex:1;justify-content:center"><i class="fa-solid fa-wand-magic-sparkles"></i> Remove Background</button>
+                <button class="btn-d active-effect" id="autoCleanBtn" title="Bersihkan sisa stroke halus di luar objek secara otomatis"><i class="fa-solid fa-broom"></i> Auto-Clean</button>
+            </div>
         </div>
         <div id="resultSection" class="rs2">
             <div class="sbar"><div class="sbar-t"><i class="fa-solid fa-check-circle"></i> Hasil</div><button class="btn-d btn-sm" id="newUploadBtn"><i class="fa-solid fa-plus"></i> Baru</button></div>
@@ -183,6 +186,7 @@
         var selectedBgColor='transparent';
         var fullResCanvas=null,fullResCtx=null,fullResW=0,fullResH=0;
         var isGrayscale=false;
+        var isAutoClean=true; // Aktifkan pembersihan maksimal secara default
 
         (async function(){try{var m=await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm');rBFn=m.default||m.removeBackground||m;if(typeof rBFn!=='function'){for(var k in m){if(typeof m[k]==='function'){rBFn=m[k];break}}}aiOK=true;console.log('AI ready')}catch(e){console.error('AI failed:',e);showToast('AI gagal dimuat — Reload','error')}})();
 
@@ -198,6 +202,12 @@
         function reset(){uFile=null;origDu=null;pBlob=null;pDu=null;selectedBgColor='transparent';fullResCanvas=null;fullResCtx=null;isGrayscale=false;$('bwToggle').classList.remove('active-effect');resetPalette();$('fileInput').value='';$('uploadAreaWrap').style.display='block';$('previewSection').classList.remove('a');$('resultSection').classList.remove('a')}
         $('removeBtn').addEventListener('click',reset);$('newUploadBtn').addEventListener('click',reset);
 
+        $('autoCleanBtn').addEventListener('click',function(){
+            isAutoClean=!isAutoClean;
+            if(isAutoClean){this.classList.add('active-effect');showToast('Auto-Clean Edge Aktif (Maksimal Bersih)','info')}
+            else{this.classList.remove('active-effect');showToast('Auto-Clean Edge Nonaktif (Standar AI)','info')}
+        });
+
         $('removeBgBtn').addEventListener('click',process);
         async function process(){
             if(!uFile)return;if(!aiOK||!rBFn){showToast('AI belum siap.','error');return}
@@ -211,10 +221,6 @@
             }catch(e){console.error(e);ov.classList.remove('a');showToast('Gagal: '+(e.message||'Error'),'error')}finally{$('removeBgBtn').disabled=false}
         }
 
-        /* ============================================================
-           ALGORITMA REFINED EDGE V2 - ANTI STROKE / NINJA
-           Menghapus stroke luar dengan Erosion + Hardening
-        ============================================================ */
         async function refineEdge(blob){
             return new Promise(function(resolve){
                 var img=new Image();
@@ -231,11 +237,10 @@
 
                     var id=fullResCtx.getImageData(0,0,pw,ph),d=id.data,len=pw*ph;
 
-                    // Simpan alpha asli dari AI
                     var origA=new Uint8Array(len);
                     for(var i=0;i<len;i++) origA[i]=d[i*4+3];
 
-                    // Deteksi warna background dominan (bersebelahan dengan objek)
+                    // Deteksi warna background dominan
                     var bgR=0,bgG=0,bgB=0,bgN=0;
                     for(var y=1;y<ph-1;y++){for(var x=1;x<pw-1;x++){
                         var i=y*pw+x;
@@ -248,22 +253,24 @@
                     if(bgN>0){bgR=Math.round(bgR/bgN);bgG=Math.round(bgG/bgN);bgB=Math.round(bgB/bgN)}
                     else{bgR=255;bgG=255;bgB=255}
 
-                    // Binary mask dasar
                     var bMask=new Uint8Array(len);
                     for(var i=0;i<len;i++) bMask[i]=origA[i]>25?1:0;
 
-                    // ERODE 1px untuk memotong sisa stroke / ninja di luar objek
-                    var eroded=new Uint8Array(len);
-                    for(var y=1;y<ph-1;y++){for(var x=1;x<pw-1;x++){
-                        var i=y*pw+x;
-                        if(bMask[i]===1 && bMask[(y-1)*pw+x]===1 && bMask[(y+1)*pw+x]===1 && bMask[y*pw+x-1]===1 && bMask[y*pw+x+1]===1){
-                            eroded[i]=1;
-                        }
-                    }}
+                    if(isAutoClean){
+                        // Erode 1px untuk memotong sisa ninja/stroke halus
+                        var eroded=new Uint8Array(len);
+                        for(var y=1;y<ph-1;y++){for(var x=1;x<pw-1;x++){
+                            var i=y*pw+x;
+                            if(bMask[i]===1 && bMask[(y-1)*pw+x]===1 && bMask[(y+1)*pw+x]===1 && bMask[y*pw+x-1]===1 && bMask[y*pw+x+1]===1){
+                                eroded[i]=1;
+                            }
+                        }}
+                        bMask=eroded;
+                    }
 
-                    // Deep interior mask (erode 5px) untuk referensi warna murni objek
-                    var di=new Uint8Array(eroded);
-                    for(var p=0;p<4;p++){
+                    // Deep interior mask (erode 5px)
+                    var di=new Uint8Array(bMask);
+                    for(var p=0;p<5;p++){
                         var t=new Uint8Array(len);
                         for(var y=1;y<ph-1;y++){for(var x=1;x<pw-1;x++){
                             var i=y*pw+x;
@@ -274,9 +281,9 @@
                     }
                     var hasDI=false;
                     for(var i=0;i<len;i++){if(di[i]){hasDI=true;break}}
-                    if(!hasDI){for(var i=0;i<len;i++) di[i]=bMask[i]}
+                    if(!hasDI){for(var i=0;i<len;i++) di[i]=origA[i]>200?1:0}
 
-                    // BFS propagate warna interior ke seluruh objek
+                    // BFS propagate warna interior
                     var pR=new Uint8Array(len),pG=new Uint8Array(len),pB=new Uint8Array(len),pV=new Uint8Array(len);
                     var q=new Int32Array(len),qh=0,qt=0;
                     for(var i=0;i<len;i++){
@@ -289,7 +296,7 @@
                             var ny=cy+dy,nx=cx+dx;
                             if(ny>=0&&ny<ph&&nx>=0&&nx<pw){
                                 var ni=ny*pw+nx;
-                                if(!pV[ni]&&eroded[ni]){
+                                if(!pV[ni]&&bMask[ni]){
                                     pR[ni]=pR[ci];pG[ni]=pG[ci];pB[ni]=pB[ci];
                                     pV[ni]=1;q[qt++]=ni;
                                 }
@@ -303,66 +310,61 @@
                         var a=origA[i];
                         var r=d[i*4],g=d[i*4+1],b=d[i*4+2];
 
-                        // Jarak warna ke background
+                        // Jarak warna ke background (Dominance ratio)
                         var bgD=Math.sqrt((r-bgR)*(r-bgR)+(g-bgG)*(g-bgG)+(b-bgB)*(b-bgB));
 
-                        if(!eroded[i]){
-                            // Di luar eroded mask → transparan mutlak (hapus stroke/ninja)
+                        // Deteksi foreground hitam/gelap (Jas hitam, rambut hitam) agar tidak salah hapus
+                        var lum = r*0.299 + g*0.587 + b*0.114;
+                        var isDarkFg = lum < 60;
+
+                        if(!bMask[i]){
+                            // Di luar mask → transparan mutlak
                             d[i*4+3]=0;
                         } else if(a<25){
-                            // Transparan/Noise yang ada di dalam mask → warnai dengan interior jika ada
                             if(pV[i]){
                                 d[i*4]=pR[i];d[i*4+1]=pG[i];d[i*4+2]=pB[i];d[i*4+3]=220;
                             } else {
                                 d[i*4+3]=0;
                             }
                         } else if(a>=25&&a<200){
-                            // Semi-transparan → Defringing keras
                             var af=a/255;
-                            // Rumus Foreground = (Pixel - (1-α)*Background) / α
                             var fR=(r-(1-af)*bgR)/af;
                             var fG=(g-(1-af)*bgG)/af;
                             var fB=(b-(1-af)*bgB)/af;
                             
+                            // Jika hasil defringing meledak (over-corrected), dan itu foreground gelap, paksa ke warna interior
                             var valid=fR>=0&&fR<=255&&fG>=0&&fG<=255&&fB>=0&&fB<=255;
+                            if(!valid && isDarkFg && pV[i]){
+                                fR=pR[i]; fG=pG[i]; fB=pB[i]; valid=true;
+                            }
+
                             if(valid){
                                 d[i*4]=Math.round(fR);
                                 d[i*4+1]=Math.round(fG);
                                 d[i*4+2]=Math.round(fB);
                             } else if(pV[i]){
-                                // Jika hasil defringing meledak, paksa pakai warna interior
                                 d[i*4]=pR[i];d[i*4+1]=pG[i];d[i*4+2]=pB[i];
                             }
-                            // Keraskan alpha agar tidak ada sisa kabut putih
                             d[i*4+3]=Math.min(255, Math.round(a*1.25));
                         } else {
-                            // Alpha tinggi (Objek solid)
-                            // Spill suppression untuk tepi yang nyangkut warna background
-                            if(bgD<120 && pV[i]){
-                                var spill = (120-bgD)/120 * 0.6;
-                                d[i*4]=Math.round(r*(1-spill)+pR[i]*spill);
-                                d[i*4+1]=Math.round(g*(1-spill)+pG[i]*spill);
-                                d[i*4+2]=Math.round(b*(1-spill)+pB[i]*spill);
+                            // Spill suppression untuk objek solid (menghapus pantulan merah di jas)
+                            if(pV[i]){
+                                var fLum = pR[i]*0.299 + pG[i]*0.587 + pB[i]*0.114;
+                                var spill = 0;
+                                if(fLum < 80){ // Objek gelap, sangat sensitif terhadap pantulan
+                                    spill = Math.max(0, (120 - bgD) / 120) * 0.85;
+                                } else if(bgD < 120){ // Objek terang
+                                    spill = (120-bgD)/120 * 0.5;
+                                }
+                                if(spill > 0){
+                                    d[i*4]=Math.round(r*(1-spill)+pR[i]*spill);
+                                    d[i*4+1]=Math.round(g*(1-spill)+pG[i]*spill);
+                                    d[i*4+2]=Math.round(b*(1-spill)+pB[i]*spill);
+                                }
                             }
                             d[i*4+3]=255;
                         }
                     }}
-
-                    // Smoothing Alpha 1px untuk anti-aliasing tepi yang baru
-                    var alphaSm=new Uint8Array(len);
-                    for(var y=0;y<ph;y++){for(var x=0;x<pw;x++){
-                        var i=y*pw+x,a=d[i*4+3];
-                        if(a>0&&a<255&&y>0&&y<ph-1&&x>0&&x<pw-1){
-                            var s=a*4,t=4;
-                            s+=d[(y-1)*pw+x*4+3];s+=d[(y+1)*pw+x*4+3];
-                            s+=d[y*pw+(x-1)*4+3];s+=d[y*pw+(x+1)*4+3];
-                            t+=4;
-                            alphaSm[i]=Math.round(s/t);
-                        } else {
-                            alphaSm[i]=a;
-                        }
-                    }}
-                    for(var i=0;i<len;i++) d[i*4+3]=alphaSm[i];
 
                     fullResCtx.putImageData(id,0,0);
 
