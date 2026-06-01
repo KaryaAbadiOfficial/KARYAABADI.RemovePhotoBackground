@@ -211,16 +211,6 @@
             }catch(e){console.error(e);ov.classList.remove('a');showToast('Gagal: '+(e.message||'Error'),'error')}finally{$('removeBgBtn').disabled=false}
         }
 
-        /* ============================================================
-           CORE: refineEdge — Photoshop-quality edge refinement
-           1. Deteksi warna background dominan
-           2. Dilate mask 3px (8-connectivity) → objek tidak terhapus
-           3. Erode deep interior 7px → referensi warna objek murni
-           4. BFS propagate warna interior ke seluruh edge zone
-           5. Mathematical color decontamination (defringing)
-           6. Alpha solidification → rapih seperti Photoshop
-           7. Smooth alpha & final cleanup
-        ============================================================ */
         async function refineEdge(blob){
             return new Promise(function(resolve){
                 var img=new Image();
@@ -237,12 +227,11 @@
 
                     var id=fullResCtx.getImageData(0,0,pw,ph),d=id.data,len=pw*ph;
 
-                    // ═══ STEP 1: Simpan alpha asli dari AI ═══
+                    // Simpan alpha asli
                     var origA=new Uint8Array(len);
                     for(var i=0;i<len;i++) origA[i]=d[i*4+3];
 
-                    // ═══ STEP 2: Deteksi warna background dominan ═══
-                    // Prioritas: pixel bg yang bersebelahan dengan objek (lebih akurat)
+                    // Deteksi warna background dominan (bersebelahan dengan objek)
                     var bgR=0,bgG=0,bgB=0,bgN=0;
                     for(var y=1;y<ph-1;y++){for(var x=1;x<pw-1;x++){
                         var i=y*pw+x;
@@ -255,11 +244,11 @@
                     if(bgN>0){bgR=Math.round(bgR/bgN);bgG=Math.round(bgG/bgN);bgB=Math.round(bgB/bgN)}
                     else{bgR=255;bgG=255;bgB=255}
 
-                    // ═══ STEP 3: Binary mask — threshold rendah agar objek tidak hilang ═══
+                    // Binary mask
                     var bMask=new Uint8Array(len);
                     for(var i=0;i<len;i++) bMask[i]=origA[i]>8?1:0;
 
-                    // ═══ STEP 4: Dilate mask 3px (8-connectivity) → recovery helai rambut ═══
+                    // Dilate mask 3px (8-connectivity)
                     var dm=new Uint8Array(bMask);
                     for(var p=0;p<3;p++){
                         var t=new Uint8Array(len);
@@ -276,7 +265,7 @@
                         dm=t;
                     }
 
-                    // ═══ STEP 5: Deep interior mask (erode 7px) → warna objek murni ═══
+                    // Deep interior mask (erode 7px)
                     var di=new Uint8Array(dm);
                     for(var p=0;p<7;p++){
                         var t=new Uint8Array(len);
@@ -291,12 +280,11 @@
                         }}
                         di=t;
                     }
-                    // Pastikan deep interior tidak kosong
                     var hasDI=false;
                     for(var i=0;i<len;i++){if(di[i]){hasDI=true;break}}
                     if(!hasDI){for(var i=0;i<len;i++) di[i]=bMask[i]}
 
-                    // ═══ STEP 6: BFS — propagate warna interior ke seluruh edge zone ═══
+                    // BFS propagate warna interior
                     var pR=new Uint8Array(len),pG=new Uint8Array(len),pB=new Uint8Array(len),pV=new Uint8Array(len);
                     var q=new Int32Array(len),qh=0,qt=0;
                     for(var i=0;i<len;i++){
@@ -317,25 +305,20 @@
                         }}
                     }
 
-                    // ═══ STEP 7: Color Decontamination & Alpha Solidification ═══
+                    // Color Decontamination & Alpha Solidification
                     for(var y=0;y<ph;y++){for(var x=0;x<pw;x++){
                         var i=y*pw+x;
                         var a=origA[i];
                         var r=d[i*4],g=d[i*4+1],b=d[i*4+2];
-
-                        // Jarak warna pixel ke background
                         var bgD=Math.sqrt((r-bgR)*(r-bgR)+(g-bgG)*(g-bgG)+(b-bgB)*(b-bgB));
 
                         if(!dm[i]){
-                            // Di luar mask → transparan
                             d[i*4+3]=0;
                         } else if(a<8){
-                            // Pixel baru dari dilation → warnai dengan warna interior terdekat
                             if(pV[i]){
                                 d[i*4]=pR[i];d[i*4+1]=pG[i];d[i*4+2]=pB[i];d[i*4+3]=225;
                             }else{d[i*4+3]=0}
                         } else if(a>=8&&a<60){
-                            // Alpha sangat rendah — kemungkinan besar kontaminasi background
                             if(pV[i]&&bgD<180){
                                 var bl=Math.min(1,(180-bgD)/180)*0.93;
                                 d[i*4]=Math.round(r*(1-bl)+pR[i]*bl);
@@ -344,14 +327,172 @@
                             }
                             d[i*4+3]=Math.min(255,a+80);
                         } else if(a>=60&&a<230){
-                            // Semi-transparan — dekontaminasi matematis (Photoshop defringing)
                             var af=a/255;
-                            // Rumus: foreground = (pixel - (1-alpha)*background) / alpha
                             var fR=(r-(1-af)*bgR)/af;
                             var fG=(g-(1-af)*bgG)/af;
                             var fB=(b-(1-af)*bgB)/af;
                             var valid=fR>=0&&fR<=255&&fG>=0&&fG<=255&&fB>=0&&fB<=255;
 
                             if(valid){
-                                // Cek apakah hasil dekontaminasi masih mirip background
-                                var dcD=Math.sqrt((fR
+                                var dcD=Math.sqrt((fR-pR[i])*(fR-pR[i])+(fG-pG[i])*(fG-pG[i])+(fB-pB[i])*(fB-pB[i]));
+                                if(dcD<150){
+                                    d[i*4]=Math.round(fR);d[i*4+1]=Math.round(fG);d[i*4+2]=Math.round(fB);
+                                } else if(pV[i]&&bgD<140){
+                                    var bl2=Math.min(1,(140-bgD)/140)*0.7;
+                                    d[i*4]=Math.round(fR*(1-bl2)+pR[i]*bl2);
+                                    d[i*4+1]=Math.round(fG*(1-bl2)+pG[i]*bl2);
+                                    d[i*4+2]=Math.round(fB*(1-bl2)+pB[i]*bl2);
+                                }
+                            } else if(pV[i]&&bgD<140){
+                                var bl3=Math.min(1,(140-bgD)/140)*0.8;
+                                d[i*4]=Math.round(r*(1-bl3)+pR[i]*bl3);
+                                d[i*4+1]=Math.round(g*(1-bl3)+pG[i]*bl3);
+                                d[i*4+2]=Math.round(b*(1-bl3)+pB[i]*bl3);
+                            }
+                            d[i*4+3]=Math.min(255,Math.round(a*1.15));
+                        } else {
+                            if(bgD<50&&pV[i]){
+                                var bl4=(50-bgD)/50*0.35;
+                                d[i*4]=Math.round(r*(1-bl4)+pR[i]*bl4);
+                                d[i*4+1]=Math.round(g*(1-bl4)+pG[i]*bl4);
+                                d[i*4+2]=Math.round(b*(1-bl4)+pB[i]*bl4);
+                            }
+                            d[i*4+3]=255;
+                        }
+                    }}
+
+                    // Smooth alpha for anti-aliasing
+                    var alphaSm=new Uint8Array(len);
+                    for(var y=0;y<ph;y++){for(var x=0;x<pw;x++){
+                        var i=y*pw+x,a=d[i*4+3];
+                        if(a>0&&a<255&&y>0&&y<ph-1&&x>0&&x<pw-1){
+                            var s=a*4,t=4;
+                            s+=d[(y-1)*pw+x*4+3];s+=d[(y+1)*pw+x*4+3];
+                            s+=d[y*pw+(x-1)*4+3];s+=d[y*pw+(x+1)*4+3];
+                            t+=4;
+                            alphaSm[i]=Math.round(s/t);
+                        } else {
+                            alphaSm[i]=a;
+                        }
+                    }}
+                    for(var i=0;i<len;i++) d[i*4+3]=alphaSm[i];
+
+                    fullResCtx.putImageData(id,0,0);
+
+                    var pvW=pw,pvH=ph,pvMax=1200;
+                    if(pvW>pvMax||pvH>pvMax){var pvSc=pvMax/Math.max(pvW,pvH);pvW=Math.round(pvW*pvSc);pvH=Math.round(pvH*pvSc)}
+                    var pvCv=document.createElement('canvas');pvCv.width=pvW;pvCv.height=pvH;
+                    var pvCtx=pvCv.getContext('2d');pvCtx.drawImage(fullResCanvas,0,0,pvW,pvH);
+                    pvCv.toBlob(function(b){resolve(b)},'image/png');
+                };
+                img.onerror=function(){resolve(null)};
+                img.src=URL.createObjectURL(blob);
+            });
+        }
+
+        function b2d(b){return new Promise(function(r,j){var rd=new FileReader();rd.onload=function(){r(rd.result)};rd.onerror=j;rd.readAsDataURL(b)})}
+
+        function showR(){$('resBefore').src=origDu;$('resAfter').src=pDu;$('previewSection').classList.remove('a');$('resultSection').classList.add('a');selectedBgColor='transparent';resetPalette();setTimeout(function(){$('resultSection').scrollIntoView({behavior:'smooth',block:'center'})},200)}
+
+        /* PALETTE LOGIC */
+        var swatches=document.querySelectorAll('.pal-swatch');
+        swatches.forEach(function(sw){sw.addEventListener('click',function(){swatches.forEach(function(s){s.classList.remove('active')});$('palCenter').classList.remove('active');sw.classList.add('active');selectedBgColor=sw.getAttribute('data-color');applyBgColor(selectedBgColor)})});
+        $('customColor').addEventListener('input',function(){var color=$('customColor').value;swatches.forEach(function(s){s.classList.remove('active')});$('palCenter').classList.add('active');$('palCenterColor').style.background=color;$('palCenter').classList.add('has-color');selectedBgColor=color;applyBgColor(selectedBgColor)});
+        function resetPalette(){swatches.forEach(function(s){s.classList.remove('active')});$('palCenter').classList.remove('active','has-color');$('palCenterColor').style.background='transparent';var first=document.querySelector('.pal-swatch.transparent-swatch');if(first)first.classList.add('active');selectedBgColor='transparent'}
+
+        function applyBgColor(color){
+            var afterWrap=$('afterWrap'),afterImg=$('resAfter');
+            if(color==='transparent'){afterWrap.style.background='var(--chk)';afterImg.src=getProcessedPreview()} 
+            else{afterWrap.style.background=color;compositePreview(color,function(dataUrl){afterImg.src=dataUrl})}
+        }
+
+        function getProcessedPreview(){
+            if(!fullResCanvas) return pDu;
+            var tempCv=document.createElement('canvas');
+            tempCv.width=fullResCanvas.width;tempCv.height=fullResCanvas.height;
+            var ctx=tempCv.getContext('2d');
+            ctx.drawImage(fullResCanvas,0,0);
+            if(isGrayscale) applyGrayscaleToCtx(ctx, tempCv.width, tempCv.height);
+            return tempCv.toDataURL('image/png');
+        }
+
+        function compositePreview(color,callback){
+            var img=new Image();img.onload=function(){
+                var cv=document.createElement('canvas'),ctx=cv.getContext('2d');
+                cv.width=img.width;cv.height=img.height;
+                ctx.fillStyle=color;ctx.fillRect(0,0,cv.width,cv.height);
+                ctx.drawImage(img,0,0);
+                if(isGrayscale) applyGrayscaleToCtx(ctx, cv.width, cv.height);
+                callback(cv.toDataURL('image/png'));
+            };img.src=pDu;
+        }
+
+        function applyGrayscaleToCtx(ctx, w, h){
+            var id=ctx.getImageData(0,0,w,h),d=id.data;
+            for(var i=0;i<d.length;i+=4){
+                if(d[i+3]>0){
+                    var gray=Math.round(0.299*d[i]+0.587*d[i+1]+0.114*d[i+2]);
+                    d[i]=gray;d[i+1]=gray;d[i+2]=gray;
+                }
+            }
+            ctx.putImageData(id,0,0);
+        }
+
+        $('bwToggle').addEventListener('click',function(){
+            isGrayscale=!isGrayscale;
+            if(isGrayscale){this.classList.add('active-effect');showToast('Efek Hitam Putih Aktif','info')}
+            else{this.classList.remove('active-effect');showToast('Efek Hitam Putih Nonaktif','info')}
+            applyBgColor(selectedBgColor);
+        });
+
+        /* 300 DPI INJECTOR */
+        function setPngDpi(pngBlob,dpi){return new Promise(function(resolve){var ppm=Math.round(dpi/0.0254);var reader=new FileReader();reader.onload=function(){var data=new Uint8Array(reader.result);var offset=8;var len=((data[offset]<<24)|(data[offset+1]<<16)|(data[offset+2]<<8)|data[offset+3]);offset+=12+len;var phys=new Uint8Array(21);phys[0]=0;phys[1]=0;phys[2]=0;phys[3]=9;phys[4]=0x70;phys[5]=0x48;phys[6]=0x59;phys[7]=0x73;phys[8]=(ppm>>>24)&0xFF;phys[9]=(ppm>>>16)&0xFF;phys[10]=(ppm>>>8)&0xFF;phys[11]=ppm&0xFF;phys[12]=(ppm>>>24)&0xFF;phys[13]=(ppm>>>16)&0xFF;phys[14]=(ppm>>>8)&0xFF;phys[15]=ppm&0xFF;phys[16]=1;var crcData=new Uint8Array(13);for(var i=0;i<4;i++)crcData[i]=phys[4+i];for(var i=0;i<9;i++)crcData[4+i]=phys[8+i];var crc=crc32(crcData);phys[17]=(crc>>>24)&0xFF;phys[18]=(crc>>>16)&0xFF;phys[19]=(crc>>>8)&0xFF;phys[20]=crc&0xFF;var before=data.slice(0,offset);var after=data.slice(offset);var result=new Uint8Array(before.length+phys.length+after.length);result.set(before,0);result.set(phys,before.length);result.set(after,before.length+phys.length);resolve(new Blob([result],{type:'image/png'}))};reader.readAsArrayBuffer(pngBlob)})}
+        function crc32(buf){var c,crcTable=[];for(var n=0;n<256;n++){c=n;for(var k=0;k<8;k++){if(c&1)c=0xEDB88320^(c>>>1);else c=c>>>1}crcTable[n]=c}var crc=0xFFFFFFFF;for(var i=0;i<buf.length;i++){crc=crcTable[(crc^buf[i])&0xFF]^(crc>>>8)}return(crc^0xFFFFFFFF)>>>0}
+
+        /* DOWNLOAD HD 300 DPI */
+        $('dlPng').addEventListener('click',function(){
+            if(!pDu)return;showToast('Menyiapkan PNG HD 300dpi...','info');
+            if(fullResCanvas){
+                var cv=document.createElement('canvas');cv.width=fullResW;cv.height=fullResH;var ctx=cv.getContext('2d');
+                if(selectedBgColor!=='transparent'){ctx.fillStyle=selectedBgColor;ctx.fillRect(0,0,fullResW,fullResH);}
+                ctx.drawImage(fullResCanvas,0,0);
+                if(isGrayscale) applyGrayscaleToCtx(ctx, fullResW, fullResH);
+                
+                cv.toBlob(function(b){setPngDpi(b,300).then(function(dpiBlob){
+                    var name=isGrayscale?'karya-abadi-BW-nobg.png':'karya-abadi-nobg.png';
+                    if(selectedBgColor!=='transparent') name=isGrayscale?'karya-abadi-BW-bg.png':'karya-abadi-bg.png';
+                    dLB(dpiBlob,name);showToast('PNG HD 300dpi berhasil! '+fullResW+'\u00D7'+fullResH+'px','success')
+                })},'image/png')
+            } else { dLB(pBlob,'karya-abadi.png');showToast('PNG berhasil!','success') }
+        });
+
+        $('dlJpg').addEventListener('click',function(){
+            if(!pDu)return;var bgColor=selectedBgColor==='transparent'?'#FFFFFF':selectedBgColor;showToast('Menyiapkan JPG 300dpi...','info');
+            if(fullResCanvas){
+                var cv=$('expC');cv.width=fullResW;cv.height=fullResH;var ctx=cv.getContext('2d');
+                ctx.fillStyle=bgColor;ctx.fillRect(0,0,fullResW,fullResH);ctx.drawImage(fullResCanvas,0,0);
+                if(isGrayscale) applyGrayscaleToCtx(ctx, fullResW, fullResH);
+                cv.toBlob(function(b){
+                    var name=isGrayscale?'karya-abadi-BW.jpg':'karya-abadi.jpg';
+                    dLB(b,name);showToast('JPG 300dpi berhasil! '+fullResW+'\u00D7'+fullResH+'px','success')
+                },'image/jpeg',1.0)
+            } else {
+                var img=new Image();img.onload=function(){var cv=$('expC');cv.width=img.width;cv.height=img.height;var ctx=cv.getContext('2d');ctx.fillStyle=bgColor;ctx.fillRect(0,0,cv.width,cv.height);ctx.drawImage(img,0,0);if(isGrayscale) applyGrayscaleToCtx(ctx, cv.width, cv.height);cv.toBlob(function(b){dLB(b,'karya-abadi.jpg');showToast('JPG berhasil!','success')},'image/jpeg',1.0)};img.src=pDu
+            }
+        });
+
+        function dLB(b,n){var u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=n;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(u)},1000)}
+
+        /* SHARE LOGIC */
+        $('shareBtn').addEventListener('click',function(){$('shareM').classList.add('a')});
+        $('cShare').addEventListener('click',function(){$('shareM').classList.remove('a')});
+        $('shareM').addEventListener('click',function(e){if(e.target===$('shareM'))$('shareM').classList.remove('a')});
+        var sT='Hapus background foto otomatis dengan AI di KARYA ABADI!',sU=window.location.href;
+        $('sWa').href='https://wa.me/?text='+encodeURIComponent(sT+' '+sU);
+        $('sFb').href='https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(sU);
+        $('sTw').href='https://twitter.com/intent/tweet?text='+encodeURIComponent(sT)+'&url='+encodeURIComponent(sU);
+        $('sTg').href='https://t.me/share/url?url='+encodeURIComponent(sU)+'&text='+encodeURIComponent(sT);
+        $('sIg').addEventListener('click',function(e){e.preventDefault();showToast('Download hasil lalu share ke Instagram! 📸','info')});
+    </script>
+</body>
+</html>
