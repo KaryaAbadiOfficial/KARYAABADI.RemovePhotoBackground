@@ -14,10 +14,13 @@ tailwind.config={theme:{extend:{colors:{'ka':'#0a0a0a','kad':'#111111','kac':'#1
 :root{--red:#dc2626;--red-glow:rgba(220,38,38,0.4)}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0a0a0a;color:#fff;font-family:'Poppins',sans-serif;overflow-x:hidden}
-::-webkit-scrollbar{width:8px}::-webkit-scrollbar-track{background:#111}::-webkit-scrollbar-thumb{background:#333;border-radius:4px}::-webkit-scrollbar-thumb:hover{background:#555}
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-track{background:#111}
+::-webkit-scrollbar-thumb{background:#333;border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:#555}
 #particleCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
 .glass{background:rgba(22,22,22,0.85);backdrop-filter:blur(16px);border:1px solid #2a2a2a}
-.checkerboard{background-image:linear-gradient(45deg,#1a1a1a 25%,transparent 25%),linear-gradient(-45deg,#1a1a1a 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#1a1a1a 75%),linear-gradient(-45deg,transparent 75%,#1a1a1a 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0}
+.checkerboard{background-image:linear-gradient(45deg,#1a1a1a 25%,transparent 25%),linear-gradient(-45deg,#1a1a1a 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#1a1a1a 75%),linear-gradient(-45deg,transparent 75%,#1a1a1a 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0px}
 input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;background:#2a2a2a;border-radius:3px;outline:none;cursor:pointer}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:var(--red);cursor:pointer;box-shadow:0 0 8px var(--red-glow);transition:transform .15s}
 input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
@@ -33,7 +36,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 .ctrl-card{background:#141414;border:1px solid #2a2a2a;border-radius:12px;padding:20px;transition:border-color .3s}
 .ctrl-card:hover{border-color:#3a3a3a}
 .ctrl-card h4{font-family:'Orbitron',sans-serif;font-size:13px;letter-spacing:1.5px;color:var(--red);margin-bottom:16px;text-transform:uppercase}
-.upload-zone{border:2px dashed #2a2a2a;border-radius:16px;padding:60px 30px;text-align:center;cursor:pointer;transition:all .3s;position:relative}
+.upload-zone{border:2px dashed #2a2a2a;border-radius:16px;padding:60px 30px;text-align:center;cursor:pointer;transition:all .3s}
 .upload-zone:hover,.upload-zone.drag-over{border-color:var(--red);background:rgba(220,38,38,0.04)}
 .upload-zone.drag-over{box-shadow:inset 0 0 40px rgba(220,38,38,0.08)}
 .preview-wrap{border-radius:12px;overflow:hidden;border:1px solid #2a2a2a;position:relative;background:#0e0e0e}
@@ -53,7 +56,8 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 .progress-bar-fill{height:100%;background:linear-gradient(90deg,#dc2626,#ef4444);border-radius:4px;transition:width .3s;width:0%}
 .color-swatch{width:32px;height:32px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:all .2s}
 .color-swatch:hover,.color-swatch.active{border-color:#fff;transform:scale(1.15)}
-footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{color:#dc2626}
+footer a{color:#9ca3af;text-decoration:none;transition:color .2s}
+footer a:hover{color:#dc2626}
 .error-log{margin-top:10px;padding:10px;background:rgba(0,0,0,0.5);border-radius:8px;font-size:11px;color:#fca5a5;max-height:120px;overflow-y:auto;word-break:break-all;font-family:'Courier New',monospace;text-align:left;line-height:1.5;border:1px solid #7f1d1d}
 @media(prefers-reduced-motion:reduce){*{animation-duration:0s!important;transition-duration:0s!important}}
 </style>
@@ -105,6 +109,8 @@ footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{
 
 <!-- MAIN TOOL -->
 <main id="tool" class="relative z-10 max-w-7xl mx-auto px-4 pb-20">
+
+<!-- Upload -->
 <div id="uploadSection">
 <div class="upload-zone" id="uploadZone">
 <input type="file" id="fileInput" accept="image/*" class="hidden">
@@ -115,13 +121,14 @@ footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{
 </div>
 </div>
 
+<!-- Workspace -->
 <div id="workspace" style="display:none">
 <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
 <div class="flex items-center gap-3">
 <button class="btn-red" id="btnRemoveBg" disabled><i class="fas fa-eraser mr-2"></i>Hapus Background</button>
 <button class="btn-outline text-sm" id="btnReset"><i class="fas fa-undo mr-2"></i>Ganti Gambar</button>
 </div>
-<div class="flex items-center gap-2 text-sm text-kag"><span id="imgInfo"></span></div>
+<div class="text-sm text-kag"><span id="imgInfo"></span></div>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-8">
@@ -135,15 +142,29 @@ footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{
 </div>
 </div>
 
+<!-- Kontrol Panel -->
 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 mb-8">
+
+<!-- Stroke Cutting -->
 <div class="ctrl-card">
 <h4><i class="fas fa-border-style mr-2"></i>Stroke Cutting</h4>
-<label class="flex items-center gap-3 cursor-pointer mb-4"><input type="checkbox" id="chkStroke" class="w-4 h-4 accent-red-600"><span class="text-sm">Aktifkan Stroke</span></label>
+<label class="flex items-center gap-3 cursor-pointer mb-4">
+<input type="checkbox" id="chkStroke" class="w-4 h-4 accent-red-600">
+<span class="text-sm">Aktifkan Stroke</span>
+</label>
 <div id="strokeControls" class="space-y-4 opacity-40 pointer-events-none transition-opacity">
-<div><div class="flex justify-between text-xs text-kag mb-1"><span>Stroke Putih</span><span id="valWhiteStroke">4px</span></div><input type="range" id="rngWhiteStroke" min="1" max="25" value="4"></div>
-<div><div class="flex justify-between text-xs text-kag mb-1"><span>Garis Hitam</span><span id="valBlackStroke">1px</span></div><input type="range" id="rngBlackStroke" min="1" max="8" value="1"></div>
+<div>
+<div class="flex justify-between text-xs text-kag mb-1"><span>Stroke Putih</span><span id="valWhiteStroke">4px</span></div>
+<input type="range" id="rngWhiteStroke" min="1" max="25" value="4">
+</div>
+<div>
+<div class="flex justify-between text-xs text-kag mb-1"><span>Garis Hitam</span><span id="valBlackStroke">1px</span></div>
+<input type="range" id="rngBlackStroke" min="1" max="8" value="1">
 </div>
 </div>
+</div>
+
+<!-- Penyempurnaan Warna -->
 <div class="ctrl-card">
 <h4><i class="fas fa-palette mr-2"></i>Penyempurnaan Warna</h4>
 <div class="space-y-4">
@@ -154,28 +175,53 @@ footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{
 <button class="btn-outline text-xs w-full mt-2" id="btnResetColor"><i class="fas fa-undo mr-1"></i>Reset Warna</button>
 </div>
 </div>
+
+<!-- Ganti Background -->
 <div class="ctrl-card">
 <h4><i class="fas fa-fill-drip mr-2"></i>Warna Background</h4>
-<label class="flex items-center gap-3 cursor-pointer mb-4"><input type="checkbox" id="chkBgColor" class="w-4 h-4 accent-red-600"><span class="text-sm">Aktifkan Warna Solid</span></label>
+<label class="flex items-center gap-3 cursor-pointer mb-4">
+<input type="checkbox" id="chkBgColor" class="w-4 h-4 accent-red-600">
+<span class="text-sm">Aktifkan Warna Solid</span>
+</label>
 <div id="bgColorControls" class="opacity-40 pointer-events-none transition-opacity">
-<div class="flex items-center gap-3 mb-4"><input type="color" id="pickBgColor" value="#ffffff" class="w-10 h-10 rounded-lg cursor-pointer border-2 border-kab bg-transparent"><span class="text-sm text-kag" id="hexBgColor">#FFFFFF</span></div>
+<div class="flex items-center gap-3 mb-4">
+<input type="color" id="pickBgColor" value="#ffffff" class="w-10 h-10 rounded-lg cursor-pointer border-2 border-kab bg-transparent">
+<span class="text-sm text-kag" id="hexBgColor">#FFFFFF</span>
+</div>
 <p class="text-xs text-kag mb-2">Warna Preset:</p>
 <div class="flex flex-wrap gap-2" id="presetColors"></div>
 </div>
 </div>
+
+<!-- Upscale -->
 <div class="ctrl-card">
 <h4><i class="fas fa-expand-arrows-alt mr-2"></i>Tingkatkan Gambar</h4>
-<div class="mb-4"><div class="flex justify-between text-xs text-kag mb-1"><span>Skala Perbesaran</span><span id="valUpscale" class="text-kar font-bold">1x</span></div><input type="range" id="rngUpscale" min="1" max="10" value="1" step="1"></div>
-<div class="flex flex-wrap gap-2 mb-4" id="upscalePresets"></div>
-<div class="p-3 bg-ka rounded-lg text-xs text-kag leading-relaxed"><i class="fas fa-info-circle text-kar mr-1"></i>Upscale diterapkan saat download. Preview tetap ukuran asli.</div>
+<div class="mb-4">
+<div class="flex justify-between text-xs text-kag mb-1"><span>Skala Perbesaran</span><span id="valUpscale" class="text-kar font-bold">1x</span></div>
+<input type="range" id="rngUpscale" min="1" max="10" value="1" step="1">
 </div>
+<div class="flex flex-wrap gap-2 mb-4" id="upscalePresets"></div>
+<div class="p-3 bg-ka rounded-lg text-xs text-kag leading-relaxed">
+<i class="fas fa-info-circle text-kar mr-1"></i>Upscale diterapkan saat download. Preview tetap ukuran asli untuk performa.
+</div>
+</div>
+
+<!-- Download -->
 <div class="ctrl-card flex flex-col justify-between">
-<div><h4><i class="fas fa-download mr-2"></i>Export HD</h4><p class="text-sm text-kag mb-4">Download hasil kualitas tinggi format PNG lossless.</p></div>
+<div>
+<h4><i class="fas fa-download mr-2"></i>Export HD</h4>
+<p class="text-sm text-kag mb-4">Download hasil kualitas tinggi format PNG lossless.</p>
+</div>
 <div class="space-y-3">
-<div class="p-3 bg-ka rounded-lg text-xs text-kag"><p><i class="fas fa-image text-kar mr-1"></i> Format: <strong class="text-white">PNG (Lossless)</strong></p><p class="mt-1"><i class="fas fa-expand text-kar mr-1"></i> Resolusi: <strong class="text-white" id="dlResInfo">-</strong></p></div>
+<div class="p-3 bg-ka rounded-lg text-xs text-kag">
+<p><i class="fas fa-image text-kar mr-1"></i> Format: <strong class="text-white">PNG (Lossless)</strong></p>
+<p class="mt-1"><i class="fas fa-expand text-kar mr-1"></i> Resolusi: <strong class="text-white" id="dlResInfo">-</strong></p>
+</div>
 <button class="btn-red w-full text-center" id="btnDownload" disabled><i class="fas fa-file-download mr-2"></i>Download HD PNG</button>
 </div>
 </div>
+
+<!-- Status -->
 <div class="ctrl-card">
 <h4><i class="fas fa-microchip mr-2"></i>Status Proses</h4>
 <div class="space-y-3 text-sm">
@@ -185,6 +231,7 @@ footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{
 <div class="flex items-center justify-between"><span class="text-kag">Ukuran Output</span><span id="statusOutput" class="text-xs text-white">-</span></div>
 </div>
 </div>
+
 </div>
 </div>
 </main>
@@ -195,10 +242,26 @@ footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{
 <h2 class="font-disp text-2xl md:text-3xl font-bold text-center mb-4 tracking-wide">Fitur Unggulan</h2>
 <p class="text-kag text-center mb-14 max-w-xl mx-auto">Semua yang Anda butuhkan untuk pengolahan gambar profesional dalam satu alat.</p>
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-<div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300"><div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-eraser text-2xl text-kar"></i></div><h3 class="font-semibold mb-2">Hapus Background</h3><p class="text-xs text-kag leading-relaxed">AI presisi tinggi menghapus background tanpa menghapus bagian objek utama.</p></div>
-<div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300"><div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-border-style text-2xl text-kar"></i></div><h3 class="font-semibold mb-2">Stroke Cutting</h3><p class="text-xs text-kag leading-relaxed">Stroke putih dan garis hitam tipis di luar untuk keperluan cutting profesional.</p></div>
-<div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300"><div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-expand-arrows-alt text-2xl text-kar"></i></div><h3 class="font-semibold mb-2">Upscale 10x</h3><p class="text-xs text-kag leading-relaxed">Tingkatkan resolusi gambar hingga 10 kali lipat dengan sharpening otomatis.</p></div>
-<div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300"><div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-palette text-2xl text-kar"></i></div><h3 class="font-semibold mb-2">Enhancement Warna</h3><p class="text-xs text-kag leading-relaxed">Saturasi, kecerahan, kontras, dan vibrance yang bisa disesuaikan secara detail.</p></div>
+<div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300">
+<div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-eraser text-2xl text-kar"></i></div>
+<h3 class="font-semibold mb-2">Hapus Background</h3>
+<p class="text-xs text-kag leading-relaxed">AI presisi tinggi menghapus background tanpa menghapus bagian objek utama.</p>
+</div>
+<div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300">
+<div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-border-style text-2xl text-kar"></i></div>
+<h3 class="font-semibold mb-2">Stroke Cutting</h3>
+<p class="text-xs text-kag leading-relaxed">Stroke putih dan garis hitam tipis di luar untuk keperluan cutting profesional.</p>
+</div>
+<div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300">
+<div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-expand-arrows-alt text-2xl text-kar"></i></div>
+<h3 class="font-semibold mb-2">Upscale 10x</h3>
+<p class="text-xs text-kag leading-relaxed">Tingkatkan resolusi gambar hingga 10 kali lipat dengan sharpening otomatis.</p>
+</div>
+<div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300">
+<div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-palette text-2xl text-kar"></i></div>
+<h3 class="font-semibold mb-2">Enhancement Warna</h3>
+<p class="text-xs text-kag leading-relaxed">Saturasi, kecerahan, kontras, dan vibrance yang bisa disesuaikan secara detail.</p>
+</div>
 </div>
 </div>
 </section>
@@ -260,161 +323,279 @@ footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{
 </footer>
 
 <script type="module">
-/* =============================================
-   KARYA ABADI REMOVE BACKGROUND — FIXED v3
-   Menggunakan ESM resolver (esm.sh / +esm)
-   ============================================= */
+/* ======================================================
+   KARYA ABADI REMOVE BACKGROUND — FIX FINAL
+   ======================================================
+   Masalah: Library memakai import.meta.url (esm.sh) untuk
+   mencari file model ONNX, menghasilkan path relatif
+   seperti "/models/isnet_ep16" TANPA domain.
+   config.publicPath DIABAIKAN library.
 
-let originalFile = null, originalImg = null, removedBgCanvas = null;
-let removeBackgroundFn = null, activePublicPath = null;
-let libLoaded = false, libLoading = false, renderTimeout = null;
+   Solusi: Fetch Interceptor — override window.fetch
+   sementara untuk mengarahkan semua request model
+   tanpa domain ke CDN jsdelivr yang benar.
+   ====================================================== */
 
+// --- State ---
+let originalFile = null;
+let originalImg = null;
+let removedBgCanvas = null;
+let removeBackgroundFn = null;
+let libLoaded = false;
+let libLoading = false;
+let renderTimeout = null;
+
+// Simpan fetch asli
+const nativeFetch = window.fetch;
+
+// CDN tempat file model ONNX disimpan
+const MODEL_CDN_BASE = 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/dist';
+
+// --- Fetch Interceptor ---
+// Library akan memanggil fetch("/models/isnet_ep16/...")
+// tanpa domain. Ini menangkap dan memperbaikinya.
+function installFetchInterceptor() {
+    window.fetch = function(input, init) {
+        // Tangkap string URL yang dimulai dengan /models/
+        if (typeof input === 'string') {
+            if (input.startsWith('/models/')) {
+                const fixedUrl = MODEL_CDN_BASE + input;
+                console.log('[Karya Abadi] Fetch redirect:', input, '->', fixedUrl);
+                return nativeFetch.call(this, fixedUrl, init);
+            }
+            // Tangkap juga path relatif lain yang mungkin dipakai library
+            if (input.startsWith('./') || input.startsWith('../')) {
+                const fixedUrl = MODEL_CDN_BASE + '/' + input.replace(/^\.\//, '');
+                console.log('[Karya Abadi] Fetch redirect:', input, '->', fixedUrl);
+                return nativeFetch.call(this, fixedUrl, init);
+            }
+        }
+        // Lewatkan semua request lain tanpa perubahan
+        return nativeFetch.call(this, input, init);
+    };
+    console.log('[Karya Abadi] Fetch interceptor aktif');
+}
+
+function removeFetchInterceptor() {
+    window.fetch = nativeFetch;
+    console.log('[Karya Abadi] Fetch interceptor dilepas');
+}
+
+// --- Shortcut DOM ---
 const $ = id => document.getElementById(id);
-const canvasOrig = $('canvasOriginal'), canvasResult = $('canvasResult');
-const ctxOrig = canvasOrig.getContext('2d'), ctxResult = canvasResult.getContext('2d');
+const canvasOrig = $('canvasOriginal');
+const canvasResult = $('canvasResult');
+const ctxOrig = canvasOrig.getContext('2d');
+const ctxResult = canvasResult.getContext('2d');
 
-// --- Preset Warna ---
-['#ffffff','#000000','#dc2626','#2563eb','#16a34a','#eab308','#f97316','#8b5cf6','#ec4899','#06b6d4','#78716c','#1e293b'].forEach(c => {
+// --- Preset Warna Background ---
+const presetColorList = [
+    '#ffffff', '#000000', '#dc2626', '#2563eb', '#16a34a',
+    '#eab308', '#f97316', '#8b5cf6', '#ec4899', '#06b6d4',
+    '#78716c', '#1e293b'
+];
+const presetContainer = $('presetColors');
+presetColorList.forEach(c => {
     const el = document.createElement('div');
-    el.className = 'color-swatch'; el.style.background = c;
-    if(c==='#000000') el.style.border='2px solid #333';
-    el.onclick = () => { $('pickBgColor').value=c; $('hexBgColor').textContent=c.toUpperCase(); $('presetColors').querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('active')); el.classList.add('active'); scheduleRender(); };
-    $('presetColors').appendChild(el);
+    el.className = 'color-swatch';
+    el.style.background = c;
+    if (c === '#000000') el.style.border = '2px solid #333';
+    el.addEventListener('click', () => {
+        $('pickBgColor').value = c;
+        $('hexBgColor').textContent = c.toUpperCase();
+        presetContainer.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+        el.classList.add('active');
+        scheduleRender();
+    });
+    presetContainer.appendChild(el);
 });
 
 // --- Preset Upscale ---
-[1,2,3,4,5,6,8,10].forEach(v => {
-    const b = document.createElement('button'); b.className='btn-outline text-xs px-3 py-1'; b.textContent=v+'x';
-    b.onclick = () => { $('rngUpscale').value=v; $('valUpscale').textContent=v+'x'; updateOutputInfo(); $('upscalePresets').querySelectorAll('button').forEach(x=>x.style.borderColor=''); b.style.borderColor='var(--red)'; };
-    $('upscalePresets').appendChild(b);
+const upscaleContainer = $('upscalePresets');
+[1, 2, 3, 4, 5, 6, 8, 10].forEach(v => {
+    const btn = document.createElement('button');
+    btn.className = 'btn-outline text-xs px-3 py-1';
+    btn.textContent = v + 'x';
+    btn.addEventListener('click', () => {
+        $('rngUpscale').value = v;
+        $('valUpscale').textContent = v + 'x';
+        updateOutputInfo();
+        upscaleContainer.querySelectorAll('button').forEach(b => b.style.borderColor = '');
+        btn.style.borderColor = 'var(--red)';
+    });
+    upscaleContainer.appendChild(btn);
 });
 
-// --- Toast ---
-function showToast(msg, type='info') {
-    const t = document.createElement('div'); t.className=`toast ${type}`;
-    t.innerHTML=`<i class="fas ${{success:'fa-check-circle',error:'fa-exclamation-circle',info:'fa-info-circle'}[type]} mt-0.5"></i><span>${msg}</span>`;
-    $('toastContainer').appendChild(t);
-    setTimeout(()=>{t.style.animation='slideOut .3s ease forwards';setTimeout(()=>t.remove(),300);},4000);
+// --- Toast Notification ---
+function showToast(msg, type = 'info') {
+    const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `<i class="fas ${icons[type]} mt-0.5"></i><span>${msg}</span>`;
+    $('toastContainer').appendChild(toast);
+    setTimeout(() => {
+        toast.style.animation = 'slideOut .3s ease forwards';
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
 }
 
-// --- Progress ---
-function showProgress(t,d){$('progressText').textContent=t||'Memproses...';$('progressDetail').textContent=d||'';$('progressBar').style.width='0%';$('progressPercent').textContent='0%';$('errorLog').style.display='none';$('errorLog').textContent='';$('btnCancelProgress').style.display='none';$('progressOverlay').style.display='flex';}
-function updateProgress(p,d){$('progressBar').style.width=Math.min(100,p)+'%';$('progressPercent').textContent=Math.round(p)+'%';if(d)$('progressDetail').textContent=d;}
-function showError(msg){$('errorLog').style.display='block';$('errorLog').textContent=msg;$('btnCancelProgress').style.display='inline-block';$('progressText').textContent='Terjadi Kesalahan';$('progressText').style.color='#fca5a5';}
-function hideProgress(){$('progressOverlay').style.display='none';$('progressText').style.color='#fff';}
- $('btnCancelProgress').onclick = hideProgress;
+// --- Progress Overlay ---
+function showProgress(text, detail) {
+    $('progressText').textContent = text || 'Memproses...';
+    $('progressText').style.color = '#fff';
+    $('progressDetail').textContent = detail || '';
+    $('progressBar').style.width = '0%';
+    $('progressPercent').textContent = '0%';
+    $('errorLog').style.display = 'none';
+    $('errorLog').textContent = '';
+    $('btnCancelProgress').style.display = 'none';
+    $('progressOverlay').style.display = 'flex';
+}
 
-// ============================================
-// LOAD LIBRARY — PENGGUNAAN ESM RESOLVER
-// ============================================
-// Akar masalah sebelumnya: import langsung ke /dist/index.mjs
-// tidak bisa menyelesaikan "bare module specifier" internal
-// seperti import { X } from "@imgly/..."
-//
-// Solusi: gunakan CDN yang meresolve ESM secara otomatis:
-// - esm.sh : merewrite semua import ke URL absolut
-// - jsdelivr +esm : endpoint khusus ESM resolution
-//
-// publicPath: lokasi file model ONNX & WASM di jsdelivr
-// ============================================
+function updateProgress(percent, detail) {
+    $('progressBar').style.width = Math.min(100, percent) + '%';
+    $('progressPercent').textContent = Math.round(percent) + '%';
+    if (detail) $('progressDetail').textContent = detail;
+}
 
-const CDN_LIST = [
-    // esm.sh — resolver ESM terbaik untuk complex packages
-    { importUrl: 'https://esm.sh/@imgly/background-removal@1.5.5', publicPath: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/dist/', label: 'esm.sh v1.5.5' },
-    // jsdelivr +esm — resolver ESM bawaan jsdelivr
-    { importUrl: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm', publicPath: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/dist/', label: 'jsdelivr+esm v1.5.5' },
-    // Fallback versi lama
-    { importUrl: 'https://esm.sh/@imgly/background-removal@1.4.5', publicPath: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/', label: 'esm.sh v1.4.5' },
-    { importUrl: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/+esm', publicPath: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/', label: 'jsdelivr+esm v1.4.5' },
-];
+function showError(msg) {
+    $('errorLog').style.display = 'block';
+    $('errorLog').textContent = msg;
+    $('btnCancelProgress').style.display = 'inline-block';
+    $('progressText').textContent = 'Terjadi Kesalahan';
+    $('progressText').style.color = '#fca5a5';
+}
 
+function hideProgress() {
+    $('progressOverlay').style.display = 'none';
+}
+
+ $('btnCancelProgress').addEventListener('click', hideProgress);
+
+// ======================================================
+// LOAD LIBRARY
+// Menggunakan esm.sh yang meresolve semua bare imports
+// secara otomatis menjadi URL absolut
+// ======================================================
 async function loadLib() {
     if (libLoaded || libLoading) return libLoaded;
     libLoading = true;
+
     $('statusModel').textContent = 'Memuat...';
     $('statusModel').className = 'text-xs px-2 py-1 rounded-full bg-yellow-900/40 text-yellow-400';
 
-    let lastError = '';
+    // Daftar CDN ESM resolver yang dicoba bergantian
+    const cdnList = [
+        { url: 'https://esm.sh/@imgly/background-removal@1.5.5', name: 'esm.sh v1.5.5' },
+        { url: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm', name: 'jsdelivr+esm v1.5.5' },
+        { url: 'https://esm.sh/@imgly/background-removal@1.4.5', name: 'esm.sh v1.4.5' },
+        { url: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/+esm', name: 'jsdelivr+esm v1.4.5' },
+    ];
 
-    for (const cdn of CDN_LIST) {
+    for (const cdn of cdnList) {
         try {
-            console.log(`[Karya Abadi] Mencoba: ${cdn.label}...`);
-            const mod = await import(cdn.importUrl);
+            console.log('[Karya Abadi] Mencoba load:', cdn.name);
+            const mod = await import(cdn.url);
 
             // Cari fungsi di berbagai bentuk export
-            removeBackgroundFn = mod.removeBackground || mod.default || mod.bgRemoval;
+            removeBackgroundFn = mod.removeBackground || mod.default;
 
             if (typeof removeBackgroundFn === 'function') {
-                activePublicPath = cdn.publicPath;
                 libLoaded = true;
-                $('statusModel').textContent = 'Siap (' + cdn.label + ')';
+                $('statusModel').textContent = 'Siap (' + cdn.name + ')';
                 $('statusModel').className = 'text-xs px-2 py-1 rounded-full bg-green-900/40 text-green-400';
-                console.log('[Karya Abadi] Berhasil:', cdn.label);
-                showToast('Model AI berhasil dimuat (' + cdn.label + ')', 'success');
+                showToast('Model AI berhasil dimuat (' + cdn.name + ')', 'success');
+                console.log('[Karya Abadi] Library OK:', cdn.name);
                 libLoading = false;
                 return true;
             } else {
-                lastError = `Fungsi removeBackground tidak ditemukan. Export tersedia: ${Object.keys(mod).join(', ')}`;
-                console.warn(`[Karya Abadi] ${cdn.label}: ${lastError}`);
+                console.warn('[Karya Abadi] Fungsi tidak ditemukan di', cdn.name, '- exports:', Object.keys(mod));
             }
         } catch (e) {
-            lastError = e.message || String(e);
-            console.warn(`[Karya Abadi] Gagal ${cdn.label}:`, lastError);
+            console.warn('[Karya Abadi] Gagal load', cdn.name, ':', e.message);
         }
     }
 
-    // Semua gagal
     $('statusModel').textContent = 'Gagal';
     $('statusModel').className = 'text-xs px-2 py-1 rounded-full bg-red-900/40 text-red-400';
     libLoading = false;
     return false;
 }
 
-// --- Upload ---
-const uploadZone = $('uploadZone'), fileInput = $('fileInput');
-uploadZone.onclick = () => fileInput.click();
-fileInput.onchange = e => { if(e.target.files[0]) handleFile(e.target.files[0]); };
-uploadZone.ondragover = e => { e.preventDefault(); uploadZone.classList.add('drag-over'); };
-uploadZone.ondragleave = () => uploadZone.classList.remove('drag-over');
-uploadZone.ondrop = e => { e.preventDefault(); uploadZone.classList.remove('drag-over'); const f=e.dataTransfer.files[0]; if(f&&f.type.startsWith('image/')) handleFile(f); else showToast('File harus berupa gambar','error'); };
+// --- Upload Handling ---
+const uploadZone = $('uploadZone');
+const fileInput = $('fileInput');
+
+uploadZone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => {
+    if (e.target.files[0]) handleFile(e.target.files[0]);
+});
+uploadZone.addEventListener('dragover', e => {
+    e.preventDefault();
+    uploadZone.classList.add('drag-over');
+});
+uploadZone.addEventListener('dragleave', () => {
+    uploadZone.classList.remove('drag-over');
+});
+uploadZone.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadZone.classList.remove('drag-over');
+    const f = e.dataTransfer.files[0];
+    if (f && f.type.startsWith('image/')) handleFile(f);
+    else showToast('File harus berupa gambar', 'error');
+});
 
 function handleFile(file) {
-    if(file.size > 20*1024*1024){showToast('Ukuran maks 20MB','error');return;}
+    if (file.size > 20 * 1024 * 1024) {
+        showToast('Ukuran file maksimal 20MB', 'error');
+        return;
+    }
     originalFile = file;
     const img = new Image();
     img.onload = () => {
         originalImg = img;
-        canvasOrig.width=img.width; canvasOrig.height=img.height; ctxOrig.drawImage(img,0,0);
-        canvasResult.width=img.width; canvasResult.height=img.height; ctxResult.clearRect(0,0,img.width,img.height);
-        $('imgInfo').textContent=`${img.width} × ${img.height} px`; $('statusSize').textContent=`${img.width}×${img.height}`;
+        canvasOrig.width = img.width;
+        canvasOrig.height = img.height;
+        ctxOrig.drawImage(img, 0, 0);
+        canvasResult.width = img.width;
+        canvasResult.height = img.height;
+        ctxResult.clearRect(0, 0, img.width, img.height);
+        $('imgInfo').textContent = `${img.width} × ${img.height} px`;
+        $('statusSize').textContent = `${img.width}×${img.height}`;
         updateOutputInfo();
-        $('uploadSection').style.display='none'; $('workspace').style.display='block';
-        $('btnRemoveBg').disabled=false; $('btnDownload').disabled=true;
-        removedBgCanvas=null;
-        $('statusBg').textContent='Menunggu'; $('statusBg').className='text-xs px-2 py-1 rounded-full bg-ka text-kag';
-        showToast('Gambar berhasil dimuat','success');
+        $('uploadSection').style.display = 'none';
+        $('workspace').style.display = 'block';
+        $('btnRemoveBg').disabled = false;
+        $('btnDownload').disabled = true;
+        removedBgCanvas = null;
+        $('statusBg').textContent = 'Menunggu';
+        $('statusBg').className = 'text-xs px-2 py-1 rounded-full bg-ka text-kag';
+        showToast('Gambar berhasil dimuat', 'success');
     };
-    img.onerror = () => showToast('Gagal memuat gambar','error');
+    img.onerror = () => showToast('Gagal memuat gambar', 'error');
     img.src = URL.createObjectURL(file);
 }
 
-// --- HAPUS BACKGROUND ---
- $('btnRemoveBg').onclick = async () => {
-    if(!originalFile) return;
+// ======================================================
+// HAPUS BACKGROUND — DENGAN FETCH INTERCEPTOR
+// ======================================================
+ $('btnRemoveBg').addEventListener('click', async () => {
+    if (!originalFile) return;
     $('btnRemoveBg').disabled = true;
+
     showProgress('Menghapus background...', 'Mempersiapkan library AI...');
-    updateProgress(5, 'Mengunduh library & model AI (sekali saja, ~40MB)...');
+    updateProgress(5, 'Mengunduh library & model AI...');
 
     const ok = await loadLib();
-    if(!ok || !removeBackgroundFn) {
+    if (!ok || !removeBackgroundFn) {
         showError(
             'Gagal memuat library AI dari semua CDN.\n\n' +
             'Kemungkinan penyebab:\n' +
             '1. Koneksi internet tidak stabil\n' +
             '2. Adblocker/VPN memblokir esm.sh atau jsdelivr\n' +
-            '3. Browser lama (gunakan Chrome/Edge terbaru)\n' +
-            '4. Jaringan kantor/sekolah memblokir CDN\n\n' +
-            'Solusi: Matikan adblocker, coba VPN berbeda, atau buka di jaringan lain.'
+            '3. Browser tidak mendukung dynamic import\n' +
+            '4. Jaringan memblokir akses CDN\n\n' +
+            'Solusi: Matikan adblocker, coba ganti jaringan, atau gunakan Chrome/Edge terbaru.'
         );
         $('btnRemoveBg').disabled = false;
         return;
@@ -422,136 +603,547 @@ function handleFile(file) {
 
     updateProgress(10, 'Memproses gambar dengan neural network...');
 
-    try {
-        const imageBlob = originalFile instanceof Blob ? originalFile : new Blob([await originalFile.arrayBuffer()], {type: originalFile.type});
+    // === AKTIFKAN FETCH INTERCEPTOR SEBELUM PROSES ===
+    installFetchInterceptor();
 
-        // Konfigurasi dengan publicPath agar model ONNX diunduh dari lokasi benar
+    try {
+        const imageBlob = originalFile instanceof Blob
+            ? originalFile
+            : new Blob([await originalFile.arrayBuffer()], { type: originalFile.type });
+
         const config = {
-            publicPath: activePublicPath,
             progress: (key, current, total) => {
-                if(total > 0) {
-                    const pct = 10 + (current/total)*85;
-                    const labels = {'fetch:model':'Mengunduh model AI (~40MB)...','compute:inference':'Menghapus background...','preprocess':'Mempersiapkan gambar...','postprocess':'Memfinalisasi...'};
+                if (total > 0) {
+                    const pct = 10 + (current / total) * 85;
+                    const labels = {
+                        'fetch:model': 'Mengunduh model AI (~40MB)...',
+                        'compute:inference': 'Menghapus background dengan AI...',
+                        'preprocess': 'Mempersiapkan gambar...',
+                        'postprocess': 'Memfinalisasi hasil...'
+                    };
                     updateProgress(pct, labels[key] || `Memproses: ${key}...`);
                 }
             }
         };
 
-        console.log('[Karya Abadi] Memulai removeBackground, publicPath:', activePublicPath);
+        console.log('[Karya Abadi] Memulai proses removeBackground...');
         const resultBlob = await removeBackgroundFn(imageBlob, config);
 
         updateProgress(96, 'Menyimpan hasil ke canvas...');
 
-        if(!(resultBlob instanceof Blob)) {
-            throw new Error('Hasil bukan Blob. Tipe: ' + typeof resultBlob + ', konstructor: ' + (resultBlob?.constructor?.name || 'unknown'));
+        if (!(resultBlob instanceof Blob)) {
+            throw new Error(
+                'Hasil bukan berupa Blob.\n' +
+                'Tipe: ' + typeof resultBlob +
+                '\nConstructor: ' + (resultBlob?.constructor?.name || 'unknown')
+            );
         }
 
         const bitmap = await createImageBitmap(resultBlob);
         removedBgCanvas = document.createElement('canvas');
-        removedBgCanvas.width = bitmap.width; removedBgCanvas.height = bitmap.height;
+        removedBgCanvas.width = bitmap.width;
+        removedBgCanvas.height = bitmap.height;
         removedBgCanvas.getContext('2d').drawImage(bitmap, 0, 0);
         bitmap.close();
 
         updateProgress(100, 'Selesai!');
+
         setTimeout(() => {
-            hideProgress(); renderResult();
-            $('btnRemoveBg').disabled=false; $('btnDownload').disabled=false;
-            $('statusBg').textContent='Selesai'; $('statusBg').className='text-xs px-2 py-1 rounded-full bg-green-900/40 text-green-400';
-            showToast('Background berhasil dihapus!','success');
+            removeFetchInterceptor(); // Lepas interceptor
+            hideProgress();
+            renderResult();
+            $('btnRemoveBg').disabled = false;
+            $('btnDownload').disabled = false;
+            $('statusBg').textContent = 'Selesai';
+            $('statusBg').className = 'text-xs px-2 py-1 rounded-full bg-green-900/40 text-green-400';
+            showToast('Background berhasil dihapus!', 'success');
         }, 300);
 
-    } catch(e) {
-        console.error('[Karya Abadi] Error:', e);
+    } catch (e) {
+        removeFetchInterceptor(); // Lepas interceptor saat error juga
+        console.error('[Karya Abadi] Error detail:', e);
+
         let detail = e.message || String(e);
-        if(e.stack) detail += '\n\n' + e.stack.split('\n').slice(0,6).join('\n');
-        // Deteksi error spesifik
-        if(detail.includes('Failed to fetch') || detail.includes('NetworkError') || detail.includes('net::ERR')) {
-            detail += '\n\n[DIAGNOSIS] Gagal mengunduh file model ONNX. Kemungkinan:\n- Koneksi terputus saat download model\n- Firewall memblokir download file .onnx\n- CDN sementara tidak tersedia\n\nSolusi: Coba lagi dalam beberapa saat, atau ganti jaringan.';
-        } else if(detail.includes('WASM') || detail.includes('wasm')) {
-            detail += '\n\n[DIAGNOSIS] Gagal memuat WASM runtime. Pastikan browser mendukung WebAssembly (Chrome 57+, Edge 16+, Firefox 52+).';
+        if (e.stack) detail += '\n\n' + e.stack.split('\n').slice(0, 5).join('\n');
+
+        // Diagnosa error spesifik
+        if (detail.includes('/models/') && detail.includes('not found')) {
+            detail += '\n\n[DIAGNOSIS] Fetch interceptor gagal menangkap request model. ' +
+                      'File model ONNX tidak ditemukan di CDN. ' +
+                      'Coba refresh halaman dan ulangi.';
+        } else if (detail.includes('Failed to fetch') || detail.includes('NetworkError')) {
+            detail += '\n\n[DIAGNOSIS] Koneksi gagal saat mengunduh model AI (~40MB). ' +
+                      'Pastikan koneksi stabil dan tidak terputus di tengah download.';
+        } else if (detail.includes('WASM') || detail.includes('wasm')) {
+            detail += '\n\n[DIAGNOSIS] WebAssembly runtime gagal. ' +
+                      'Gunakan browser modern (Chrome 57+, Edge 16+, Firefox 52+).';
         }
+
         showError(detail);
         $('btnRemoveBg').disabled = false;
-        showToast('Gagal menghapus background','error');
+        showToast('Gagal menghapus background', 'error');
     }
-};
+});
 
 // --- Reset ---
- $('btnReset').onclick = () => { originalFile=null;originalImg=null;removedBgCanvas=null; $('workspace').style.display='none'; $('uploadSection').style.display='block'; fileInput.value=''; resetControls(); };
-function resetControls() { ['rngSat','rngBri','rngCon'].forEach((id,i)=>{$(id).value=100; [{t:'valSat'},{t:'valBri'},{t:'valCon'}][i]&&($([{t:'valSat'},{t:'valBri'},{t:'valCon'}][i].t).textContent='100%')}); $('rngVib').value=0;$('valVib').textContent='0%';$('rngWhiteStroke').value=4;$('valWhiteStroke').textContent='4px';$('rngBlackStroke').value=1;$('valBlackStroke').textContent='1px';$('rngUpscale').value=1;$('valUpscale').textContent='1x';$('chkStroke').checked=false;$('chkBgColor').checked=false;toggleStrokeCtrl();toggleBgColorCtrl(); }
+ $('btnReset').addEventListener('click', () => {
+    originalFile = null;
+    originalImg = null;
+    removedBgCanvas = null;
+    $('workspace').style.display = 'none';
+    $('uploadSection').style.display = 'block';
+    fileInput.value = '';
+    resetControls();
+});
 
-// --- Render ---
-function scheduleRender(){clearTimeout(renderTimeout);renderTimeout=setTimeout(renderResult,40);}
+function resetControls() {
+    $('rngSat').value = 100; $('valSat').textContent = '100%';
+    $('rngBri').value = 100; $('valBri').textContent = '100%';
+    $('rngCon').value = 100; $('valCon').textContent = '100%';
+    $('rngVib').value = 0; $('valVib').textContent = '0%';
+    $('rngWhiteStroke').value = 4; $('valWhiteStroke').textContent = '4px';
+    $('rngBlackStroke').value = 1; $('valBlackStroke').textContent = '1px';
+    $('rngUpscale').value = 1; $('valUpscale').textContent = '1x';
+    $('chkStroke').checked = false;
+    $('chkBgColor').checked = false;
+    toggleStrokeCtrl();
+    toggleBgColorCtrl();
+}
+
+// --- Render Hasil ---
+function scheduleRender() {
+    clearTimeout(renderTimeout);
+    renderTimeout = setTimeout(renderResult, 50);
+}
+
 function renderResult() {
-    if(!removedBgCanvas) return;
-    const w=removedBgCanvas.width,h=removedBgCanvas.height;
-    canvasResult.width=w;canvasResult.height=h;
-    const sat=$('rngSat').value/100,bri=$('rngBri').value/100,con=$('rngCon').value/100,vib=+$('rngVib').value;
-    const useStroke=$('chkStroke').checked,whiteW=+$('rngWhiteStroke').value,blackW=+$('rngBlackStroke').value;
-    const useBg=$('chkBgColor').checked,bgColor=$('pickBgColor').value;
-    if(useBg){ctxResult.fillStyle=bgColor;ctxResult.fillRect(0,0,w,h);$('resultWrap').classList.remove('checkerboard');}else{ctxResult.clearRect(0,0,w,h);$('resultWrap').classList.add('checkerboard');}
-    const tc=document.createElement('canvas');tc.width=w;tc.height=h;const tx=tc.getContext('2d');
-    tx.filter=`saturate(${sat}) brightness(${bri}) contrast(${con})`;tx.drawImage(removedBgCanvas,0,0);tx.filter='none';
-    if(vib>0){const d=tx.getImageData(0,0,w,h);applyVibrance(d.data,vib/100);tx.putImageData(d,0,0);}
-    if(useStroke){const tr=whiteW+blackW,bm=createSolidMask(tc,'#000000'),wm=createSolidMask(tc,'#ffffff');for(let dy=-tr;dy<=tr;dy++)for(let dx=-tr;dx<=tr;dx++)if(dx*dx+dy*dy<=tr*tr)ctxResult.drawImage(bm,dx,dy);for(let dy=-whiteW;dy<=whiteW;dy++)for(let dx=-whiteW;dx<=whiteW;dx++)if(dx*dx+dy*dy<=whiteW*whiteW)ctxResult.drawImage(wm,dx,dy);}
-    ctxResult.drawImage(tc,0,0);
-}
-function createSolidMask(src,color){const c=document.createElement('canvas');c.width=src.width;c.height=src.height;const x=c.getContext('2d');x.fillStyle=color;x.fillRect(0,0,c.width,c.height);x.globalCompositeOperation='destination-in';x.drawImage(src,0,0);return c;}
-function applyVibrance(data,amt){for(let i=0;i<data.length;i+=4){if(!data[i+3])continue;const r=data[i],g=data[i+1],b=data[i+2],mx=Math.max(r,g,b),sat=mx?((mx-Math.min(r,g,b))/mx):0,f=amt*(1-sat)*0.6;data[i]=Math.max(0,Math.min(255,r+(mx-r)*f));data[i+1]=Math.max(0,Math.min(255,g+(mx-g)*f));data[i+2]=Math.max(0,Math.min(255,b+(mx-b)*f));}}
+    if (!removedBgCanvas) return;
+    const w = removedBgCanvas.width;
+    const h = removedBgCanvas.height;
+    canvasResult.width = w;
+    canvasResult.height = h;
 
-// --- Download ---
- $('btnDownload').onclick = async () => {
-    if(!removedBgCanvas) return;
-    const scale=+$('rngUpscale').value; $('btnDownload').disabled=true;
-    if(scale>1) showProgress('Mempersiapkan download HD...',`Upscale ${scale}x dan rendering...`);
-    await new Promise(r=>setTimeout(r,50));
+    const sat = $('rngSat').value / 100;
+    const bri = $('rngBri').value / 100;
+    const con = $('rngCon').value / 100;
+    const vib = parseInt($('rngVib').value);
+    const useStroke = $('chkStroke').checked;
+    const whiteW = parseInt($('rngWhiteStroke').value);
+    const blackW = parseInt($('rngBlackStroke').value);
+    const useBg = $('chkBgColor').checked;
+    const bgColor = $('pickBgColor').value;
+
+    // Background solid atau transparan
+    if (useBg) {
+        ctxResult.fillStyle = bgColor;
+        ctxResult.fillRect(0, 0, w, h);
+        $('resultWrap').classList.remove('checkerboard');
+    } else {
+        ctxResult.clearRect(0, 0, w, h);
+        $('resultWrap').classList.add('checkerboard');
+    }
+
+    // Terapkan filter warna
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = w;
+    tempCanvas.height = h;
+    const tctx = tempCanvas.getContext('2d');
+    tctx.filter = `saturate(${sat}) brightness(${bri}) contrast(${con})`;
+    tctx.drawImage(removedBgCanvas, 0, 0);
+    tctx.filter = 'none';
+
+    // Vibrance per-piksel
+    if (vib > 0) {
+        const imgData = tctx.getImageData(0, 0, w, h);
+        applyVibrance(imgData.data, vib / 100);
+        tctx.putImageData(imgData, 0, 0);
+    }
+
+    // Stroke cutting
+    if (useStroke) {
+        const totalR = whiteW + blackW;
+        const blackMask = createSolidMask(tempCanvas, '#000000');
+        const whiteMask = createSolidMask(tempCanvas, '#ffffff');
+
+        // Garis hitam (luar)
+        for (let dy = -totalR; dy <= totalR; dy++) {
+            for (let dx = -totalR; dx <= totalR; dx++) {
+                if (dx * dx + dy * dy <= totalR * totalR) {
+                    ctxResult.drawImage(blackMask, dx, dy);
+                }
+            }
+        }
+        // Stroke putih (dalam)
+        for (let dy = -whiteW; dy <= whiteW; dy++) {
+            for (let dx = -whiteW; dx <= whiteW; dx++) {
+                if (dx * dx + dy * dy <= whiteW * whiteW) {
+                    ctxResult.drawImage(whiteMask, dx, dy);
+                }
+            }
+        }
+    }
+
+    // Gambar utama di atas
+    ctxResult.drawImage(tempCanvas, 0, 0);
+}
+
+// Buat mask warna solid dari gambar (pertahankan alpha)
+function createSolidMask(sourceCanvas, color) {
+    const c = document.createElement('canvas');
+    c.width = sourceCanvas.width;
+    c.height = sourceCanvas.height;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.globalCompositeOperation = 'destination-in';
+    ctx.drawImage(sourceCanvas, 0, 0);
+    return c;
+}
+
+// Vibrance: tingkatkan saturasi lebih banyak pada warna yang kurang saturasi
+function applyVibrance(data, amount) {
+    for (let i = 0; i < data.length; i += 4) {
+        if (data[i + 3] === 0) continue;
+        const r = data[i], g = data[i + 1], b = data[i + 2];
+        const max = Math.max(r, g, b);
+        const sat = max === 0 ? 0 : (max - Math.min(r, g, b)) / max;
+        const f = amount * (1 - sat) * 0.6;
+        data[i] = Math.max(0, Math.min(255, r + (max - r) * f));
+        data[i + 1] = Math.max(0, Math.min(255, g + (max - g) * f));
+        data[i + 2] = Math.max(0, Math.min(255, b + (max - b) * f));
+    }
+}
+
+// --- Download HD ---
+ $('btnDownload').addEventListener('click', async () => {
+    if (!removedBgCanvas) return;
+    const scale = parseInt($('rngUpscale').value);
+    $('btnDownload').disabled = true;
+
+    if (scale > 1) {
+        showProgress('Mempersiapkan download HD...', `Upscale ${scale}x dan rendering...`);
+    }
+    await new Promise(r => setTimeout(r, 50));
+
     try {
-        const dl=await renderFullRes(scale); updateProgress(90,'Mengkonversi ke PNG...'); await new Promise(r=>setTimeout(r,30));
-        dl.toBlob(blob=>{if(!blob){hideProgress();showToast('Gagal membuat file','error');$('btnDownload').disabled=false;return;}const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=`${originalFile?originalFile.name.replace(/\.[^.]+$/,''):'result'}_karyaabadi${scale>1?'_'+scale+'x':''}.png`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);hideProgress();showToast(`Berhasil download (${(blob.size/1024/1024).toFixed(1)} MB)`,'success');$('btnDownload').disabled=false;},'image/png');
-    } catch(e){hideProgress();showToast('Gagal: '+e.message,'error');$('btnDownload').disabled=false;}
-};
-async function renderFullRes(scale){
-    const sw=removedBgCanvas.width,sh=removedBgCanvas.height,ow=sw*scale,oh=sh*scale;
-    const sat=$('rngSat').value/100,bri=$('rngBri').value/100,con=$('rngCon').value/100,vib=+$('rngVib').value;
-    const useStroke=$('chkStroke').checked,whiteW=+$('rngWhiteStroke').value*scale,blackW=+$('rngBlackStroke').value*scale;
-    const useBg=$('chkBgColor').checked,bgColor=$('pickBgColor').value;
-    const oc=document.createElement('canvas');oc.width=ow;oc.height=oh;const ox=oc.getContext('2d');
-    if(useBg){ox.fillStyle=bgColor;ox.fillRect(0,0,ow,oh);}
-    const uc=document.createElement('canvas');uc.width=ow;uc.height=oh;const ux=uc.getContext('2d');
-    ux.imageSmoothingEnabled=true;ux.imageSmoothingQuality='high';ux.drawImage(removedBgCanvas,0,0,ow,oh);
-    if(scale>1){applySharpen(ux,ow,oh,Math.min(0.8,0.15*scale));updateProgress(50,'Sharpening...');await new Promise(r=>setTimeout(r,10));}
-    const cc=document.createElement('canvas');cc.width=ow;cc.height=oh;const cx=cc.getContext('2d');
-    cx.filter=`saturate(${sat}) brightness(${bri}) contrast(${con})`;cx.drawImage(uc,0,0);cx.filter='none';
-    if(vib>0){const d=cx.getImageData(0,0,ow,oh);applyVibrance(d.data,vib/100);cx.putImageData(d,0,0);}
-    updateProgress(65,'Efek warna...');
-    if(useStroke){const tr=whiteW+blackW,bm=createSolidMask(cc,'#000000'),wm=createSolidMask(cc,'#ffffff'),st=scale>4?2:1;for(let dy=-tr;dy<=tr;dy+=st)for(let dx=-tr;dx<=tr;dx+=st)if(dx*dx+dy*dy<=tr*tr)ox.drawImage(bm,dx,dy);for(let dy=-whiteW;dy<=whiteW;dy+=st)for(let dx=-whiteW;dx<=whiteW;dx+=st)if(dx*dx+dy*dy<=whiteW*whiteW)ox.drawImage(wm,dx,dy);updateProgress(80,'Stroke...');}
-    ox.drawImage(cc,0,0);updateProgress(88,'Finalisasi...');await new Promise(r=>setTimeout(r,10));return oc;
+        const dlCanvas = await renderFullRes(scale);
+        updateProgress(90, 'Mengkonversi ke PNG...');
+        await new Promise(r => setTimeout(r, 30));
+
+        dlCanvas.toBlob(blob => {
+            if (!blob) {
+                hideProgress();
+                showToast('Gagal membuat file PNG', 'error');
+                $('btnDownload').disabled = false;
+                return;
+            }
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const baseName = originalFile
+                ? originalFile.name.replace(/\.[^.]+$/, '')
+                : 'result';
+            a.download = `${baseName}_karyaabadi${scale > 1 ? '_' + scale + 'x' : ''}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            hideProgress();
+            showToast(`Berhasil download (${(blob.size / 1024 / 1024).toFixed(1)} MB)`, 'success');
+            $('btnDownload').disabled = false;
+        }, 'image/png');
+    } catch (e) {
+        hideProgress();
+        showToast('Gagal: ' + e.message, 'error');
+        $('btnDownload').disabled = false;
+    }
+});
+
+// Render full resolution untuk download (termasuk upscale)
+async function renderFullRes(scale) {
+    const srcW = removedBgCanvas.width;
+    const srcH = removedBgCanvas.height;
+    const outW = srcW * scale;
+    const outH = srcH * scale;
+
+    const sat = $('rngSat').value / 100;
+    const bri = $('rngBri').value / 100;
+    const con = $('rngCon').value / 100;
+    const vib = parseInt($('rngVib').value);
+    const useStroke = $('chkStroke').checked;
+    const whiteW = parseInt($('rngWhiteStroke').value) * scale;
+    const blackW = parseInt($('rngBlackStroke').value) * scale;
+    const useBg = $('chkBgColor').checked;
+    const bgColor = $('pickBgColor').value;
+
+    const outCanvas = document.createElement('canvas');
+    outCanvas.width = outW;
+    outCanvas.height = outH;
+    const octx = outCanvas.getContext('2d');
+
+    // Background
+    if (useBg) {
+        octx.fillStyle = bgColor;
+        octx.fillRect(0, 0, outW, outH);
+    }
+
+    // Upscale
+    const upscaled = document.createElement('canvas');
+    upscaled.width = outW;
+    upscaled.height = outH;
+    const uctx = upscaled.getContext('2d');
+    uctx.imageSmoothingEnabled = true;
+    uctx.imageSmoothingQuality = 'high';
+    uctx.drawImage(removedBgCanvas, 0, 0, outW, outH);
+
+    // Sharpening setelah upscale
+    if (scale > 1) {
+        applySharpen(uctx, outW, outH, Math.min(0.8, 0.15 * scale));
+        updateProgress(50, 'Menerapkan sharpening...');
+        await new Promise(r => setTimeout(r, 10));
+    }
+
+    // Filter warna
+    const colorCanvas = document.createElement('canvas');
+    colorCanvas.width = outW;
+    colorCanvas.height = outH;
+    const cctx = colorCanvas.getContext('2d');
+    cctx.filter = `saturate(${sat}) brightness(${bri}) contrast(${con})`;
+    cctx.drawImage(upscaled, 0, 0);
+    cctx.filter = 'none';
+
+    if (vib > 0) {
+        const imgData = cctx.getImageData(0, 0, outW, outH);
+        applyVibrance(imgData.data, vib / 100);
+        cctx.putImageData(imgData, 0, 0);
+    }
+    updateProgress(65, 'Menerapkan efek warna...');
+
+    // Stroke
+    if (useStroke) {
+        const totalR = whiteW + blackW;
+        const blackMask = createSolidMask(colorCanvas, '#000000');
+        const whiteMask = createSolidMask(colorCanvas, '#ffffff');
+        const step = scale > 4 ? 2 : 1;
+
+        for (let dy = -totalR; dy <= totalR; dy += step) {
+            for (let dx = -totalR; dx <= totalR; dx += step) {
+                if (dx * dx + dy * dy <= totalR * totalR) {
+                    octx.drawImage(blackMask, dx, dy);
+                }
+            }
+        }
+        for (let dy = -whiteW; dy <= whiteW; dy += step) {
+            for (let dx = -whiteW; dx <= whiteW; dx += step) {
+                if (dx * dx + dy * dy <= whiteW * whiteW) {
+                    octx.drawImage(whiteMask, dx, dy);
+                }
+            }
+        }
+        updateProgress(80, 'Menggambar stroke...');
+    }
+
+    // Gambar utama
+    octx.drawImage(colorCanvas, 0, 0);
+    updateProgress(88, 'Finalisasi...');
+    await new Promise(r => setTimeout(r, 10));
+    return outCanvas;
 }
-function applySharpen(ctx,w,h,amt){const t=document.createElement('canvas');t.width=w;t.height=h;const tx=t.getContext('2d');tx.drawImage(ctx.canvas,0,0);const b=document.createElement('canvas');b.width=w;b.height=h;const bx=b.getContext('2d');bx.filter=`blur(${Math.max(1,Math.round(amt*3))}px)`;bx.drawImage(t,0,0);bx.filter='none';const d=document.createElement('canvas');d.width=w;d.height=h;const dx=d.getContext('2d');dx.drawImage(t,0,0);dx.globalCompositeOperation='difference';dx.drawImage(b,0,0);ctx.globalCompositeOperation='source-over';ctx.drawImage(t,0,0);ctx.globalAlpha=Math.min(1,amt);ctx.drawImage(d,0,0);ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';}
 
-// --- Kontrol Event ---
- $('chkStroke').onchange=()=>{const e=$('strokeControls');if($('chkStroke').checked)e.classList.remove('opacity-40','pointer-events-none');else e.classList.add('opacity-40','pointer-events-none');scheduleRender();};
- $('rngWhiteStroke').oninput=e=>{$('valWhiteStroke').textContent=e.target.value+'px';scheduleRender();};
- $('rngBlackStroke').oninput=e=>{$('valBlackStroke').textContent=e.target.value+'px';scheduleRender();};
- $('chkBgColor').onchange=()=>{const e=$('bgColorControls');if($('chkBgColor').checked)e.classList.remove('opacity-40','pointer-events-none');else e.classList.add('opacity-40','pointer-events-none');scheduleRender();};
- $('pickBgColor').oninput=e=>{$('hexBgColor').textContent=e.target.value.toUpperCase();$('presetColors').querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('active'));scheduleRender();};
- $('rngSat').oninput=e=>{$('valSat').textContent=e.target.value+'%';scheduleRender();};
- $('rngBri').oninput=e=>{$('valBri').textContent=e.target.value+'%';scheduleRender();};
- $('rngCon').oninput=e=>{$('valCon').textContent=e.target.value+'%';scheduleRender();};
- $('rngVib').oninput=e=>{$('valVib').textContent=e.target.value+'%';scheduleRender();};
- $('btnResetColor').onclick=()=>{$('rngSat').value=100;$('valSat').textContent='100%';$('rngBri').value=100;$('valBri').textContent='100%';$('rngCon').value=100;$('valCon').textContent='100%';$('rngVib').value=0;$('valVib').textContent='0%';scheduleRender();showToast('Warna direset','info');};
- $('rngUpscale').oninput=e=>{$('valUpscale').textContent=e.target.value+'x';updateOutputInfo();$('upscalePresets').querySelectorAll('button').forEach(b=>b.style.borderColor='');};
-function toggleStrokeCtrl(){const e=$('strokeControls');if($('chkStroke').checked)e.classList.remove('opacity-40','pointer-events-none');else e.classList.add('opacity-40','pointer-events-none');}
-function toggleBgColorCtrl(){const e=$('bgColorControls');if($('chkBgColor').checked)e.classList.remove('opacity-40','pointer-events-none');else e.classList.add('opacity-40','pointer-events-none');}
-function updateOutputInfo(){if(!removedBgCanvas)return;const s=+$('rngUpscale').value;$('statusOutput').textContent=`${removedBgCanvas.width*s}×${removedBgCanvas.height*s}`;$('dlResInfo').textContent=`${removedBgCanvas.width*s} × ${removedBgCanvas.height*s} px (${s}x)`;}
+// Unsharp Mask sederhana
+function applySharpen(ctx, w, h, amount) {
+    const temp = document.createElement('canvas');
+    temp.width = w; temp.height = h;
+    const tctx = temp.getContext('2d');
+    tctx.drawImage(ctx.canvas, 0, 0);
 
-// --- Partikel ---
-(function(){const c=$('particleCanvas'),x=c.getContext('2d');let ps=[],w,h;function rs(){w=c.width=innerWidth;h=c.height=innerHeight;}rs();addEventListener('resize',rs);class P{constructor(){this.rs();}rs(){this.x=Math.random()*w;this.y=Math.random()*h;this.s=Math.random()*2+0.5;this.sx=(Math.random()-0.5)*0.3;this.sy=(Math.random()-0.5)*0.3;this.o=Math.random()*0.3+0.05;this.p=Math.random()*Math.PI*2;}u(){this.x+=this.sx;this.y+=this.sy;this.p+=0.01;if(this.x<-10||this.x>w+10||this.y<-10||this.y>h+10)this.rs();}d(){const o=this.o*(0.6+0.4*Math.sin(this.p));x.beginPath();x.arc(this.x,this.y,Math.max(0.1,this.s),0,Math.PI*2);x.fillStyle=`rgba(220,38,38,${o})`;x.fill();}}for(let i=0;i<50;i++)ps.push(new P());function a(){x.clearRect(0,0,w,h);ps.forEach(p=>{p.u();p.d();});for(let i=0;i<ps.length;i++)for(let j=i+1;j<ps.length;j++){const dx=ps[i].x-ps[j].x,dy=ps[i].y-ps[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<150){x.beginPath();x.moveTo(ps[i].x,ps[i].y);x.lineTo(ps[j].x,ps[j].y);x.strokeStyle=`rgba(220,38,38,${0.04*(1-d/150)})`;x.lineWidth=0.5;x.stroke();}}requestAnimationFrame(a);}if(!matchMedia('(prefers-reduced-motion:reduce)').matches)a();})();
+    const blurred = document.createElement('canvas');
+    blurred.width = w; blurred.height = h;
+    const bctx = blurred.getContext('2d');
+    bctx.filter = `blur(${Math.max(1, Math.round(amount * 3))}px)`;
+    bctx.drawImage(temp, 0, 0);
+    bctx.filter = 'none';
 
-document.querySelectorAll('a[href^="#"]').forEach(a=>{a.onclick=e=>{e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth',block:'start'});};});
+    const diff = document.createElement('canvas');
+    diff.width = w; diff.height = h;
+    const dctx = diff.getContext('2d');
+    dctx.drawImage(temp, 0, 0);
+    dctx.globalCompositeOperation = 'difference';
+    dctx.drawImage(blurred, 0, 0);
 
-// Preload library setelah halaman siap
-setTimeout(() => loadLib(), 1500);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.drawImage(temp, 0, 0);
+    ctx.globalAlpha = Math.min(1, amount);
+    ctx.drawImage(diff, 0, 0);
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+}
+
+// --- Event Listeners Kontrol ---
+ $('chkStroke').addEventListener('change', () => {
+    const el = $('strokeControls');
+    if ($('chkStroke').checked) el.classList.remove('opacity-40', 'pointer-events-none');
+    else el.classList.add('opacity-40', 'pointer-events-none');
+    scheduleRender();
+});
+
+ $('rngWhiteStroke').addEventListener('input', e => {
+    $('valWhiteStroke').textContent = e.target.value + 'px';
+    scheduleRender();
+});
+
+ $('rngBlackStroke').addEventListener('input', e => {
+    $('valBlackStroke').textContent = e.target.value + 'px';
+    scheduleRender();
+});
+
+ $('chkBgColor').addEventListener('change', () => {
+    const el = $('bgColorControls');
+    if ($('chkBgColor').checked) el.classList.remove('opacity-40', 'pointer-events-none');
+    else el.classList.add('opacity-40', 'pointer-events-none');
+    scheduleRender();
+});
+
+ $('pickBgColor').addEventListener('input', e => {
+    $('hexBgColor').textContent = e.target.value.toUpperCase();
+    presetContainer.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+    scheduleRender();
+});
+
+ $('rngSat').addEventListener('input', e => {
+    $('valSat').textContent = e.target.value + '%';
+    scheduleRender();
+});
+
+ $('rngBri').addEventListener('input', e => {
+    $('valBri').textContent = e.target.value + '%';
+    scheduleRender();
+});
+
+ $('rngCon').addEventListener('input', e => {
+    $('valCon').textContent = e.target.value + '%';
+    scheduleRender();
+});
+
+ $('rngVib').addEventListener('input', e => {
+    $('valVib').textContent = e.target.value + '%';
+    scheduleRender();
+});
+
+ $('btnResetColor').addEventListener('click', () => {
+    $('rngSat').value = 100; $('valSat').textContent = '100%';
+    $('rngBri').value = 100; $('valBri').textContent = '100%';
+    $('rngCon').value = 100; $('valCon').textContent = '100%';
+    $('rngVib').value = 0; $('valVib').textContent = '0%';
+    scheduleRender();
+    showToast('Pengaturan warna direset', 'info');
+});
+
+ $('rngUpscale').addEventListener('input', e => {
+    $('valUpscale').textContent = e.target.value + 'x';
+    updateOutputInfo();
+    upscaleContainer.querySelectorAll('button').forEach(b => b.style.borderColor = '');
+});
+
+function toggleStrokeCtrl() {
+    const el = $('strokeControls');
+    if ($('chkStroke').checked) el.classList.remove('opacity-40', 'pointer-events-none');
+    else el.classList.add('opacity-40', 'pointer-events-none');
+}
+
+function toggleBgColorCtrl() {
+    const el = $('bgColorControls');
+    if ($('chkBgColor').checked) el.classList.remove('opacity-40', 'pointer-events-none');
+    else el.classList.add('opacity-40', 'pointer-events-none');
+}
+
+function updateOutputInfo() {
+    if (!removedBgCanvas) return;
+    const s = parseInt($('rngUpscale').value);
+    $('statusOutput').textContent = `${removedBgCanvas.width * s}×${removedBgCanvas.height * s}`;
+    $('dlResInfo').textContent = `${removedBgCanvas.width * s} × ${removedBgCanvas.height * s} px (${s}x)`;
+}
+
+// --- Partikel Background ---
+(function initParticles() {
+    const canvas = $('particleCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let w, h;
+
+    function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    class Particle {
+        constructor() { this.reset(); }
+        reset() {
+            this.x = Math.random() * w;
+            this.y = Math.random() * h;
+            this.size = Math.random() * 2 + 0.5;
+            this.speedX = (Math.random() - 0.5) * 0.3;
+            this.speedY = (Math.random() - 0.5) * 0.3;
+            this.opacity = Math.random() * 0.3 + 0.05;
+            this.pulse = Math.random() * Math.PI * 2;
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            this.pulse += 0.01;
+            if (this.x < -10 || this.x > w + 10 || this.y < -10 || this.y > h + 10) this.reset();
+        }
+        draw() {
+            const o = this.opacity * (0.6 + 0.4 * Math.sin(this.pulse));
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, Math.max(0.1, this.size), 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(220,38,38,${o})`;
+            ctx.fill();
+        }
+    }
+
+    for (let i = 0; i < 50; i++) particles.push(new Particle());
+
+    function animate() {
+        ctx.clearRect(0, 0, w, h);
+        particles.forEach(p => { p.update(); p.draw(); });
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 150) {
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.strokeStyle = `rgba(220,38,38,${0.04 * (1 - dist / 150)})`;
+                    ctx.lineWidth = 0.5;
+                    ctx.stroke();
+                }
+            }
+        }
+        requestAnimationFrame(animate);
+    }
+
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        animate();
+    }
+})();
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+        e.preventDefault();
+        const t = document.querySelector(a.getAttribute('href'));
+        if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+});
+
+// Preload library di background setelah halaman siap
+setTimeout(() => loadLib(), 2000);
+
 </script>
 </body>
 </html>
