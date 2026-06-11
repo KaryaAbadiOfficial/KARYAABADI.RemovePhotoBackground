@@ -1,487 +1,1034 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KARYA ABADI Remove Photo Background</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        :root{--bg:#000;--bg2:#0A0A0A;--card:#111;--border:#222;--red:#db1514;--red-b:#ef2020;--red-glow:rgba(219,21,20,0.4);--red-s:rgba(219,21,20,0.08);--red-s2:rgba(219,21,20,0.15);--fg:#FFF;--fg8:rgba(255,255,255,0.8);--fg6:rgba(255,255,255,0.6);--fg4:rgba(255,255,255,0.4);--fg2:rgba(255,255,255,0.2);--fg05:rgba(255,255,255,0.05);--chk:repeating-conic-gradient(var(--border)0% 25%,var(--bg2)0% 50%)0 0/20px 20px}
-        [data-theme="light"]{--bg:#F5F5F5;--bg2:#EAEAEA;--card:#FFF;--border:#D0D0D0;--red-s:rgba(219,21,20,0.06);--red-s2:rgba(219,21,20,0.1);--fg:#111;--fg8:rgba(0,0,0,0.8);--fg6:rgba(0,0,0,0.6);--fg4:rgba(0,0,0,0.4);--fg2:rgba(0,0,0,0.2);--fg05:rgba(0,0,0,0.05);--chk:repeating-conic-gradient(var(--border)0% 25%,#fff 0% 50%)0 0/20px 20px}
-        *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
-        body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;overflow-x:hidden;transition:background .35s,color .35s}
-        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--red);border-radius:99px}
-        .navbar-c{background:#000!important;border-bottom:1px solid #222;padding:10px 0;z-index:1050}.navbar-c.scrolled{box-shadow:0 4px 30px rgba(219,21,20,0.15)}
-        .nb-link{display:flex;align-items:center;gap:10px;text-decoration:none}
-        .nb-logo{height:34px;width:auto;object-fit:contain;flex-shrink:0}
-        .nb-text{font-weight:800;font-size:.88rem;color:#FFF!important;letter-spacing:.03em;line-height:1.15}.nb-text span{color:var(--red)}
-        .dm-btn{width:36px;height:36px;border-radius:50%;border:1px solid #333;background:#111;color:rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;font-size:.9rem}.dm-btn:hover{border-color:var(--red);color:var(--red);background:rgba(219,21,20,0.1)}
-        .main-c{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:80px 20px 60px;position:relative}
-        .bg1{position:fixed;top:-250px;left:-150px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(219,21,20,0.06)0%,transparent 70%);pointer-events:none;z-index:0}
-        .bg2{position:fixed;bottom:-300px;right:-150px;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(219,21,20,0.04)0%,transparent 70%);pointer-events:none;z-index:0}
-        .app-c{position:relative;z-index:1;width:100%;max-width:700px}
-        .card{background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;transition:background .35s,border-color .35s}
-        .up-area{padding:56px 36px;text-align:center;cursor:pointer;transition:all .3s;border:2px dashed var(--border);border-radius:14px;margin:20px}
-        .up-area:hover,.up-area.dragover{border-color:var(--red);background:var(--red-s)}
-        .up-ic{width:64px;height:64px;border-radius:50%;background:var(--red-s);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;transition:all .3s}
-        .up-ic i{font-size:1.4rem;color:var(--red);transition:all .3s}
-        .up-area:hover .up-ic{background:var(--red)}.up-area:hover .up-ic i{color:#fff}
-        .up-t{font-size:1.3rem;font-weight:900;color:var(--fg8);margin-bottom:8px;letter-spacing:.1em;transition:color .35s}
-        .up-f1{font-size:.82rem;color:var(--fg4);margin-bottom:2px;transition:color .35s}
-        .up-f2{font-size:.78rem;color:var(--fg4);transition:color .35s}
-        .ps{display:none}.ps.a{display:block}
-        .sbar{padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;transition:border-color .35s}
-        .sbar-t{font-weight:700;font-size:.85rem;color:var(--fg8);display:flex;align-items:center;gap:8px;transition:color .35s}.sbar-t i{color:var(--red)}
-        .iw{padding:20px;text-align:center}
-        .iw img{max-width:100%;max-height:400px;border-radius:10px;display:block;margin:0 auto}
-        .fi2{font-size:.75rem;color:var(--fg4);margin-top:10px;transition:color .35s}
-        .abar{padding:12px 20px 20px;display:flex;gap:10px;flex-wrap:wrap}
-        .btn-r{background:var(--red);color:#fff;border:none;padding:12px 24px;border-radius:10px;font-weight:700;font-size:.85rem;display:inline-flex;align-items:center;gap:8px;cursor:pointer;transition:all .3s;box-shadow:0 4px 20px var(--red-glow);text-decoration:none}
-        .btn-r:hover{background:var(--red-b);transform:translateY(-2px);box-shadow:0 8px 30px var(--red-glow);color:#fff}
-        .btn-r:disabled{opacity:.5;cursor:not-allowed;transform:none}
-        .btn-d{background:var(--fg05);color:var(--fg6);border:1px solid var(--border);padding:11px 18px;border-radius:10px;font-weight:600;font-size:.8rem;display:inline-flex;align-items:center;gap:8px;cursor:pointer;transition:all .3s;text-decoration:none}
-        .btn-d:hover{border-color:var(--red);color:var(--red);background:var(--red-s)}
-        .btn-d.active-effect{background:var(--red);color:#fff;border-color:var(--red)}
-        .btn-sm{padding:6px 12px;font-size:.74rem}
-        .rs2{display:none}.rs2.a{display:block}
-        .ba-wrap{padding:16px 20px 8px}
-        .ba-row{display:flex;gap:12px}
-        .ba-col{flex:1;min-width:0;position:relative}
-        .ba-img-wrap{border-radius:10px;overflow:hidden;border:1px solid var(--border);transition:border-color .35s;position:relative}
-        .ba-img-wrap img{width:100%;display:block;border-radius:9px}
-        .ba-img-wrap.after-wrap{background:var(--chk)}
-        .ba-lbl{position:absolute;top:8px;left:8px;padding:4px 12px;border-radius:6px;font-size:.65rem;font-weight:700;letter-spacing:.06em;z-index:2;text-transform:uppercase}
-        .ba-lbl.before{background:rgba(0,0,0,.75);color:rgba(255,255,255,.9)}
-        .ba-lbl.after{background:var(--red);color:#fff}
-        @media(max-width:576px){.ba-row{flex-direction:column;gap:10px}}
-        .palette-wrap{padding:10px 20px 6px}
-        .palette-layout{display:flex;align-items:center;justify-content:center;gap:10px}
-        .pal-side{display:flex;flex-direction:row;gap:8px;align-items:center}
-        .pal-swatch{width:36px;height:36px;border-radius:10px;cursor:pointer;border:2.5px solid transparent;transition:all .2s;flex-shrink:0}
-        .pal-swatch:hover{transform:scale(1.15)}
-        .pal-swatch.active{border-color:var(--red);box-shadow:0 0 0 2px var(--red-glow)}
-        .pal-swatch.transparent-swatch{background:var(--chk);border:2.5px dashed var(--border)}
-        .pal-swatch.transparent-swatch.active{border-color:var(--red);border-style:solid}
-        .pal-center{position:relative;width:56px;height:56px;border-radius:14px;overflow:hidden;cursor:pointer;border:2px solid var(--border);transition:all .3s;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--fg05)}
-        .pal-center:hover{border-color:var(--red);transform:scale(1.06)}
-        .pal-center.active{border-color:var(--red);box-shadow:0 0 0 3px var(--red-glow)}
-        .pal-center i{font-size:1.3rem;color:var(--fg4);pointer-events:none;transition:color .3s;z-index:1}
-        .pal-center:hover i{color:var(--red)}
-        .pal-center-color{position:absolute;inset:0;border-radius:12px;opacity:0;transition:opacity .2s}
-        .pal-center.has-color .pal-center-color{opacity:1}
-        .pal-center.has-color i{color:#fff;mix-blend-mode:difference}
-        .pal-center input[type="color"]{position:absolute;inset:0;width:100%;height:100%;border:none;padding:0;cursor:pointer;opacity:0}
-        @media(max-width:576px){.pal-swatch{width:30px;height:30px;border-radius:8px}.pal-center{width:46px;height:46px;border-radius:12px}.pal-center i{font-size:1.1rem}.palette-layout{gap:6px}.pal-side{gap:6px}}
-        .ra{padding:12px 20px 20px;display:flex;gap:10px;flex-wrap:wrap}
-        .ra .btn-r,.ra .btn-d{flex:1;min-width:70px;justify-content:center}
-        .po{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);z-index:9998;align-items:center;justify-content:center}.po.a{display:flex}
-        .pb2{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:44px;text-align:center;max-width:340px;width:90%;transition:background .35s,border-color .35s}
-        .psp{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--red);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 20px}
-        @keyframes spin{to{transform:rotate(360deg)}}
-        .pb2 h5{font-weight:700;color:var(--fg);font-size:.95rem;transition:color .35s}
-        .ppb{height:5px;border-radius:99px;background:var(--border);overflow:hidden;transition:background .35s;margin-top:14px}
-        .ppf{height:100%;border-radius:99px;background:var(--red);transition:width .3s ease;width:0%}
-        .pps{font-size:.72rem;color:var(--fg4);margin-top:8px;transition:color .35s}
-        .so{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:9997;align-items:center;justify-content:center}.so.a{display:flex}
-        .sb2{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;text-align:center;max-width:360px;width:90%;transition:background .35s,border-color .35s}
-        .sb2 h5{font-weight:700;margin-bottom:18px;color:var(--fg);font-size:.9rem;transition:color .35s}
-        .si-r{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
-        .si{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#fff;transition:all .3s;cursor:pointer;text-decoration:none}
-        .si:hover{transform:scale(1.15)}
-        .si.wa{background:#25D366}.si.fb{background:#1877F2}.si.ig{background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)}.si.tg{background:#0088CC}.si.tw{background:#1DA1F2}
-        .sc2{margin-top:16px;background:var(--fg05);border:1px solid var(--border);color:var(--fg6);padding:8px 22px;border-radius:10px;font-weight:600;font-size:.8rem;cursor:pointer;transition:all .3s}
-        .sc2:hover{border-color:var(--red);color:var(--red)}
-        .tw2{position:fixed;top:70px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px}
-        .ti2{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:8px;font-size:.8rem;font-weight:500;color:var(--fg8);animation:tIn .3s ease;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,.3);transition:background .35s,border-color .35s}
-        .ti2.success{border-left:3px solid var(--red)}.ti2.error{border-left:3px solid #f44}.ti2.info{border-left:3px solid var(--fg4)}
-        @keyframes tIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
-        @keyframes tOut{from{opacity:1}to{opacity:0;transform:translateX(30px)}}
-        .ft2{position:relative;z-index:1;text-align:center;padding:16px;font-size:.7rem;color:var(--fg2);transition:color .35s}
-        .ft2 a{color:var(--fg4);text-decoration:none;transition:color .3s}.ft2 a:hover{color:var(--red)}
-        @media(max-width:576px){.up-area{padding:40px 18px;margin:14px}.abar,.ra{flex-direction:column}.abar .btn-r,.abar .btn-d,.ra .btn-r,.ra .btn-d{width:100%;justify-content:center}.pb2{padding:32px 20px}}
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KARYA ABADI Remove Background</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script>
+tailwind.config={theme:{extend:{colors:{'ka':'#0a0a0a','kad':'#111111','kac':'#161616','kach':'#1e1e1e','kar':'#dc2626','kard':'#991b1b','karl':'#ef4444','kab':'#2a2a2a','kag':'#9ca3af','kagl':'#d1d5db'},fontFamily:{'disp':['Orbitron','sans-serif'],'body':['Poppins','sans-serif']}}}}
+</script>
+<style>
+:root{--red:#dc2626;--red-glow:rgba(220,38,38,0.4)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;color:#fff;font-family:'Poppins',sans-serif;overflow-x:hidden}
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-track{background:#111}
+::-webkit-scrollbar-thumb{background:#333;border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:#555}
+#particleCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.glass{background:rgba(22,22,22,0.85);backdrop-filter:blur(16px);border:1px solid #2a2a2a}
+.checkerboard{background-image:linear-gradient(45deg,#1a1a1a 25%,transparent 25%),linear-gradient(-45deg,#1a1a1a 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#1a1a1a 75%),linear-gradient(-45deg,transparent 75%,#1a1a1a 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;background:#2a2a2a;border-radius:3px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:var(--red);cursor:pointer;box-shadow:0 0 8px var(--red-glow);transition:transform .15s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--red);cursor:pointer;border:none}
+.btn-red{background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;border:none;padding:12px 28px;border-radius:8px;font-weight:600;font-size:15px;cursor:pointer;transition:all .25s;box-shadow:0 4px 20px rgba(220,38,38,0.3);position:relative;overflow:hidden}
+.btn-red:hover{transform:translateY(-2px);box-shadow:0 6px 30px rgba(220,38,38,0.5)}
+.btn-red:active{transform:translateY(0)}
+.btn-red:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+.btn-red::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);transition:left .5s}
+.btn-red:hover::after{left:100%}
+.btn-outline{background:transparent;color:#fff;border:2px solid #2a2a2a;padding:10px 24px;border-radius:8px;font-weight:500;cursor:pointer;transition:all .25s}
+.btn-outline:hover{border-color:var(--red);color:var(--red);box-shadow:0 0 15px rgba(220,38,38,0.15)}
+.ctrl-card{background:#141414;border:1px solid #2a2a2a;border-radius:12px;padding:20px;transition:border-color .3s}
+.ctrl-card:hover{border-color:#3a3a3a}
+.ctrl-card h4{font-family:'Orbitron',sans-serif;font-size:13px;letter-spacing:1.5px;color:var(--red);margin-bottom:16px;text-transform:uppercase}
+.upload-zone{border:2px dashed #2a2a2a;border-radius:16px;padding:60px 30px;text-align:center;cursor:pointer;transition:all .3s;position:relative}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--red);background:rgba(220,38,38,0.04)}
+.upload-zone.drag-over{box-shadow:inset 0 0 40px rgba(220,38,38,0.08)}
+.preview-wrap{border-radius:12px;overflow:hidden;border:1px solid #2a2a2a;position:relative;background:#0e0e0e}
+.preview-wrap canvas{display:block;width:100%;height:auto;max-height:500px;object-fit:contain}
+.toast-container{position:fixed;top:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:10px}
+.toast{padding:14px 22px;border-radius:10px;font-size:14px;font-weight:500;color:#fff;animation:slideIn .35s ease;min-width:280px;box-shadow:0 8px 30px rgba(0,0,0,0.4);display:flex;align-items:center;gap:10px}
+.toast.success{background:linear-gradient(135deg,#166534,#14532d);border:1px solid #22c55e}
+.toast.error{background:linear-gradient(135deg,#991b1b,#7f1d1d);border:1px solid #ef4444}
+.toast.info{background:linear-gradient(135deg,#1e3a5f,#1e293b);border:1px solid #3b82f6}
+@keyframes slideIn{from{transform:translateX(100px);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes slideOut{from{transform:translateX(0);opacity:1}to{transform:translateX(100px);opacity:0}}
+@keyframes pulse-red{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,0.4)}50%{box-shadow:0 0 0 12px rgba(220,38,38,0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.hero-text{background:linear-gradient(90deg,#fff,#dc2626,#fff,#dc2626);background-size:300% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gradientShift 6s ease infinite}
+.progress-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9998;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+.progress-bar-track{width:400px;max-width:90vw;height:8px;background:#1a1a1a;border-radius:4px;overflow:hidden}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,#dc2626,#ef4444);border-radius:4px;transition:width .3s;width:0%}
+.color-swatch{width:32px;height:32px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:all .2s}
+.color-swatch:hover,.color-swatch.active{border-color:#fff;transform:scale(1.15)}
+footer a{color:#9ca3af;text-decoration:none;transition:color .2s}
+footer a:hover{color:#dc2626}
+@media(prefers-reduced-motion:reduce){*{animation-duration:0s!important;transition-duration:0s!important}}
+</style>
 </head>
 <body>
-    <div class="bg1"></div><div class="bg2"></div>
-    <nav class="navbar navbar-c fixed-top" id="mainNav">
-        <div class="container d-flex align-items-center" style="justify-content:space-between">
-            <a class="nb-link" href="#">
-                <img src="https://z-cdn-media.chatglm.cn/files/62242f3c-116c-484e-a5ec-0f587c90f268.png?auth_key=1880176404-45e3b7618d7e406db5bcdb4bb1275ca7-0-2541488488a0873713f7886d6e09f992" alt="Logo" class="nb-logo">
-                <div class="nb-text">KARYA ABADI<br><span>Remove Photo Background</span></div>
-            </a>
-            <button class="dm-btn" id="dmToggle" title="Dark/Light Mode"><i class="fa-solid fa-sun"></i></button>
-        </div>
-    </nav>
-    <div class="main-c"><div class="app-c"><div class="card">
-        <div id="uploadAreaWrap">
-            <div class="up-area" id="uploadArea">
-                <div class="up-ic"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-                <div class="up-t">UPLOAD</div>
-                <div class="up-f1">JPG, PNG, WEBP</div>
-                <div class="up-f2">Maks 20 MB</div>
-                <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp" hidden>
-            </div>
-        </div>
-        <div id="previewSection" class="ps">
-            <div class="sbar"><div class="sbar-t"><i class="fa-solid fa-image"></i> Preview</div><button class="btn-d btn-sm" id="removeBtn"><i class="fa-solid fa-xmark"></i> Hapus</button></div>
-            <div class="iw"><img id="previewImg" src="" alt="Preview"><div id="fileInfo" class="fi2"></div></div>
-            <div class="abar">
-                <button class="btn-r" id="removeBgBtn" style="flex:1;justify-content:center"><i class="fa-solid fa-wand-magic-sparkles"></i> Remove Background</button>
-                <button class="btn-d active-effect" id="autoCleanBtn" title="Bersihkan sisa stroke halus di luar objek secara otomatis"><i class="fa-solid fa-broom"></i> Auto-Clean</button>
-            </div>
-        </div>
-        <div id="resultSection" class="rs2">
-            <div class="sbar"><div class="sbar-t"><i class="fa-solid fa-check-circle"></i> Hasil</div><button class="btn-d btn-sm" id="newUploadBtn"><i class="fa-solid fa-plus"></i> Baru</button></div>
-            <div class="ba-wrap"><div class="ba-row">
-                <div class="ba-col"><div class="ba-img-wrap"><span class="ba-lbl before">Sebelum</span><img id="resBefore" src="" alt="Sebelum"></div></div>
-                <div class="ba-col"><div class="ba-img-wrap after-wrap" id="afterWrap"><span class="ba-lbl after">Sesudah</span><img id="resAfter" src="" alt="Sesudah"></div></div>
-            </div></div>
-            <div class="palette-wrap">
-                <div class="palette-layout">
-                    <div class="pal-side" id="palLeft">
-                        <div class="pal-swatch transparent-swatch active" data-color="transparent" title="Transparan"></div>
-                        <div class="pal-swatch" data-color="#FFFFFF" style="background:#FFFFFF" title="Putih"></div>
-                    </div>
-                    <div class="pal-center" id="palCenter" title="Pilih Warna">
-                        <div class="pal-center-color" id="palCenterColor"></div>
-                        <i class="fa-solid fa-palette"></i>
-                        <input type="color" id="customColor" value="#2563EB">
-                    </div>
-                    <div class="pal-side" id="palRight">
-                        <div class="pal-swatch" data-color="#0b00a3" style="background:#0b00a3" title="Biru"></div>
-                        <div class="pal-swatch" data-color="#db1514" style="background:#db1514" title="Merah"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="ra">
-                <button class="btn-d" id="bwToggle"><i class="fa-solid fa-circle-half-stroke"></i> B&W</button>
-                <button class="btn-r" id="dlPng"><i class="fa-solid fa-download"></i> PNG HD</button>
-                <button class="btn-d" id="dlJpg"><i class="fa-solid fa-image"></i> JPG</button>
-                <button class="btn-d" id="shareBtn"><i class="fa-solid fa-share-nodes"></i> Share</button>
-            </div>
-        </div>
-    </div></div></div>
-    <div class="ft2">&copy; 2026 <a href="#">KARYA ABADI</a> Remove Photo Background. All Rights Reserved.</div>
-    <div class="po" id="procOv"><div class="pb2"><div class="psp"></div><h5 id="pT">Memproses...</h5><div class="ppb"><div class="ppf" id="pF"></div></div><div class="pps" id="pS"></div></div></div>
-    <div class="so" id="shareM"><div class="sb2"><h5><i class="fa-solid fa-share-nodes me-2" style="color:var(--red)"></i>Bagikan</h5><div class="si-r"><a class="si wa" href="#" id="sWa" target="_blank"><i class="fa-brands fa-whatsapp"></i></a><a class="si fb" href="#" id="sFb" target="_blank"><i class="fa-brands fa-facebook-f"></i></a><a class="si ig" href="#" id="sIg"><i class="fa-brands fa-instagram"></i></a><a class="si tg" href="#" id="sTg" target="_blank"><i class="fa-brands fa-telegram"></i></a><a class="si tw" href="#" id="sTw" target="_blank"><i class="fa-brands fa-x-twitter"></i></a></div><button class="sc2" id="cShare">Tutup</button></div></div>
-    <div class="tw2" id="toastW"></div>
-    <canvas id="expC" style="display:none"></canvas>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        var $=function(id){return document.getElementById(id)};
-        var html=document.documentElement,dmBtn=$('dmToggle');
-        var stored=localStorage.getItem('ka-theme');if(stored){html.setAttribute('data-theme',stored)}else{html.setAttribute('data-theme','dark')}updateDmIcon();
-        dmBtn.addEventListener('click',function(){var c=html.getAttribute('data-theme');var n=c==='dark'?'light':'dark';html.setAttribute('data-theme',n);localStorage.setItem('ka-theme',n);updateDmIcon()});
-        function updateDmIcon(){dmBtn.innerHTML=html.getAttribute('data-theme')==='dark'?'<i class="fa-solid fa-sun"></i>':'<i class="fa-solid fa-moon"></i>'}
-        function showToast(m,t){t=t||'info';var w=$('toastW'),e=document.createElement('div');e.className='ti2 '+t;var ic={success:'fa-check-circle',error:'fa-exclamation-circle',info:'fa-info-circle'};var cl={success:'var(--red)',error:'#f44',info:'var(--fg4)'};e.innerHTML='<i class="fa-solid '+ic[t]+'" style="color:'+cl[t]+'"></i> '+m;w.appendChild(e);setTimeout(function(){e.style.animation='tOut .3s ease forwards';setTimeout(function(){e.remove()},300)},3500)}
-        document.addEventListener('keydown',function(e){if(e.key==='Escape'){$('shareM').classList.remove('a');$('procOv').classList.remove('a')}});
-    </script>
+<!-- Partikel Background -->
+<canvas id="particleCanvas"></canvas>
 
-    <script type="module">
-        var $=function(id){return document.getElementById(id)};
-        var rBFn=null,aiOK=false,uFile=null,origDu=null,pBlob=null,pDu=null;
-        var selectedBgColor='transparent';
-        var fullResCanvas=null,fullResCtx=null,fullResW=0,fullResH=0;
-        var isGrayscale=false;
-        var isAutoClean=true; // Aktifkan pembersihan maksimal secara default
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
 
-        (async function(){try{var m=await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm');rBFn=m.default||m.removeBackground||m;if(typeof rBFn!=='function'){for(var k in m){if(typeof m[k]==='function'){rBFn=m[k];break}}}aiOK=true;console.log('AI ready')}catch(e){console.error('AI failed:',e);showToast('AI gagal dimuat — Reload','error')}})();
+<!-- Progress Overlay -->
+<div class="progress-overlay" id="progressOverlay" style="display:none">
+<div class="text-center">
+<div class="mb-6"><i class="fas fa-spinner fa-spin text-4xl" style="color:var(--red)"></i></div>
+<p class="text-lg font-semibold mb-2" id="progressText">Memproses...</p>
+<p class="text-sm text-kag mb-4" id="progressDetail">Mengunduh model AI...</p>
+<div class="progress-bar-track"><div class="progress-bar-fill" id="progressBar"></div></div>
+<p class="text-xs text-kag mt-3" id="progressPercent">0%</p>
+</div>
+</div>
 
-        $('uploadArea').addEventListener('click',function(){$('fileInput').click()});
-        $('fileInput').addEventListener('change',function(e){if(e.target.files.length)hFile(e.target.files[0])});
-        var ua=$('uploadArea');
-        ua.addEventListener('dragover',function(e){e.preventDefault();ua.classList.add('dragover')});
-        ua.addEventListener('dragleave',function(){ua.classList.remove('dragover')});
-        ua.addEventListener('drop',function(e){e.preventDefault();ua.classList.remove('dragover');if(e.dataTransfer.files.length)hFile(e.dataTransfer.files[0])});
+<!-- HEADER -->
+<header class="relative z-10 glass border-b border-kab">
+<div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<img src="https://z-cdn-media.chatglm.cn/files/d8d9758a-64b8-473f-9056-3a6cb6005469.png?auth_key=1881188958-36e1c8339315420bbc4474797d44d353-0-787fa910f1c51bcf3e06e58bb7b185b8" alt="Logo Karya Abadi" class="h-11 w-11 object-contain">
+<div>
+<h1 class="font-disp text-base md:text-lg font-bold tracking-wider text-white leading-tight">KARYA ABADI</h1>
+<p class="text-[10px] font-disp tracking-[3px] text-kar font-semibold">REMOVE BACKGROUND</p>
+</div>
+</div>
+<nav class="hidden md:flex items-center gap-6 text-sm text-kag">
+<a href="#tool" class="hover:text-kar transition-colors"><i class="fas fa-magic mr-1"></i>Tool</a>
+<a href="#features" class="hover:text-kar transition-colors"><i class="fas fa-star mr-1"></i>Fitur</a>
+<a href="#footer" class="hover:text-kar transition-colors"><i class="fas fa-info-circle mr-1"></i>Tentang</a>
+</nav>
+</div>
+</header>
 
-        function hFile(f){if(!['image/jpeg','image/png','image/webp'].includes(f.type)){showToast('Format tidak didukung.','error');return}if(f.size>20*1024*1024){showToast('File melebihi 20 MB.','error');return}uFile=f;var r=new FileReader();r.onload=function(e){origDu=e.target.result;$('previewImg').src=origDu;$('fileInfo').textContent=f.name+' \u2022 '+(f.size/1024/1024).toFixed(2)+' MB';$('uploadAreaWrap').style.display='none';$('previewSection').classList.add('a');$('resultSection').classList.remove('a');showToast('Foto berhasil diupload!','success')};r.readAsDataURL(f)}
+<!-- HERO -->
+<section class="relative z-10 py-16 md:py-24 text-center px-4">
+<div class="max-w-3xl mx-auto">
+<p class="text-kar font-disp text-xs tracking-[4px] mb-4">PRECISION BACKGROUND REMOVAL</p>
+<h2 class="hero-text font-disp text-3xl md:text-5xl font-black leading-tight mb-6">Hapus Background<br>Gambar Sempurna</h2>
+<p class="text-kag text-base md:text-lg max-w-xl mx-auto mb-8">Teknologi AI canggih untuk menghapus background dengan presisi tinggi, dilengkapi stroke cutting, upscale hingga 10x, dan penyempurnaan warna.</p>
+<a href="#tool" class="btn-red inline-flex items-center gap-2 text-base"><i class="fas fa-rocket"></i> Mulai Sekarang</a>
+</div>
+</section>
 
-        function reset(){uFile=null;origDu=null;pBlob=null;pDu=null;selectedBgColor='transparent';fullResCanvas=null;fullResCtx=null;isGrayscale=false;$('bwToggle').classList.remove('active-effect');resetPalette();$('fileInput').value='';$('uploadAreaWrap').style.display='block';$('previewSection').classList.remove('a');$('resultSection').classList.remove('a')}
-        $('removeBtn').addEventListener('click',reset);$('newUploadBtn').addEventListener('click',reset);
+<!-- MAIN TOOL -->
+<main id="tool" class="relative z-10 max-w-7xl mx-auto px-4 pb-20">
 
-        $('autoCleanBtn').addEventListener('click',function(){
-            isAutoClean=!isAutoClean;
-            if(isAutoClean){this.classList.add('active-effect');showToast('Auto-Clean Edge Aktif (Maksimal Bersih)','info')}
-            else{this.classList.remove('active-effect');showToast('Auto-Clean Edge Nonaktif (Standar AI)','info')}
-        });
+<!-- Upload Area -->
+<div id="uploadSection">
+<div class="upload-zone" id="uploadZone">
+<input type="file" id="fileInput" accept="image/*" class="hidden">
+<div style="animation:float 3s ease-in-out infinite">
+<i class="fas fa-cloud-upload-alt text-5xl text-kab mb-4"></i>
+</div>
+<p class="text-white font-semibold text-lg mb-2">Drag & Drop gambar di sini</p>
+<p class="text-kag text-sm mb-4">atau klik untuk memilih file</p>
+<p class="text-kag text-xs">Mendukung PNG, JPG, WEBP (Maks 20MB)</p>
+</div>
+</div>
 
-        $('removeBgBtn').addEventListener('click',process);
-        async function process(){
-            if(!uFile)return;if(!aiOK||!rBFn){showToast('AI belum siap.','error');return}
-            var ov=$('procOv'),pF=$('pF'),pS=$('pS'),pT=$('pT');
-            ov.classList.add('a');pF.style.width='0%';pS.textContent='';$('removeBgBtn').disabled=true;
-            try{var blob=await rBFn(uFile,{model:'large',output:{format:'image/png',quality:1},progress:function(k,c,t){var p=t>0?Math.round(c/t*100):0;if(k.includes('fetch')||k.includes('download')){pT.textContent='Mengunduh Model...';pS.textContent=p+'%'}else if(k.includes('compute')||k.includes('inference')){pT.textContent='Memproses...';pS.textContent=p+'%'}var cu=parseInt(pF.style.width)||0;pF.style.width=Math.max(p,cu)+'%'}});
-            pT.textContent='Memperbaiki Tepi Objek...';pF.style.width='95%';
-            var ref=await refineEdge(blob);
-            pBlob=ref||blob;pDu=await b2d(pBlob);pF.style.width='100%';pS.textContent='';
-            setTimeout(function(){ov.classList.remove('a');showR();showToast('Background berhasil dihapus!','success')},400);
-            }catch(e){console.error(e);ov.classList.remove('a');showToast('Gagal: '+(e.message||'Error'),'error')}finally{$('removeBgBtn').disabled=false}
-        }
+<!-- Workspace -->
+<div id="workspace" style="display:none">
+<!-- Tombol Aksi Atas -->
+<div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+<div class="flex items-center gap-3">
+<button class="btn-red" id="btnRemoveBg" disabled><i class="fas fa-eraser mr-2"></i>Hapus Background</button>
+<button class="btn-outline text-sm" id="btnReset"><i class="fas fa-undo mr-2"></i>Ganti Gambar</button>
+</div>
+<div class="flex items-center gap-2 text-sm text-kag">
+<span id="imgInfo"></span>
+</div>
+</div>
 
-        async function refineEdge(blob){
-            return new Promise(function(resolve){
-                var img=new Image();
-                img.onload=function(){
-                    var ow=img.width,oh=img.height,maxDim=4096,sc=1;
-                    if(ow>maxDim||oh>maxDim)sc=maxDim/Math.max(ow,oh);
-                    var pw=Math.round(ow*sc),ph=Math.round(oh*sc);
+<!-- Preview -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-8">
+<div>
+<div class="flex items-center gap-2 mb-3">
+<span class="w-2 h-2 rounded-full bg-kag"></span>
+<h3 class="font-semibold text-sm tracking-wide text-kagl">GAMBAR ASLI</h3>
+</div>
+<div class="preview-wrap"><canvas id="canvasOriginal"></canvas></div>
+</div>
+<div>
+<div class="flex items-center gap-2 mb-3">
+<span class="w-2 h-2 rounded-full bg-kar"></span>
+<h3 class="font-semibold text-sm tracking-wide text-kagl">HASIL</h3>
+</div>
+<div class="preview-wrap checkerboard" id="resultWrap"><canvas id="canvasResult"></canvas></div>
+</div>
+</div>
 
-                    fullResCanvas=document.createElement('canvas');
-                    fullResCanvas.width=pw;fullResCanvas.height=ph;
-                    fullResCtx=fullResCanvas.getContext('2d',{willReadFrequently:true});
-                    fullResCtx.drawImage(img,0,0,pw,ph);
-                    fullResW=pw;fullResH=ph;
+<!-- Kontrol Panel -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 mb-8">
 
-                    var id=fullResCtx.getImageData(0,0,pw,ph),d=id.data,len=pw*ph;
+<!-- Stroke Cutting -->
+<div class="ctrl-card">
+<h4><i class="fas fa-border-style mr-2"></i>Stroke Cutting</h4>
+<label class="flex items-center gap-3 cursor-pointer mb-4">
+<input type="checkbox" id="chkStroke" class="w-4 h-4 accent-red-600">
+<span class="text-sm">Aktifkan Stroke</span>
+</label>
+<div id="strokeControls" class="space-y-4 opacity-40 pointer-events-none transition-opacity">
+<div>
+<div class="flex justify-between text-xs text-kag mb-1"><span>Stroke Putih</span><span id="valWhiteStroke">4px</span></div>
+<input type="range" id="rngWhiteStroke" min="1" max="25" value="4">
+</div>
+<div>
+<div class="flex justify-between text-xs text-kag mb-1"><span>Garis Hitam</span><span id="valBlackStroke">1px</span></div>
+<input type="range" id="rngBlackStroke" min="1" max="8" value="1">
+</div>
+</div>
+</div>
 
-                    var origA=new Uint8Array(len);
-                    for(var i=0;i<len;i++) origA[i]=d[i*4+3];
+<!-- Penyempurnaan Warna -->
+<div class="ctrl-card">
+<h4><i class="fas fa-palette mr-2"></i>Penyempurnaan Warna</h4>
+<div class="space-y-4">
+<div>
+<div class="flex justify-between text-xs text-kag mb-1"><span>Saturasi</span><span id="valSat">100%</span></div>
+<input type="range" id="rngSat" min="0" max="250" value="100">
+</div>
+<div>
+<div class="flex justify-between text-xs text-kag mb-1"><span>Kecerahan</span><span id="valBri">100%</span></div>
+<input type="range" id="rngBri" min="30" max="200" value="100">
+</div>
+<div>
+<div class="flex justify-between text-xs text-kag mb-1"><span>Kontras</span><span id="valCon">100%</span></div>
+<input type="range" id="rngCon" min="30" max="250" value="100">
+</div>
+<div>
+<div class="flex justify-between text-xs text-kag mb-1"><span>Vibrance</span><span id="valVib">0%</span></div>
+<input type="range" id="rngVib" min="0" max="200" value="0">
+</div>
+<button class="btn-outline text-xs w-full mt-2" id="btnResetColor"><i class="fas fa-undo mr-1"></i>Reset Warna</button>
+</div>
+</div>
 
-                    // Deteksi warna background dominan
-                    var bgR=0,bgG=0,bgB=0,bgN=0;
-                    for(var y=1;y<ph-1;y++){for(var x=1;x<pw-1;x++){
-                        var i=y*pw+x;
-                        if(origA[i]===0){
-                            var adj=origA[(y-1)*pw+x]>0||origA[(y+1)*pw+x]>0||origA[y*pw+x-1]>0||origA[y*pw+x+1]>0;
-                            if(adj){bgR+=d[i*4];bgG+=d[i*4+1];bgB+=d[i*4+2];bgN++}
-                        }
-                    }}
-                    if(bgN<50){for(var i=0;i<len;i++){if(origA[i]===0){bgR+=d[i*4];bgG+=d[i*4+1];bgB+=d[i*4+2];bgN++}}}
-                    if(bgN>0){bgR=Math.round(bgR/bgN);bgG=Math.round(bgG/bgN);bgB=Math.round(bgB/bgN)}
-                    else{bgR=255;bgG=255;bgB=255}
+<!-- Ganti Background -->
+<div class="ctrl-card">
+<h4><i class="fas fa-fill-drip mr-2"></i>Warna Background</h4>
+<label class="flex items-center gap-3 cursor-pointer mb-4">
+<input type="checkbox" id="chkBgColor" class="w-4 h-4 accent-red-600">
+<span class="text-sm">Aktifkan Warna Solid</span>
+</label>
+<div id="bgColorControls" class="opacity-40 pointer-events-none transition-opacity">
+<div class="flex items-center gap-3 mb-4">
+<input type="color" id="pickBgColor" value="#ffffff" class="w-10 h-10 rounded-lg cursor-pointer border-2 border-kab bg-transparent">
+<span class="text-sm text-kag" id="hexBgColor">#FFFFFF</span>
+</div>
+<p class="text-xs text-kag mb-2">Warna Preset:</p>
+<div class="flex flex-wrap gap-2" id="presetColors"></div>
+</div>
+</div>
 
-                    var bMask=new Uint8Array(len);
-                    for(var i=0;i<len;i++) bMask[i]=origA[i]>25?1:0;
+<!-- Upscale -->
+<div class="ctrl-card">
+<h4><i class="fas fa-expand-arrows-alt mr-2"></i>Tingkatkan Gambar</h4>
+<div class="mb-4">
+<div class="flex justify-between text-xs text-kag mb-1"><span>Skala Perbesaran</span><span id="valUpscale" class="text-kar font-bold">1x</span></div>
+<input type="range" id="rngUpscale" min="1" max="10" value="1" step="1">
+</div>
+<div class="flex flex-wrap gap-2 mb-4" id="upscalePresets"></div>
+<div class="p-3 bg-ka rounded-lg text-xs text-kag leading-relaxed">
+<i class="fas fa-info-circle text-kar mr-1"></i>
+Upscale diterapkan saat download. Preview tetap pada ukuran asli untuk performa. Skala 2x-4x direkomendasikan untuk kualitas optimal.
+</div>
+</div>
 
-                    if(isAutoClean){
-                        // Erode 1px untuk memotong sisa ninja/stroke halus
-                        var eroded=new Uint8Array(len);
-                        for(var y=1;y<ph-1;y++){for(var x=1;x<pw-1;x++){
-                            var i=y*pw+x;
-                            if(bMask[i]===1 && bMask[(y-1)*pw+x]===1 && bMask[(y+1)*pw+x]===1 && bMask[y*pw+x-1]===1 && bMask[y*pw+x+1]===1){
-                                eroded[i]=1;
-                            }
-                        }}
-                        bMask=eroded;
-                    }
+<!-- Download -->
+<div class="ctrl-card flex flex-col justify-between">
+<div>
+<h4><i class="fas fa-download mr-2"></i>Export HD</h4>
+<p class="text-sm text-kag mb-4">Download hasil dalam kualitas tinggi format PNG tanpa kompresi.</p>
+</div>
+<div class="space-y-3">
+<div class="p-3 bg-ka rounded-lg text-xs text-kag">
+<p><i class="fas fa-image text-kar mr-1"></i> Format: <strong class="text-white">PNG (Lossless)</strong></p>
+<p class="mt-1"><i class="fas fa-expand text-kar mr-1"></i> Resolusi: <strong class="text-white" id="dlResInfo">-</strong></p>
+</div>
+<button class="btn-red w-full text-center" id="btnDownload" disabled><i class="fas fa-file-download mr-2"></i>Download HD PNG</button>
+</div>
+</div>
 
-                    // Deep interior mask (erode 5px)
-                    var di=new Uint8Array(bMask);
-                    for(var p=0;p<5;p++){
-                        var t=new Uint8Array(len);
-                        for(var y=1;y<ph-1;y++){for(var x=1;x<pw-1;x++){
-                            var i=y*pw+x;
-                            if(!di[i])continue;
-                            if(di[(y-1)*pw+x]&&di[(y+1)*pw+x]&&di[y*pw+x-1]&&di[y*pw+x+1]) t[i]=1;
-                        }}
-                        di=t;
-                    }
-                    var hasDI=false;
-                    for(var i=0;i<len;i++){if(di[i]){hasDI=true;break}}
-                    if(!hasDI){for(var i=0;i<len;i++) di[i]=origA[i]>200?1:0}
+<!-- Info Proses -->
+<div class="ctrl-card">
+<h4><i class="fas fa-microchip mr-2"></i>Status Proses</h4>
+<div class="space-y-3 text-sm">
+<div class="flex items-center justify-between">
+<span class="text-kag">Background Removal</span>
+<span id="statusBg" class="text-xs px-2 py-1 rounded-full bg-ka text-kag">Menunggu</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-kag">Model AI</span>
+<span id="statusModel" class="text-xs px-2 py-1 rounded-full bg-ka text-kag">Belum dimuat</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-kag">Ukuran Asli</span>
+<span id="statusSize" class="text-xs text-white">-</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-kag">Ukuran Output</span>
+<span id="statusOutput" class="text-xs text-white">-</span>
+</div>
+</div>
+</div>
 
-                    // BFS propagate warna interior
-                    var pR=new Uint8Array(len),pG=new Uint8Array(len),pB=new Uint8Array(len),pV=new Uint8Array(len);
-                    var q=new Int32Array(len),qh=0,qt=0;
-                    for(var i=0;i<len;i++){
-                        if(di[i]){pR[i]=d[i*4];pG[i]=d[i*4+1];pB[i]=d[i*4+2];pV[i]=1;q[qt++]=i}
-                    }
-                    while(qh<qt){
-                        var ci=q[qh++],cy=(ci/pw)|0,cx=ci%pw;
-                        for(var dy=-1;dy<=1;dy++){for(var dx=-1;dx<=1;dx++){
-                            if(!dy&&!dx)continue;
-                            var ny=cy+dy,nx=cx+dx;
-                            if(ny>=0&&ny<ph&&nx>=0&&nx<pw){
-                                var ni=ny*pw+nx;
-                                if(!pV[ni]&&bMask[ni]){
-                                    pR[ni]=pR[ci];pG[ni]=pG[ci];pB[ni]=pB[ci];
-                                    pV[ni]=1;q[qt++]=ni;
-                                }
-                            }
-                        }}
-                    }
+</div>
+</div>
+</main>
 
-                    // Color Decontamination, Alpha Hardening & Anti-Stroke Cleanup
-                    for(var y=0;y<ph;y++){for(var x=0;x<pw;x++){
-                        var i=y*pw+x;
-                        var a=origA[i];
-                        var r=d[i*4],g=d[i*4+1],b=d[i*4+2];
+<!-- FITUR SECTION -->
+<section id="features" class="relative z-10 py-20 border-t border-kab">
+<div class="max-w-6xl mx-auto px-4">
+<h2 class="font-disp text-2xl md:text-3xl font-bold text-center mb-4 tracking-wide">Fitur Unggulan</h2>
+<p class="text-kag text-center mb-14 max-w-xl mx-auto">Semua yang Anda butuhkan untuk pengolahan gambar profesional dalam satu alat.</p>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+<div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300">
+<div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-eraser text-2xl text-kar"></i></div>
+<h3 class="font-semibold mb-2">Hapus Background</h3>
+<p class="text-xs text-kag leading-relaxed">AI presisi tinggi menghapus background tanpa menghapus bagian objek utama.</p>
+</div>
+<div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300">
+<div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-border-style text-2xl text-kar"></i></div>
+<h3 class="font-semibold mb-2">Stroke Cutting</h3>
+<p class="text-xs text-kag leading-relaxed">Stroke putih dan garis hitam tipis di luar untuk keperluan cutting profesional.</p>
+</div>
+<div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300">
+<div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-expand-arrows-alt text-2xl text-kar"></i></div>
+<h3 class="font-semibold mb-2">Upscale 10x</h3>
+<p class="text-xs text-kag leading-relaxed">Tingkatkan resolusi gambar hingga 10 kali lipat dengan sharpening otomatis.</p>
+</div>
+<div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300">
+<div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-palette text-2xl text-kar"></i></div>
+<h3 class="font-semibold mb-2">Enhancement Warna</h3>
+<p class="text-xs text-kag leading-relaxed">Saturasi, kecerahan, kontras, dan vibrance yang bisa disesuaikan secara detail.</p>
+</div>
+</div>
+</div>
+</section>
 
-                        // Jarak warna ke background (Dominance ratio)
-                        var bgD=Math.sqrt((r-bgR)*(r-bgR)+(g-bgG)*(g-bgG)+(b-bgB)*(b-bgB));
+<!-- FOOTER -->
+<footer id="footer" class="relative z-10 border-t border-kab bg-kad">
+<div class="max-w-7xl mx-auto px-4 py-14">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+<!-- Info Perusahaan -->
+<div>
+<div class="flex items-center gap-3 mb-5">
+<img src="https://z-cdn-media.chatglm.cn/files/d8d9758a-64b8-473f-9056-3a6cb6005469.png?auth_key=1881188958-36e1c8339315420bbc4474797d44d353-0-787fa910f1c51bcf3e06e58bb7b185b8" alt="Logo" class="h-10 w-10 object-contain">
+<div>
+<p class="font-disp text-sm font-bold tracking-wider">KARYA ABADI</p>
+<p class="text-[9px] font-disp tracking-[2px] text-kar">REMOVE BACKGROUND</p>
+</div>
+</div>
+<p class="text-sm text-kag leading-relaxed">Layanan penghapusan background gambar berbasis AI dengan kualitas profesional. Semua proses dilakukan di browser Anda — gambar tidak diunggah ke server manapun, privasi 100% terjaga.</p>
+</div>
+<!-- Layanan -->
+<div>
+<h4 class="font-disp text-xs tracking-[2px] text-kar mb-5">LAYANAN</h4>
+<ul class="space-y-3 text-sm">
+<li><a href="#tool"><i class="fas fa-angle-right text-kar mr-2 text-xs"></i>Hapus Background AI</a></li>
+<li><a href="#tool"><i class="fas fa-angle-right text-kar mr-2 text-xs"></i>Stroke Cutting</a></li>
+<li><a href="#tool"><i class="fas fa-angle-right text-kar mr-2 text-xs"></i>Upscale Gambar</a></li>
+<li><a href="#tool"><i class="fas fa-angle-right text-kar mr-2 text-xs"></i>Penyempurnaan Warna</a></li>
+<li><a href="#tool"><i class="fas fa-angle-right text-kar mr-2 text-xs"></i>Ganti Background</a></li>
+</ul>
+</div>
+<!-- Keunggulan -->
+<div>
+<h4 class="font-disp text-xs tracking-[2px] text-kar mb-5">KEUNGGULAN</h4>
+<ul class="space-y-3 text-sm text-kag">
+<li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>Presisi Tinggi</li>
+<li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>Proses Cepat (Client-Side)</li>
+<li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>Privasi Terjaga 100%</li>
+<li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>Gratis Tanpa Batas</li>
+<li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>Export HD PNG Lossless</li>
+<li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>Tanpa Watermark</li>
+</ul>
+</div>
+<!-- Kontak -->
+<div>
+<h4 class="font-disp text-xs tracking-[2px] text-kar mb-5">HUBUNGI KAMI</h4>
+<ul class="space-y-3 text-sm text-kag">
+<li><i class="fas fa-envelope text-kar mr-2 text-xs"></i>info@karyaabadi.co.id</li>
+<li><i class="fas fa-phone text-kar mr-2 text-xs"></i>+62 812-3456-7890</li>
+<li><i class="fas fa-map-marker-alt text-kar mr-2 text-xs"></i>Jakarta, Indonesia</li>
+</ul>
+<div class="flex gap-3 mt-5">
+<a href="#" class="w-9 h-9 rounded-lg bg-ka flex items-center justify-center text-kag hover:bg-kar hover:text-white transition-all"><i class="fab fa-instagram"></i></a>
+<a href="#" class="w-9 h-9 rounded-lg bg-ka flex items-center justify-center text-kag hover:bg-kar hover:text-white transition-all"><i class="fab fa-facebook-f"></i></a>
+<a href="#" class="w-9 h-9 rounded-lg bg-ka flex items-center justify-center text-kag hover:bg-kar hover:text-white transition-all"><i class="fab fa-whatsapp"></i></a>
+<a href="#" class="w-9 h-9 rounded-lg bg-ka flex items-center justify-center text-kag hover:bg-kar hover:text-white transition-all"><i class="fab fa-youtube"></i></a>
+</div>
+</div>
+</div>
+</div>
+<!-- Copyright -->
+<div class="border-t border-kab py-5">
+<div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-kag">
+<p>&copy; 2024 KARYA ABADI. Seluruh Hak Cipta Dilindungi Undang-Undang.</p>
+<p>Dibuat dengan <i class="fas fa-heart text-kar mx-1"></i> di Indonesia</p>
+</div>
+</div>
+</footer>
 
-                        // Deteksi foreground hitam/gelap (Jas hitam, rambut hitam) agar tidak salah hapus
-                        var lum = r*0.299 + g*0.587 + b*0.114;
-                        var isDarkFg = lum < 60;
+<!-- JAVASCRIPT -->
+<script type="module">
+/* ============================================
+   KARYA ABADI REMOVE BACKGROUND
+   Semua proses berjalan di browser (client-side)
+   ============================================ */
 
-                        if(!bMask[i]){
-                            // Di luar mask → transparan mutlak
-                            d[i*4+3]=0;
-                        } else if(a<25){
-                            if(pV[i]){
-                                d[i*4]=pR[i];d[i*4+1]=pG[i];d[i*4+2]=pB[i];d[i*4+3]=220;
-                            } else {
-                                d[i*4+3]=0;
-                            }
-                        } else if(a>=25&&a<200){
-                            var af=a/255;
-                            var fR=(r-(1-af)*bgR)/af;
-                            var fG=(g-(1-af)*bgG)/af;
-                            var fB=(b-(1-af)*bgB)/af;
-                            
-                            // Jika hasil defringing meledak (over-corrected), dan itu foreground gelap, paksa ke warna interior
-                            var valid=fR>=0&&fR<=255&&fG>=0&&fG<=255&&fB>=0&&fB<=255;
-                            if(!valid && isDarkFg && pV[i]){
-                                fR=pR[i]; fG=pG[i]; fB=pB[i]; valid=true;
-                            }
+// --- State ---
+let originalFile = null;
+let originalImg = null;
+let removedBgCanvas = null; // Hasil hapus background (canvas)
+let removeBackgroundFn = null;
+let libLoaded = false;
+let libLoading = false;
+let renderTimeout = null;
 
-                            if(valid){
-                                d[i*4]=Math.round(fR);
-                                d[i*4+1]=Math.round(fG);
-                                d[i*4+2]=Math.round(fB);
-                            } else if(pV[i]){
-                                d[i*4]=pR[i];d[i*4+1]=pG[i];d[i*4+2]=pB[i];
-                            }
-                            d[i*4+3]=Math.min(255, Math.round(a*1.25));
-                        } else {
-                            // Spill suppression untuk objek solid (menghapus pantulan merah di jas)
-                            if(pV[i]){
-                                var fLum = pR[i]*0.299 + pG[i]*0.587 + pB[i]*0.114;
-                                var spill = 0;
-                                if(fLum < 80){ // Objek gelap, sangat sensitif terhadap pantulan
-                                    spill = Math.max(0, (120 - bgD) / 120) * 0.85;
-                                } else if(bgD < 120){ // Objek terang
-                                    spill = (120-bgD)/120 * 0.5;
-                                }
-                                if(spill > 0){
-                                    d[i*4]=Math.round(r*(1-spill)+pR[i]*spill);
-                                    d[i*4+1]=Math.round(g*(1-spill)+pG[i]*spill);
-                                    d[i*4+2]=Math.round(b*(1-spill)+pB[i]*spill);
-                                }
-                            }
-                            d[i*4+3]=255;
-                        }
-                    }}
+// --- Elemen DOM ---
+const $ = id => document.getElementById(id);
+const uploadZone = $('uploadZone');
+const fileInput = $('fileInput');
+const uploadSection = $('uploadSection');
+const workspace = $('workspace');
+const canvasOrig = $('canvasOriginal');
+const canvasResult = $('canvasResult');
+const ctxOrig = canvasOrig.getContext('2d');
+const ctxResult = canvasResult.getContext('2d');
+const resultWrap = $('resultWrap');
 
-                    fullResCtx.putImageData(id,0,0);
+// --- Inisialisasi Preset Warna Background ---
+const presetColorList = [
+    '#ffffff','#000000','#dc2626','#2563eb','#16a34a','#eab308',
+    '#f97316','#8b5cf6','#ec4899','#06b6d4','#78716c','#1e293b'
+];
+const presetContainer = $('presetColors');
+presetColorList.forEach(c => {
+    const el = document.createElement('div');
+    el.className = 'color-swatch';
+    el.style.background = c;
+    if(c === '#000000') el.style.border = '2px solid #333';
+    el.addEventListener('click', () => {
+        $('pickBgColor').value = c;
+        $('hexBgColor').textContent = c.toUpperCase();
+        presetContainer.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+        el.classList.add('active');
+        scheduleRender();
+    });
+    presetContainer.appendChild(el);
+});
 
-                    var pvW=pw,pvH=ph,pvMax=1200;
-                    if(pvW>pvMax||pvH>pvMax){var pvSc=pvMax/Math.max(pvW,pvH);pvW=Math.round(pvW*pvSc);pvH=Math.round(pvH*pvSc)}
-                    var pvCv=document.createElement('canvas');pvCv.width=pvW;pvCv.height=pvH;
-                    var pvCtx=pvCv.getContext('2d');pvCtx.drawImage(fullResCanvas,0,0,pvW,pvH);
-                    pvCv.toBlob(function(b){resolve(b)},'image/png');
-                };
-                img.onerror=function(){resolve(null)};
-                img.src=URL.createObjectURL(blob);
-            });
-        }
+// --- Inisialisasi Preset Upscale ---
+const upscaleContainer = $('upscalePresets');
+[1,2,3,4,5,6,8,10].forEach(v => {
+    const btn = document.createElement('button');
+    btn.className = 'btn-outline text-xs px-3 py-1';
+    btn.textContent = v + 'x';
+    btn.addEventListener('click', () => {
+        $('rngUpscale').value = v;
+        $('valUpscale').textContent = v + 'x';
+        updateOutputInfo();
+        upscaleContainer.querySelectorAll('button').forEach(b => b.style.borderColor = '');
+        btn.style.borderColor = 'var(--red)';
+    });
+    upscaleContainer.appendChild(btn);
+});
 
-        function b2d(b){return new Promise(function(r,j){var rd=new FileReader();rd.onload=function(){r(rd.result)};rd.onerror=j;rd.readAsDataURL(b)})}
+// --- Toast Notification ---
+function showToast(msg, type = 'info') {
+    const container = $('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
+    toast.innerHTML = `<i class="fas ${icons[type]}"></i><span>${msg}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => {
+        toast.style.animation = 'slideOut .3s ease forwards';
+        setTimeout(() => toast.remove(), 300);
+    }, 3500);
+}
 
-        function showR(){$('resBefore').src=origDu;$('resAfter').src=pDu;$('previewSection').classList.remove('a');$('resultSection').classList.add('a');selectedBgColor='transparent';resetPalette();setTimeout(function(){$('resultSection').scrollIntoView({behavior:'smooth',block:'center'})},200)}
+// --- Progress Overlay ---
+function showProgress(text, detail) {
+    $('progressText').textContent = text || 'Memproses...';
+    $('progressDetail').textContent = detail || '';
+    $('progressBar').style.width = '0%';
+    $('progressPercent').textContent = '0%';
+    $('progressOverlay').style.display = 'flex';
+}
+function updateProgress(percent, detail) {
+    $('progressBar').style.width = Math.min(100, percent) + '%';
+    $('progressPercent').textContent = Math.round(percent) + '%';
+    if (detail) $('progressDetail').textContent = detail;
+}
+function hideProgress() {
+    $('progressOverlay').style.display = 'none';
+}
 
-        /* PALETTE LOGIC */
-        var swatches=document.querySelectorAll('.pal-swatch');
-        swatches.forEach(function(sw){sw.addEventListener('click',function(){swatches.forEach(function(s){s.classList.remove('active')});$('palCenter').classList.remove('active');sw.classList.add('active');selectedBgColor=sw.getAttribute('data-color');applyBgColor(selectedBgColor)})});
-        $('customColor').addEventListener('input',function(){var color=$('customColor').value;swatches.forEach(function(s){s.classList.remove('active')});$('palCenter').classList.add('active');$('palCenterColor').style.background=color;$('palCenter').classList.add('has-color');selectedBgColor=color;applyBgColor(selectedBgColor)});
-        function resetPalette(){swatches.forEach(function(s){s.classList.remove('active')});$('palCenter').classList.remove('active','has-color');$('palCenterColor').style.background='transparent';var first=document.querySelector('.pal-swatch.transparent-swatch');if(first)first.classList.add('active');selectedBgColor='transparent'}
+// --- Load Library Background Removal ---
+async function loadLib() {
+    if (libLoaded || libLoading) return libLoaded;
+    libLoading = true;
+    $('statusModel').textContent = 'Memuat...';
+    $('statusModel').className = 'text-xs px-2 py-1 rounded-full bg-yellow-900/40 text-yellow-400';
+    try {
+        const mod = await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/dist/index.mjs');
+        removeBackgroundFn = mod.removeBackground || mod.default;
+        libLoaded = true;
+        $('statusModel').textContent = 'Siap';
+        $('statusModel').className = 'text-xs px-2 py-1 rounded-full bg-green-900/40 text-green-400';
+        showToast('Model AI berhasil dimuat', 'success');
+    } catch (e) {
+        console.error('Gagal memuat library:', e);
+        $('statusModel').textContent = 'Gagal';
+        $('statusModel').className = 'text-xs px-2 py-1 rounded-full bg-red-900/40 text-red-400';
+        showToast('Gagal memuat model AI. Pastikan koneksi internet stabil, lalu refresh halaman.', 'error');
+    }
+    libLoading = false;
+    return libLoaded;
+}
 
-        function applyBgColor(color){
-            var afterWrap=$('afterWrap'),afterImg=$('resAfter');
-            if(color==='transparent'){afterWrap.style.background='var(--chk)';afterImg.src=getProcessedPreview()} 
-            else{afterWrap.style.background=color;compositePreview(color,function(dataUrl){afterImg.src=dataUrl})}
-        }
+// --- Upload Handling ---
+uploadZone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadZone.classList.remove('drag-over');
+    const f = e.dataTransfer.files[0];
+    if (f && f.type.startsWith('image/')) handleFile(f);
+    else showToast('File harus berupa gambar', 'error');
+});
 
-        function getProcessedPreview(){
-            if(!fullResCanvas) return pDu;
-            var tempCv=document.createElement('canvas');
-            tempCv.width=fullResCanvas.width;tempCv.height=fullResCanvas.height;
-            var ctx=tempCv.getContext('2d');
-            ctx.drawImage(fullResCanvas,0,0);
-            if(isGrayscale) applyGrayscaleToCtx(ctx, tempCv.width, tempCv.height);
-            return tempCv.toDataURL('image/png');
-        }
+async function handleFile(file) {
+    if (file.size > 20 * 1024 * 1024) { showToast('Ukuran file maksimal 20MB', 'error'); return; }
+    originalFile = file;
+    const img = new Image();
+    img.onload = () => {
+        originalImg = img;
+        // Gambar asli ke canvas
+        canvasOrig.width = img.width;
+        canvasOrig.height = img.height;
+        ctxOrig.drawImage(img, 0, 0);
+        // Reset hasil
+        canvasResult.width = img.width;
+        canvasResult.height = img.height;
+        ctxResult.clearRect(0, 0, img.width, img.height);
+        // Info
+        $('imgInfo').textContent = `${img.width} × ${img.height} px`;
+        $('statusSize').textContent = `${img.width}×${img.height}`;
+        updateOutputInfo();
+        // Tampilkan workspace
+        uploadSection.style.display = 'none';
+        workspace.style.display = 'block';
+        $('btnRemoveBg').disabled = false;
+        $('btnDownload').disabled = true;
+        removedBgCanvas = null;
+        $('statusBg').textContent = 'Menunggu';
+        $('statusBg').className = 'text-xs px-2 py-1 rounded-full bg-ka text-kag';
+        showToast('Gambar berhasil dimuat', 'success');
+    };
+    img.onerror = () => showToast('Gagal memuat gambar', 'error');
+    img.src = URL.createObjectURL(file);
+}
 
-        function compositePreview(color,callback){
-            var img=new Image();img.onload=function(){
-                var cv=document.createElement('canvas'),ctx=cv.getContext('2d');
-                cv.width=img.width;cv.height=img.height;
-                ctx.fillStyle=color;ctx.fillRect(0,0,cv.width,cv.height);
-                ctx.drawImage(img,0,0);
-                if(isGrayscale) applyGrayscaleToCtx(ctx, cv.width, cv.height);
-                callback(cv.toDataURL('image/png'));
-            };img.src=pDu;
-        }
-
-        function applyGrayscaleToCtx(ctx, w, h){
-            var id=ctx.getImageData(0,0,w,h),d=id.data;
-            for(var i=0;i<d.length;i+=4){
-                if(d[i+3]>0){
-                    var gray=Math.round(0.299*d[i]+0.587*d[i+1]+0.114*d[i+2]);
-                    d[i]=gray;d[i+1]=gray;d[i+2]=gray;
+// --- Hapus Background ---
+ $('btnRemoveBg').addEventListener('click', async () => {
+    if (!originalFile) return;
+    $('btnRemoveBg').disabled = true;
+    showProgress('Menghapus background...', 'Mengunduh model AI (sekali saja, ~40MB)');
+    const ok = await loadLib();
+    if (!ok || !removeBackgroundFn) {
+        hideProgress();
+        $('btnRemoveBg').disabled = false;
+        return;
+    }
+    updateProgress(10, 'Memproses gambar dengan AI...');
+    try {
+        const blob = await removeBackgroundFn(originalFile, {
+            progress: (key, current, total) => {
+                if (total > 0) {
+                    const pct = 10 + (current / total) * 85;
+                    const labels = {
+                        'fetch:model': 'Mengunduh model AI...',
+                        'compute:inference': 'Menghapus background...',
+                    };
+                    updateProgress(pct, labels[key] || 'Memproses...');
                 }
             }
-            ctx.putImageData(id,0,0);
-        }
-
-        $('bwToggle').addEventListener('click',function(){
-            isGrayscale=!isGrayscale;
-            if(isGrayscale){this.classList.add('active-effect');showToast('Efek Hitam Putih Aktif','info')}
-            else{this.classList.remove('active-effect');showToast('Efek Hitam Putih Nonaktif','info')}
-            applyBgColor(selectedBgColor);
         });
+        updateProgress(96, 'Menyimpan hasil...');
+        const bitmap = await createImageBitmap(blob);
+        // Simpan ke canvas
+        removedBgCanvas = document.createElement('canvas');
+        removedBgCanvas.width = bitmap.width;
+        removedBgCanvas.height = bitmap.height;
+        const rctx = removedBgCanvas.getContext('2d');
+        rctx.drawImage(bitmap, 0, 0);
+        bitmap.close();
+        updateProgress(100, 'Selesai!');
+        setTimeout(() => {
+            hideProgress();
+            renderResult();
+            $('btnRemoveBg').disabled = false;
+            $('btnDownload').disabled = false;
+            $('statusBg').textContent = 'Selesai';
+            $('statusBg').className = 'text-xs px-2 py-1 rounded-full bg-green-900/40 text-green-400';
+            showToast('Background berhasil dihapus!', 'success');
+        }, 400);
+    } catch (e) {
+        hideProgress();
+        $('btnRemoveBg').disabled = false;
+        console.error(e);
+        showToast('Gagal menghapus background: ' + e.message, 'error');
+    }
+});
 
-        /* 300 DPI INJECTOR */
-        function setPngDpi(pngBlob,dpi){return new Promise(function(resolve){var ppm=Math.round(dpi/0.0254);var reader=new FileReader();reader.onload=function(){var data=new Uint8Array(reader.result);var offset=8;var len=((data[offset]<<24)|(data[offset+1]<<16)|(data[offset+2]<<8)|data[offset+3]);offset+=12+len;var phys=new Uint8Array(21);phys[0]=0;phys[1]=0;phys[2]=0;phys[3]=9;phys[4]=0x70;phys[5]=0x48;phys[6]=0x59;phys[7]=0x73;phys[8]=(ppm>>>24)&0xFF;phys[9]=(ppm>>>16)&0xFF;phys[10]=(ppm>>>8)&0xFF;phys[11]=ppm&0xFF;phys[12]=(ppm>>>24)&0xFF;phys[13]=(ppm>>>16)&0xFF;phys[14]=(ppm>>>8)&0xFF;phys[15]=ppm&0xFF;phys[16]=1;var crcData=new Uint8Array(13);for(var i=0;i<4;i++)crcData[i]=phys[4+i];for(var i=0;i<9;i++)crcData[4+i]=phys[8+i];var crc=crc32(crcData);phys[17]=(crc>>>24)&0xFF;phys[18]=(crc>>>16)&0xFF;phys[19]=(crc>>>8)&0xFF;phys[20]=crc&0xFF;var before=data.slice(0,offset);var after=data.slice(offset);var result=new Uint8Array(before.length+phys.length+after.length);result.set(before,0);result.set(phys,before.length);result.set(after,before.length+phys.length);resolve(new Blob([result],{type:'image/png'}))};reader.readAsArrayBuffer(pngBlob)})}
-        function crc32(buf){var c,crcTable=[];for(var n=0;n<256;n++){c=n;for(var k=0;k<8;k++){if(c&1)c=0xEDB88320^(c>>>1);else c=c>>>1}crcTable[n]=c}var crc=0xFFFFFFFF;for(var i=0;i<buf.length;i++){crc=crcTable[(crc^buf[i])&0xFF]^(crc>>>8)}return(crc^0xFFFFFFFF)>>>0}
+// --- Reset ---
+ $('btnReset').addEventListener('click', () => {
+    originalFile = null; originalImg = null; removedBgCanvas = null;
+    workspace.style.display = 'none';
+    uploadSection.style.display = 'block';
+    fileInput.value = '';
+    resetControls();
+});
 
-        /* DOWNLOAD HD 300 DPI */
-        $('dlPng').addEventListener('click',function(){
-            if(!pDu)return;showToast('Menyiapkan PNG HD 300dpi...','info');
-            if(fullResCanvas){
-                var cv=document.createElement('canvas');cv.width=fullResW;cv.height=fullResH;var ctx=cv.getContext('2d');
-                if(selectedBgColor!=='transparent'){ctx.fillStyle=selectedBgColor;ctx.fillRect(0,0,fullResW,fullResH);}
-                ctx.drawImage(fullResCanvas,0,0);
-                if(isGrayscale) applyGrayscaleToCtx(ctx, fullResW, fullResH);
-                
-                cv.toBlob(function(b){setPngDpi(b,300).then(function(dpiBlob){
-                    var name=isGrayscale?'karya-abadi-BW-nobg.png':'karya-abadi-nobg.png';
-                    if(selectedBgColor!=='transparent') name=isGrayscale?'karya-abadi-BW-bg.png':'karya-abadi-bg.png';
-                    dLB(dpiBlob,name);showToast('PNG HD 300dpi berhasil! '+fullResW+'\u00D7'+fullResH+'px','success')
-                })},'image/png')
-            } else { dLB(pBlob,'karya-abadi.png');showToast('PNG berhasil!','success') }
-        });
+function resetControls() {
+    $('rngSat').value = 100; $('valSat').textContent = '100%';
+    $('rngBri').value = 100; $('valBri').textContent = '100%';
+    $('rngCon').value = 100; $('valCon').textContent = '100%';
+    $('rngVib').value = 0; $('valVib').textContent = '0%';
+    $('rngWhiteStroke').value = 4; $('valWhiteStroke').textContent = '4px';
+    $('rngBlackStroke').value = 1; $('valBlackStroke').textContent = '1px';
+    $('rngUpscale').value = 1; $('valUpscale').textContent = '1x';
+    $('chkStroke').checked = false;
+    $('chkBgColor').checked = false;
+    toggleStrokeCtrl(); toggleBgColorCtrl();
+}
 
-        $('dlJpg').addEventListener('click',function(){
-            if(!pDu)return;var bgColor=selectedBgColor==='transparent'?'#FFFFFF':selectedBgColor;showToast('Menyiapkan JPG 300dpi...','info');
-            if(fullResCanvas){
-                var cv=$('expC');cv.width=fullResW;cv.height=fullResH;var ctx=cv.getContext('2d');
-                ctx.fillStyle=bgColor;ctx.fillRect(0,0,fullResW,fullResH);ctx.drawImage(fullResCanvas,0,0);
-                if(isGrayscale) applyGrayscaleToCtx(ctx, fullResW, fullResH);
-                cv.toBlob(function(b){
-                    var name=isGrayscale?'karya-abadi-BW.jpg':'karya-abadi.jpg';
-                    dLB(b,name);showToast('JPG 300dpi berhasil! '+fullResW+'\u00D7'+fullResH+'px','success')
-                },'image/jpeg',1.0)
-            } else {
-                var img=new Image();img.onload=function(){var cv=$('expC');cv.width=img.width;cv.height=img.height;var ctx=cv.getContext('2d');ctx.fillStyle=bgColor;ctx.fillRect(0,0,cv.width,cv.height);ctx.drawImage(img,0,0);if(isGrayscale) applyGrayscaleToCtx(ctx, cv.width, cv.height);cv.toBlob(function(b){dLB(b,'karya-abadi.jpg');showToast('JPG berhasil!','success')},'image/jpeg',1.0)};img.src=pDu
+// --- Render Hasil ---
+function scheduleRender() {
+    clearTimeout(renderTimeout);
+    renderTimeout = setTimeout(renderResult, 40);
+}
+
+function renderResult() {
+    if (!removedBgCanvas) return;
+    const w = removedBgCanvas.width;
+    const h = removedBgCanvas.height;
+    canvasResult.width = w;
+    canvasResult.height = h;
+
+    const sat = $('rngSat').value / 100;
+    const bri = $('rngBri').value / 100;
+    const con = $('rngCon').value / 100;
+    const vib = parseInt($('rngVib').value);
+    const useStroke = $('chkStroke').checked;
+    const whiteW = parseInt($('rngWhiteStroke').value);
+    const blackW = parseInt($('rngBlackStroke').value);
+    const useBg = $('chkBgColor').checked;
+    const bgColor = $('pickBgColor').value;
+
+    // 1. Background warna solid jika aktif
+    if (useBg) {
+        ctxResult.fillStyle = bgColor;
+        ctxResult.fillRect(0, 0, w, h);
+        resultWrap.classList.remove('checkerboard');
+    } else {
+        ctxResult.clearRect(0, 0, w, h);
+        resultWrap.classList.add('checkerboard');
+    }
+
+    // 2. Buat salinan dengan penyesuaian warna
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = w;
+    tempCanvas.height = h;
+    const tctx = tempCanvas.getContext('2d');
+
+    // Terapkan filter CSS (saturasi, kecerahan, kontras)
+    tctx.filter = `saturate(${sat}) brightness(${bri}) contrast(${con})`;
+    tctx.drawImage(removedBgCanvas, 0, 0);
+    tctx.filter = 'none';
+
+    // Terapkan vibrance (per-pixel)
+    if (vib > 0) {
+        const imgData = tctx.getImageData(0, 0, w, h);
+        applyVibrance(imgData.data, vib / 100);
+        tctx.putImageData(imgData, 0, 0);
+    }
+
+    // 3. Stroke
+    if (useStroke) {
+        const totalR = whiteW + blackW;
+        // Buat mask hitam solid
+        const blackMask = createSolidMask(tempCanvas, '#000000');
+        // Buat mask putih solid
+        const whiteMask = createSolidMask(tempCanvas, '#ffffff');
+
+        // Gambar stroke hitam (offset lebih jauh)
+        for (let dy = -totalR; dy <= totalR; dy++) {
+            for (let dx = -totalR; dx <= totalR; dx++) {
+                if (dx * dx + dy * dy <= totalR * totalR) {
+                    ctxResult.drawImage(blackMask, dx, dy);
+                }
             }
-        });
+        }
+        // Gambar stroke putih (offset lebih dekat)
+        for (let dy = -whiteW; dy <= whiteW; dy++) {
+            for (let dx = -whiteW; dx <= whiteW; dx++) {
+                if (dx * dx + dy * dy <= whiteW * whiteW) {
+                    ctxResult.drawImage(whiteMask, dx, dy);
+                }
+            }
+        }
+    }
 
-        function dLB(b,n){var u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=n;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(u)},1000)}
+    // 4. Gambar gambar utama di atas
+    ctxResult.drawImage(tempCanvas, 0, 0);
+}
 
-        /* SHARE LOGIC */
-        $('shareBtn').addEventListener('click',function(){$('shareM').classList.add('a')});
-        $('cShare').addEventListener('click',function(){$('shareM').classList.remove('a')});
-        $('shareM').addEventListener('click',function(e){if(e.target===$('shareM'))$('shareM').classList.remove('a')});
-        var sT='Hapus background foto otomatis dengan AI di KARYA ABADI!',sU=window.location.href;
-        $('sWa').href='https://wa.me/?text='+encodeURIComponent(sT+' '+sU);
-        $('sFb').href='https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(sU);
-        $('sTw').href='https://twitter.com/intent/tweet?text='+encodeURIComponent(sT)+'&url='+encodeURIComponent(sU);
-        $('sTg').href='https://t.me/share/url?url='+encodeURIComponent(sU)+'&text='+encodeURIComponent(sT);
-        $('sIg').addEventListener('click',function(e){e.preventDefault();showToast('Download hasil lalu share ke Instagram! 📸','info')});
-    </script>
+// --- Buat mask warna solid dari gambar (mempertahankan alpha) ---
+function createSolidMask(sourceCanvas, color) {
+    const c = document.createElement('canvas');
+    c.width = sourceCanvas.width;
+    c.height = sourceCanvas.height;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.globalCompositeOperation = 'destination-in';
+    ctx.drawImage(sourceCanvas, 0, 0);
+    return c;
+}
+
+// --- Vibrance (peningkatan saturasi selektif) ---
+function applyVibrance(data, amount) {
+    for (let i = 0; i < data.length; i += 4) {
+        if (data[i + 3] === 0) continue; // Skip piksel transparan
+        const r = data[i], g = data[i + 1], b = data[i + 2];
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
+        const sat = (max === 0) ? 0 : (max - min) / max;
+        // Vibrance: lebih banyak efek pada warna yang kurang saturasi
+        const factor = amount * (1 - sat) * 0.6;
+        data[i] = Math.max(0, Math.min(255, r + (max - r) * factor));
+        data[i + 1] = Math.max(0, Math.min(255, g + (max - g) * factor));
+        data[i + 2] = Math.max(0, Math.min(255, b + (max - b) * factor));
+    }
+}
+
+// --- Download HD ---
+ $('btnDownload').addEventListener('click', async () => {
+    if (!removedBgCanvas) return;
+    const scale = parseInt($('rngUpscale').value);
+    $('btnDownload').disabled = true;
+    if (scale > 1) {
+        showProgress('Mempersiapkan download HD...', `Upscale ${scale}x dan rendering...`);
+    }
+    // Gunakan setTimeout agar UI update dulu
+    await new Promise(r => setTimeout(r, 50));
+
+    try {
+        const dlCanvas = await renderFullRes(scale);
+        updateProgress(90, 'Mengkonversi ke PNG...');
+        await new Promise(r => setTimeout(r, 30));
+
+        dlCanvas.toBlob(blob => {
+            if (!blob) {
+                hideProgress();
+                showToast('Gagal membuat file PNG', 'error');
+                $('btnDownload').disabled = false;
+                return;
+            }
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const baseName = originalFile ? originalFile.name.replace(/\.[^.]+$/, '') : 'result';
+            a.download = `${baseName}_karyaabadi${scale > 1 ? '_' + scale + 'x' : ''}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            hideProgress();
+            showToast(`Berhasil download (${(blob.size / 1024 / 1024).toFixed(1)} MB)`, 'success');
+            $('btnDownload').disabled = false;
+        }, 'image/png');
+    } catch (e) {
+        hideProgress();
+        showToast('Gagal: ' + e.message, 'error');
+        $('btnDownload').disabled = false;
+    }
+});
+
+// --- Render Full Resolution (untuk download) ---
+async function renderFullRes(scale) {
+    const srcW = removedBgCanvas.width;
+    const srcH = removedBgCanvas.height;
+    const outW = srcW * scale;
+    const outH = srcH * scale;
+
+    const sat = $('rngSat').value / 100;
+    const bri = $('rngBri').value / 100;
+    const con = $('rngCon').value / 100;
+    const vib = parseInt($('rngVib').value);
+    const useStroke = $('chkStroke').checked;
+    const whiteW = parseInt($('rngWhiteStroke').value) * scale;
+    const blackW = parseInt($('rngBlackStroke').value) * scale;
+    const useBg = $('chkBgColor').checked;
+    const bgColor = $('pickBgColor').value;
+
+    const outCanvas = document.createElement('canvas');
+    outCanvas.width = outW;
+    outCanvas.height = outH;
+    const octx = outCanvas.getContext('2d');
+
+    // 1. Background
+    if (useBg) {
+        octx.fillStyle = bgColor;
+        octx.fillRect(0, 0, outW, outH);
+    }
+
+    // 2. Upscale gambar yang sudah dihapus background
+    const upscaled = document.createElement('canvas');
+    upscaled.width = outW;
+    upscaled.height = outH;
+    const uctx = upscaled.getContext('2d');
+    uctx.imageSmoothingEnabled = true;
+    uctx.imageSmoothingQuality = 'high';
+    uctx.drawImage(removedBgCanvas, 0, 0, outW, outH);
+
+    // 3. Sharpening setelah upscale (jika scale > 1)
+    if (scale > 1) {
+        const sharpAmount = Math.min(0.8, 0.15 * scale);
+        applySharpen(uctx, outW, outH, sharpAmount);
+        updateProgress(50, 'Menerapkan sharpening...');
+        await new Promise(r => setTimeout(r, 10));
+    }
+
+    // 4. Filter warna
+    const colorCanvas = document.createElement('canvas');
+    colorCanvas.width = outW;
+    colorCanvas.height = outH;
+    const cctx = colorCanvas.getContext('2d');
+    cctx.filter = `saturate(${sat}) brightness(${bri}) contrast(${con})`;
+    cctx.drawImage(upscaled, 0, 0);
+    cctx.filter = 'none';
+
+    // 5. Vibrance
+    if (vib > 0) {
+        const imgData = cctx.getImageData(0, 0, outW, outH);
+        applyVibrance(imgData.data, vib / 100);
+        cctx.putImageData(imgData, 0, 0);
+    }
+    updateProgress(65, 'Menerapkan efek...');
+
+    // 6. Stroke
+    if (useStroke) {
+        const totalR = whiteW + blackW;
+        const blackMask = createSolidMask(colorCanvas, '#000000');
+        const whiteMask = createSolidMask(colorCanvas, '#ffffff');
+
+        // Untuk gambar besar, gunakan langkah (step) pada offset agar tidak terlalu banyak draw call
+        const step = scale > 4 ? 2 : 1;
+        for (let dy = -totalR; dy <= totalR; dy += step) {
+            for (let dx = -totalR; dx <= totalR; dx += step) {
+                if (dx * dx + dy * dy <= totalR * totalR) {
+                    octx.drawImage(blackMask, dx, dy);
+                }
+            }
+        }
+        for (let dy = -whiteW; dy <= whiteW; dy += step) {
+            for (let dx = -whiteW; dx <= whiteW; dx += step) {
+                if (dx * dx + dy * dy <= whiteW * whiteW) {
+                    octx.drawImage(whiteMask, dx, dy);
+                }
+            }
+        }
+        updateProgress(80, 'Menggambar stroke...');
+    }
+
+    // 7. Gambar utama
+    octx.drawImage(colorCanvas, 0, 0);
+    updateProgress(88, 'Finalisasi...');
+    await new Promise(r => setTimeout(r, 10));
+
+    return outCanvas;
+}
+
+// --- Sharpening (Unsharp Mask sederhana) ---
+function applySharpen(ctx, w, h, amount) {
+    // Gunakan pendekatan dua pass: blur lalu selisihkan
+    // Untuk efisiensi, gunakan canvas filter bawaan + kontras
+    const temp = document.createElement('canvas');
+    temp.width = w; temp.height = h;
+    const tctx = temp.getContext('2d');
+    // Salin original
+    tctx.drawImage(ctx.canvas, 0, 0);
+    // Blur versi
+    const blurred = document.createElement('canvas');
+    blurred.width = w; blurred.height = h;
+    const bctx = blurred.getContext('2d');
+    bctx.filter = `blur(${Math.max(1, Math.round(amount * 3))}px)`;
+    bctx.drawImage(temp, 0, 0);
+    bctx.filter = 'none';
+    // Unsharp mask: original + amount * (original - blurred)
+    // Menggunakan composite operation
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.drawImage(temp, 0, 0);
+    ctx.globalCompositeOperation = 'luminosity';
+    // Buat layer selisih
+    const diff = document.createElement('canvas');
+    diff.width = w; diff.height = h;
+    const dctx = diff.getContext('2d');
+    dctx.drawImage(temp, 0, 0);
+    dctx.globalCompositeOperation = 'difference';
+    dctx.drawImage(blurred, 0, 0);
+    // Tambahkan selisih ke original
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = Math.min(1, amount);
+    ctx.drawImage(diff, 0, 0);
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+}
+
+// --- Event Listeners Kontrol ---
+// Stroke
+ $('chkStroke').addEventListener('change', toggleStrokeCtrl);
+function toggleStrokeCtrl() {
+    const el = $('strokeControls');
+    if ($('chkStroke').checked) { el.classList.remove('opacity-40','pointer-events-none'); }
+    else { el.classList.add('opacity-40','pointer-events-none'); }
+    scheduleRender();
+}
+ $('rngWhiteStroke').addEventListener('input', e => { $('valWhiteStroke').textContent = e.target.value + 'px'; scheduleRender(); });
+ $('rngBlackStroke').addEventListener('input', e => { $('valBlackStroke').textContent = e.target.value + 'px'; scheduleRender(); });
+
+// Warna
+ $('chkBgColor').addEventListener('change', toggleBgColorCtrl);
+function toggleBgColorCtrl() {
+    const el = $('bgColorControls');
+    if ($('chkBgColor').checked) { el.classList.remove('opacity-40','pointer-events-none'); }
+    else { el.classList.add('opacity-40','pointer-events-none'); }
+    scheduleRender();
+}
+ $('pickBgColor').addEventListener('input', e => {
+    $('hexBgColor').textContent = e.target.value.toUpperCase();
+    presetContainer.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+    scheduleRender();
+});
+
+// Penyempurnaan Warna
+ $('rngSat').addEventListener('input', e => { $('valSat').textContent = e.target.value + '%'; scheduleRender(); });
+ $('rngBri').addEventListener('input', e => { $('valBri').textContent = e.target.value + '%'; scheduleRender(); });
+ $('rngCon').addEventListener('input', e => { $('valCon').textContent = e.target.value + '%'; scheduleRender(); });
+ $('rngVib').addEventListener('input', e => { $('valVib').textContent = e.target.value + '%'; scheduleRender(); });
+ $('btnResetColor').addEventListener('click', () => {
+    $('rngSat').value = 100; $('valSat').textContent = '100%';
+    $('rngBri').value = 100; $('valBri').textContent = '100%';
+    $('rngCon').value = 100; $('valCon').textContent = '100%';
+    $('rngVib').value = 0; $('valVib').textContent = '0%';
+    scheduleRender();
+    showToast('Pengaturan warna direset', 'info');
+});
+
+// Upscale
+ $('rngUpscale').addEventListener('input', e => {
+    $('valUpscale').textContent = e.target.value + 'x';
+    updateOutputInfo();
+    upscaleContainer.querySelectorAll('button').forEach(b => b.style.borderColor = '');
+});
+
+function updateOutputInfo() {
+    if (!removedBgCanvas) return;
+    const s = parseInt($('rngUpscale').value);
+    const ow = removedBgCanvas.width * s;
+    const oh = removedBgCanvas.height * s;
+    $('statusOutput').textContent = `${ow}×${oh}`;
+    $('dlResInfo').textContent = `${ow} × ${oh} px (${s}x)`;
+}
+
+// --- Partikel Background ---
+(function initParticles() {
+    const canvas = $('particleCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let w, h;
+    const PARTICLE_COUNT = 50;
+
+    function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    class Particle {
+        constructor() { this.reset(); }
+        reset() {
+            this.x = Math.random() * w;
+            this.y = Math.random() * h;
+            this.size = Math.random() * 2 + 0.5;
+            this.speedX = (Math.random() - 0.5) * 0.3;
+            this.speedY = (Math.random() - 0.5) * 0.3;
+            this.opacity = Math.random() * 0.3 + 0.05;
+            this.pulse = Math.random() * Math.PI * 2;
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            this.pulse += 0.01;
+            if (this.x < -10 || this.x > w + 10 || this.y < -10 || this.y > h + 10) this.reset();
+        }
+        draw() {
+            const o = this.opacity * (0.6 + 0.4 * Math.sin(this.pulse));
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, Math.max(0.1, this.size), 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(220,38,38,${o})`;
+            ctx.fill();
+        }
+    }
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(new Particle());
+
+    function animate() {
+        ctx.clearRect(0, 0, w, h);
+        particles.forEach(p => { p.update(); p.draw(); });
+        // Garis penghubung
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 150) {
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.strokeStyle = `rgba(220,38,38,${0.04 * (1 - dist / 150)})`;
+                    ctx.lineWidth = 0.5;
+                    ctx.stroke();
+                }
+            }
+        }
+        requestAnimationFrame(animate);
+    }
+    // Hormati prefers-reduced-motion
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        animate();
+    }
+})();
+
+// --- Smooth scroll untuk anchor ---
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+        e.preventDefault();
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+});
+
+// --- Preload library di background ---
+setTimeout(() => loadLib(), 2000);
+
+</script>
 </body>
 </html>
