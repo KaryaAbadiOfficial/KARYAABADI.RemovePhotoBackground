@@ -166,8 +166,8 @@ footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{
 
 <script type="module">
 /* ======================================================
-   KARYA ABADI REMOVE BACKGROUND — KUALITAS PREMIUM
-   PERBAIKAN: Model enum valid (isnet_fp16 / isnet)
+   KARYA ABADI REMOVE BACKGROUND
+   SOLUSI: Service Worker Proxy untuk redirect aset AI
    ====================================================== */
 
 // --- State ---
@@ -178,6 +178,7 @@ let removeBackgroundFn = null;
 let libLoaded = false;
 let libLoading = false;
 let renderTimeout = null;
+let swReady = false;
 
 // --- Shortcut DOM ---
 const $ = id => document.getElementById(id);
@@ -185,6 +186,104 @@ const canvasOrig = $('canvasOriginal');
 const canvasResult = $('canvasResult');
 const ctxOrig = canvasOrig.getContext('2d');
 const ctxResult = canvasResult.getContext('2d');
+
+// ======================================================
+// 1. DAFTARKAN SERVICE WORKER PROXY
+// Ini adalah SATU-SATUNYA cara yang bisa mengintercept
+// fetch request dari dalam Web Worker ONNX
+// ======================================================
+async function initServiceWorker() {
+    if (!('serviceWorker' in navigator)) {
+        console.warn('[SW] Browser tidak mendukung Service Worker');
+        return false;
+    }
+    
+    try {
+        // Kode Service Worker sebagai string blob
+        const swCode = `
+            const CDN = 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/';
+            
+            self.addEventListener('fetch', event => {
+                const url = event.request.url;
+                
+                // Intercept semua request yang mencari aset library AI
+                if (url.includes('/models/') || url.includes('/onnx/') || 
+                    url.includes('ort-wasm') || url.includes('.wasm') || 
+                    url.includes('isnet') || url.includes('onnxruntime') ||
+                    url.includes('background-removal')) {
+                    
+                    let path = url;
+                    // Ekstrak path relatif dari URL
+                    const distIdx = url.indexOf('/dist/');
+                    if (distIdx > -1) {
+                        path = url.substring(distIdx + 6); // setelah /dist/
+                    } else {
+                        const slashIdx = url.lastIndexOf('/');
+                        path = url.substring(slashIdx + 1);
+                    }
+                    
+                    const redirectUrl = CDN + path;
+                    console.log('[SW Proxy]', url, '->', redirectUrl);
+                    
+                    event.respondWith(
+                        fetch(redirectUrl, { mode: 'cors' }).catch(() => {
+                            // Fallback: coba tanpa path tambahan
+                            return fetch(CDN + url.split('/').pop(), { mode: 'cors' });
+                        })
+                    );
+                }
+            });
+        `;
+        
+        const blob = new Blob([swCode], { type: 'application/javascript' });
+        const swUrl = URL.createObjectURL(blob);
+        
+        const reg = await navigator.serviceWorker.register(swUrl, { scope: '/' });
+        await navigator.serviceWorker.ready;
+        
+        console.log('[SW] Service Worker Proxy aktif!');
+        swReady = true;
+        return true;
+    } catch (e) {
+        console.warn('[SW] Gagal daftar SW:', e.message);
+        return false;
+    }
+}
+
+// ======================================================
+// 2. FETCH INTERCEPTOR (Main Thread fallback)
+// ======================================================
+const nativeFetch = window.fetch;
+window.fetch = function(input, init) {
+    let url = '';
+    if (typeof input === 'string') url = input;
+    else if (input instanceof Request) url = input.url;
+    else if (input instanceof URL) url = input.href;
+    
+    const CDN = 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/';
+    
+    if (url && (url.includes('/models/') || url.includes('/onnx/') || 
+        url.includes('ort-wasm') || url.includes('.wasm') || 
+        url.includes('isnet') || url.includes('onnxruntime') ||
+        url.includes('background-removal') ||
+        url.startsWith('./') || url.startsWith('../'))) {
+        
+        let path = url;
+        if (url.startsWith('./') || url.startsWith('../')) {
+            path = url.replace(/^\.\//, '').replace(/^\.\.\//, '');
+        } else {
+            const distIdx = url.indexOf('/dist/');
+            if (distIdx > -1) path = url.substring(distIdx + 6);
+            else path = url.split('/').pop();
+        }
+        
+        const redirectUrl = CDN + path;
+        console.log('[Fetch Proxy]', url, '->', redirectUrl);
+        return nativeFetch.call(this, redirectUrl, init);
+    }
+    
+    return nativeFetch.call(this, input, init);
+};
 
 // --- Preset Warna ---
 ['#ffffff','#000000','#dc2626','#2563eb','#16a34a','#eab308','#f97316','#8b5cf6','#ec4899','#06b6d4','#78716c','#1e293b'].forEach(c => {
@@ -224,7 +323,7 @@ function hideProgress() { $('progressOverlay').style.display = 'none'; }
  $('btnCancelProgress').addEventListener('click', hideProgress);
 
 // ======================================================
-// LOAD LIBRARY — Versi 1.4.5 lebih stabil untuk enum
+// LOAD LIBRARY
 // ======================================================
 async function loadLib() {
     if (libLoaded || libLoading) return libLoaded;
@@ -232,7 +331,6 @@ async function loadLib() {
     $('statusModel').textContent = 'Memuat...';
     $('statusModel').className = 'text-xs px-2 py-1 rounded-full bg-yellow-900/40 text-yellow-400';
 
-    // Coba v1.4.5 dulu (lebih stabil), lalu v1.5.5
     const cdnList = [
         { url: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/+esm', name: 'jsdelivr v1.4.5' },
         { url: 'https://esm.sh/@imgly/background-removal@1.4.5', name: 'esm.sh v1.4.5' },
@@ -293,15 +391,26 @@ function handleFile(file) {
 }
 
 // ======================================================
-// HAPUS BACKGROUND — PERBAIKAN ENUM VALUE
-// Model valid: 'isnet_fp16' (default), 'isnet', 'isnet_quint8'
-// 'isnet_generaluse' TIDAK VALID dan menyebabkan error!
+// HAPUS BACKGROUND
 // ======================================================
  $('btnRemoveBg').addEventListener('click', async () => {
     if (!originalFile) return;
+    
+    // Cek apakah dibuka dari file:///
+    if (window.location.protocol === 'file:') {
+        showError('ERROR: File ini harus dibuka via HTTP Server!\n\nKlik kanan file HTML -> "Open with Live Server" (di VS Code).\nAtau jalankan: python -m http.server lalu buka http://localhost:8000');
+        return;
+    }
+    
     $('btnRemoveBg').disabled = true;
     showProgress('Menghapus background...', 'Mempersiapkan AI presisi tinggi...');
-    updateProgress(5, 'Mengunduh model AI...');
+    updateProgress(5, 'Memulai proses AI...');
+
+    // Pastikan Service Worker aktif
+    if (!swReady) {
+        updateProgress(7, 'Mengaktifkan Service Worker Proxy...');
+        await initServiceWorker();
+    }
 
     const ok = await loadLib();
     if (!ok || !removeBackgroundFn) {
@@ -309,28 +418,21 @@ function handleFile(file) {
         $('btnRemoveBg').disabled = false; return;
     }
 
-    updateProgress(10, 'Memproses gambar dengan AI presisi tinggi...');
-
+    let imageBlob;
     try {
-        const imageBlob = originalFile instanceof Blob ? originalFile : new Blob([await originalFile.arrayBuffer()], { type: originalFile.type });
+        imageBlob = originalFile instanceof Blob ? originalFile : new Blob([await originalFile.arrayBuffer()], { type: originalFile.type });
 
-        // ============================================================
-        // KONFIGURASI YANG BENAR — Hanya gunakan enum model yang valid
-        // 'isnet_fp16' = model ringan (default, ~40MB)
-        // 'isnet' = model presisi penuh (~170MB, kualitas terbaik)
-        // 'isnet_quint8' = model terkuantisasi (~12MB)
-        // ============================================================
+        updateProgress(10, 'Memproses gambar dengan AI...');
+        
         const config = {
             model: 'isnet_fp16',
-            output: {
-                format: 'image/png',
-                quality: 1.0
-            },
+            publicPath: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/',
+            output: { format: 'image/png', quality: 1.0 },
             progress: (key, current, total) => {
                 if (total > 0) {
                     const pct = 10 + (current / total) * 75;
                     const labels = {
-                        'fetch:model': 'Mengunduh model AI ISNET (~40MB, sekali saja)...',
+                        'fetch:model': 'Mengunduh model AI ISNET (~40MB)...',
                         'compute:inference': 'AI sedang menganalisis gambar...',
                         'preprocess': 'Mempersiapkan gambar...',
                         'postprocess': 'Memfinalisasi mask...'
@@ -340,7 +442,7 @@ function handleFile(file) {
             }
         };
 
-        console.log('[Karya Abadi] Memulai removeBackground dengan model isnet_fp16...');
+        console.log('[Karya Abadi] Memulai removeBackground...');
         const resultBlob = await removeBackgroundFn(imageBlob, config);
 
         updateProgress(88, 'Menerapkan edge refinement...');
@@ -353,8 +455,7 @@ function handleFile(file) {
         const rawCanvas = document.createElement('canvas');
         rawCanvas.width = bitmap.width;
         rawCanvas.height = bitmap.height;
-        const rawCtx = rawCanvas.getContext('2d');
-        rawCtx.drawImage(bitmap, 0, 0);
+        rawCanvas.getContext('2d').drawImage(bitmap, 0, 0);
         bitmap.close();
 
         updateProgress(92, 'Membersihkan sisa background di tepi objek...');
@@ -368,68 +469,21 @@ function handleFile(file) {
             $('btnDownload').disabled = false;
             $('statusBg').textContent = 'Selesai';
             $('statusBg').className = 'text-xs px-2 py-1 rounded-full bg-green-900/40 text-green-400';
-            showToast('Background berhasil dihapus dengan presisi tinggi!', 'success');
+            showToast('Background berhasil dihapus!', 'success');
         }, 300);
 
     } catch (e) {
         console.error('[Karya Abadi] Error:', e);
         let detail = e.message || String(e);
-
-        // Jika fp16 gagal, coba model isnet (presisi penuh)
-        if (detail.includes('isnet_fp16') || detail.includes('enum') || detail.includes('Failed to fetch') || detail.includes('NetworkError')) {
-            console.log('[Karya Abadi] Model fp16 gagal, mencoba model isnet (presisi penuh)...');
-            try {
-                await tryFallbackIsnet(imageBlob);
-                return;
-            } catch (e2) {
-                detail = 'Gagal dengan model fp16 DAN model isnet.\n\nError: ' + e2.message;
-            }
+        if (e.stack) detail += '\n\n' + e.stack.split('\n').slice(0, 5).join('\n');
+        if (detail.includes('Failed to fetch') || detail.includes('NetworkError')) {
+            detail += '\n\n[DIAGNOSIS] Koneksi gagal mengunduh model AI.\nPastikan: \n1. Buka file via Live Server (BUKAN file:///)\n2. Matikan Adblocker\n3. Koneksi internet stabil';
         }
-
-        if (e.stack) detail += '\n\n' + e.stack.split('\n').slice(0, 4).join('\n');
         showError(detail);
         $('btnRemoveBg').disabled = false;
         showToast('Gagal menghapus background', 'error');
     }
 });
-
-// ======================================================
-// FALLBACK: Coba model 'isnet' (presisi penuh)
-// ======================================================
-async function tryFallbackIsnet(imageBlob) {
-    showProgress('Mencoba model presisi penuh...', 'Menggunakan model ISNET (kualitas tertinggi)...');
-    updateProgress(10, 'Mengunduh model ISNET (~170MB)...');
-
-    const config = {
-        model: 'isnet',
-        output: { format: 'image/png', quality: 1.0 },
-        progress: (key, current, total) => {
-            if (total > 0) {
-                const pct = 10 + (current / total) * 75;
-                updateProgress(pct, key === 'fetch:model' ? 'Mengunduh model ISNET (~170MB)...' : 'Memproses...');
-            }
-        }
-    };
-
-    const resultBlob = await removeBackgroundFn(imageBlob, config);
-    updateProgress(88, 'Menerapkan edge refinement...');
-
-    const bitmap = await createImageBitmap(resultBlob);
-    const rawCanvas = document.createElement('canvas');
-    rawCanvas.width = bitmap.width; rawCanvas.height = bitmap.height;
-    rawCanvas.getContext('2d').drawImage(bitmap, 0, 0);
-    bitmap.close();
-
-    removedBgCanvas = refineEdges(rawCanvas, true);
-
-    hideProgress();
-    renderResult();
-    $('btnRemoveBg').disabled = false;
-    $('btnDownload').disabled = false;
-    $('statusBg').textContent = 'Selesai (ISNET)';
-    $('statusBg').className = 'text-xs px-2 py-1 rounded-full bg-green-900/40 text-green-400';
-    showToast('Background dihapus dengan model presisi penuh', 'success');
-}
 
 // ======================================================
 // EDGE REFINEMENT
@@ -446,9 +500,7 @@ function refineEdges(srcCanvas, aggressive = false) {
     const NOISE_SIZE = aggressive ? 4 : 3;
 
     for (let i = 0; i < d.length; i += 4) {
-        if (d[i + 3] > 0 && d[i + 3] < GHOST_THRESHOLD) {
-            d[i + 3] = 0;
-        }
+        if (d[i + 3] > 0 && d[i + 3] < GHOST_THRESHOLD) d[i + 3] = 0;
     }
 
     const alphaMap = new Uint8Array(w * h);
@@ -461,9 +513,7 @@ function refineEdges(srcCanvas, aggressive = false) {
         for (let x = 0; x < w; x++) {
             const idx = y * w + x;
             if (alphaMap[idx] === 0) { eroded[idx] = 0; continue; }
-
-            let solidCount = 0;
-            let totalCount = 0;
+            let solidCount = 0, totalCount = 0;
             for (let dy = -halfN; dy <= halfN; dy++) {
                 for (let dx = -halfN; dx <= halfN; dx++) {
                     const nx = x + dx, ny = y + dy;
@@ -473,65 +523,47 @@ function refineEdges(srcCanvas, aggressive = false) {
                     }
                 }
             }
-
-            const ratio = solidCount / totalCount;
-            eroded[idx] = ratio < 0.4 ? 0 : alphaMap[idx];
+            eroded[idx] = (solidCount / totalCount) < 0.4 ? 0 : alphaMap[idx];
         }
     }
 
     const dilated = new Uint8Array(eroded);
     const dilateR = 1;
-
     for (let y = 0; y < h; y++) {
         for (let x = 0; x < w; x++) {
             const idx = y * w + x;
             if (eroded[idx] > 0) continue;
-
             let maxNeighborAlpha = 0;
             for (let dy = -dilateR; dy <= dilateR; dy++) {
                 for (let dx = -dilateR; dx <= dilateR; dx++) {
                     const nx = x + dx, ny = y + dy;
-                    if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
-                        maxNeighborAlpha = Math.max(maxNeighborAlpha, eroded[ny * w + nx]);
-                    }
+                    if (nx >= 0 && nx < w && ny >= 0 && ny < h) maxNeighborAlpha = Math.max(maxNeighborAlpha, eroded[ny * w + nx]);
                 }
             }
-
-            if (maxNeighborAlpha > 200) {
-                dilated[idx] = Math.round(maxNeighborAlpha * 0.3);
-            }
+            if (maxNeighborAlpha > 200) dilated[idx] = Math.round(maxNeighborAlpha * 0.3);
         }
     }
 
     const blurred = new Uint8Array(dilated);
     const br = Math.ceil(ALPHA_BLUR_RADIUS);
-
     for (let y = 0; y < h; y++) {
         for (let x = 0; x < w; x++) {
             let sum = 0, count = 0;
             for (let dy = -br; dy <= br; dy++) {
                 for (let dx = -br; dx <= br; dx++) {
                     const nx = x + dx, ny = y + dy;
-                    if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
-                        sum += dilated[ny * w + nx];
-                        count++;
-                    }
+                    if (nx >= 0 && nx < w && ny >= 0 && ny < h) { sum += dilated[ny * w + nx]; count++; }
                 }
             }
             blurred[y * w + x] = Math.round(sum / count);
         }
     }
 
-    for (let i = 0; i < w * h; i++) {
-        d[i * 4 + 3] = blurred[i];
-    }
+    for (let i = 0; i < w * h; i++) d[i * 4 + 3] = blurred[i];
 
     const outCanvas = document.createElement('canvas');
-    outCanvas.width = w;
-    outCanvas.height = h;
+    outCanvas.width = w; outCanvas.height = h;
     outCanvas.getContext('2d').putImageData(imgData, 0, 0);
-
-    console.log(`[Karya Abadi] Edge refinement selesai (aggressive=${aggressive})`);
     return outCanvas;
 }
 
@@ -633,45 +665,31 @@ function updateOutputInfo(){if(!removedBgCanvas)return;const s=+$('rngUpscale').
     let particles = [];
     const count = 60;
 
-    function resize() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resize);
-    resize();
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resize); resize();
 
     class Particle {
         constructor() { this.reset(); }
         reset() {
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height;
-            this.size = Math.random() * 2 + 0.5;
-            this.speedX = (Math.random() - 0.5) * 0.5;
-            this.speedY = (Math.random() - 0.5) * 0.5;
-            this.opacity = Math.random() * 0.5 + 0.1;
+            this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+            this.size = Math.random() * 2 + 0.5; this.speedX = (Math.random() - 0.5) * 0.5;
+            this.speedY = (Math.random() - 0.5) * 0.5; this.opacity = Math.random() * 0.5 + 0.1;
         }
-        update() {
-            this.x += this.speedX;
-            this.y += this.speedY;
-            if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
-        }
-        draw() {
-            ctx.fillStyle = `rgba(220, 38, 38, ${this.opacity})`;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fill();
-        }
+        update() { this.x += this.speedX; this.y += this.speedY; if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset(); }
+        draw() { ctx.fillStyle = `rgba(220, 38, 38, ${this.opacity})`; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
     }
 
     for (let i = 0; i < count; i++) particles.push(new Particle());
-
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particles.forEach(p => { p.update(); p.draw(); });
-        requestAnimationFrame(animate);
-    }
+    function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animate); }
     animate();
 })();
+
+// --- Cek file:/// saat pertama kali load ---
+if (window.location.protocol === 'file:') {
+    setTimeout(() => {
+        showToast('PERINGATAN: Buka file ini via Live Server, bukan klik 2x!', 'error');
+    }, 1000);
+}
 
 </script>
 </body>
