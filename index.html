@@ -144,7 +144,7 @@ footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{
 <h2 class="font-disp text-2xl md:text-3xl font-bold text-center mb-4 tracking-wide">Fitur Unggulan</h2>
 <p class="text-kag text-center mb-14 max-w-xl mx-auto">Semua yang Anda butuhkan untuk pengolahan gambar profesional dalam satu alat.</p>
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-<div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300"><div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-eraser text-2xl text-kar"></i></div><h3 class="font-semibold mb-2">Hapus Background</h3><p class="text-xs text-kag leading-relaxed">Model AI generaluse dengan edge refinement untuk hasil presisi tinggi tanpa sisa.</p></div>
+<div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300"><div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-eraser text-2xl text-kar"></i></div><h3 class="font-semibold mb-2">Hapus Background</h3><p class="text-xs text-kag leading-relaxed">Model AI ISNET dengan edge refinement untuk hasil presisi tinggi tanpa sisa.</p></div>
 <div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300"><div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-border-style text-2xl text-kar"></i></div><h3 class="font-semibold mb-2">Stroke Cutting</h3><p class="text-xs text-kag leading-relaxed">Stroke putih dan garis hitam tipis di luar untuk keperluan cutting profesional.</p></div>
 <div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300"><div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-expand-arrows-alt text-2xl text-kar"></i></div><h3 class="font-semibold mb-2">Upscale 10x</h3><p class="text-xs text-kag leading-relaxed">Tingkatkan resolusi gambar hingga 10 kali lipat dengan sharpening otomatis.</p></div>
 <div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300"><div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-palette text-2xl text-kar"></i></div><h3 class="font-semibold mb-2">Enhancement Warna</h3><p class="text-xs text-kag leading-relaxed">Saturasi, kecerahan, kontras, dan vibrance yang bisa disesuaikan secara detail.</p></div>
@@ -167,7 +167,7 @@ footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{
 <script type="module">
 /* ======================================================
    KARYA ABADI REMOVE BACKGROUND — KUALITAS PREMIUM
-   PERBAIKAN: Menggunakan publicPath resmi dari library
+   PERBAIKAN: Model enum valid (isnet_fp16 / isnet)
    ====================================================== */
 
 // --- State ---
@@ -224,7 +224,7 @@ function hideProgress() { $('progressOverlay').style.display = 'none'; }
  $('btnCancelProgress').addEventListener('click', hideProgress);
 
 // ======================================================
-// LOAD LIBRARY
+// LOAD LIBRARY — Versi 1.4.5 lebih stabil untuk enum
 // ======================================================
 async function loadLib() {
     if (libLoaded || libLoading) return libLoaded;
@@ -232,9 +232,12 @@ async function loadLib() {
     $('statusModel').textContent = 'Memuat...';
     $('statusModel').className = 'text-xs px-2 py-1 rounded-full bg-yellow-900/40 text-yellow-400';
 
+    // Coba v1.4.5 dulu (lebih stabil), lalu v1.5.5
     const cdnList = [
+        { url: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/+esm', name: 'jsdelivr v1.4.5' },
+        { url: 'https://esm.sh/@imgly/background-removal@1.4.5', name: 'esm.sh v1.4.5' },
+        { url: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm', name: 'jsdelivr v1.5.5' },
         { url: 'https://esm.sh/@imgly/background-removal@1.5.5', name: 'esm.sh v1.5.5' },
-        { url: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm', name: 'jsdelivr+esm v1.5.5' },
     ];
 
     for (const cdn of cdnList) {
@@ -290,13 +293,15 @@ function handleFile(file) {
 }
 
 // ======================================================
-// HAPUS BACKGROUND — PERBAIKAN UTAMA: PUBLICPATH
+// HAPUS BACKGROUND — PERBAIKAN ENUM VALUE
+// Model valid: 'isnet_fp16' (default), 'isnet', 'isnet_quint8'
+// 'isnet_generaluse' TIDAK VALID dan menyebabkan error!
 // ======================================================
  $('btnRemoveBg').addEventListener('click', async () => {
     if (!originalFile) return;
     $('btnRemoveBg').disabled = true;
     showProgress('Menghapus background...', 'Mempersiapkan AI presisi tinggi...');
-    updateProgress(5, 'Mengunduh model AI generaluse (~170MB)...');
+    updateProgress(5, 'Mengunduh model AI...');
 
     const ok = await loadLib();
     if (!ok || !removeBackgroundFn) {
@@ -309,10 +314,14 @@ function handleFile(file) {
     try {
         const imageBlob = originalFile instanceof Blob ? originalFile : new Blob([await originalFile.arrayBuffer()], { type: originalFile.type });
 
-        // KONFIGURASI RESMI: Gunakan publicPath agar Web Worker tahu harus download dari mana
+        // ============================================================
+        // KONFIGURASI YANG BENAR — Hanya gunakan enum model yang valid
+        // 'isnet_fp16' = model ringan (default, ~40MB)
+        // 'isnet' = model presisi penuh (~170MB, kualitas terbaik)
+        // 'isnet_quint8' = model terkuantisasi (~12MB)
+        // ============================================================
         const config = {
-            model: 'isnet_generaluse',
-            publicPath: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/dist/', // INI KUNCINYA
+            model: 'isnet_fp16',
             output: {
                 format: 'image/png',
                 quality: 1.0
@@ -321,7 +330,7 @@ function handleFile(file) {
                 if (total > 0) {
                     const pct = 10 + (current / total) * 75;
                     const labels = {
-                        'fetch:model': 'Mengunduh model AI generaluse (~170MB, sekali saja)...',
+                        'fetch:model': 'Mengunduh model AI ISNET (~40MB, sekali saja)...',
                         'compute:inference': 'AI sedang menganalisis gambar...',
                         'preprocess': 'Mempersiapkan gambar...',
                         'postprocess': 'Memfinalisasi mask...'
@@ -331,7 +340,7 @@ function handleFile(file) {
             }
         };
 
-        console.log('[Karya Abadi] Memulai removeBackground...');
+        console.log('[Karya Abadi] Memulai removeBackground dengan model isnet_fp16...');
         const resultBlob = await removeBackgroundFn(imageBlob, config);
 
         updateProgress(88, 'Menerapkan edge refinement...');
@@ -365,15 +374,62 @@ function handleFile(file) {
     } catch (e) {
         console.error('[Karya Abadi] Error:', e);
         let detail = e.message || String(e);
-        if (e.stack) detail += '\n\n' + e.stack.split('\n').slice(0, 4).join('\n');
-        if (detail.includes('Failed to fetch') || detail.includes('NetworkError')) {
-            detail += '\n\n[DIAGNOSIS] Koneksi gagal saat mengunduh model AI. Pastikan koneksi stabil atau coba gunakan HTTP Server lokal (bukan file://).';
+
+        // Jika fp16 gagal, coba model isnet (presisi penuh)
+        if (detail.includes('isnet_fp16') || detail.includes('enum') || detail.includes('Failed to fetch') || detail.includes('NetworkError')) {
+            console.log('[Karya Abadi] Model fp16 gagal, mencoba model isnet (presisi penuh)...');
+            try {
+                await tryFallbackIsnet(imageBlob);
+                return;
+            } catch (e2) {
+                detail = 'Gagal dengan model fp16 DAN model isnet.\n\nError: ' + e2.message;
+            }
         }
+
+        if (e.stack) detail += '\n\n' + e.stack.split('\n').slice(0, 4).join('\n');
         showError(detail);
         $('btnRemoveBg').disabled = false;
         showToast('Gagal menghapus background', 'error');
     }
 });
+
+// ======================================================
+// FALLBACK: Coba model 'isnet' (presisi penuh)
+// ======================================================
+async function tryFallbackIsnet(imageBlob) {
+    showProgress('Mencoba model presisi penuh...', 'Menggunakan model ISNET (kualitas tertinggi)...');
+    updateProgress(10, 'Mengunduh model ISNET (~170MB)...');
+
+    const config = {
+        model: 'isnet',
+        output: { format: 'image/png', quality: 1.0 },
+        progress: (key, current, total) => {
+            if (total > 0) {
+                const pct = 10 + (current / total) * 75;
+                updateProgress(pct, key === 'fetch:model' ? 'Mengunduh model ISNET (~170MB)...' : 'Memproses...');
+            }
+        }
+    };
+
+    const resultBlob = await removeBackgroundFn(imageBlob, config);
+    updateProgress(88, 'Menerapkan edge refinement...');
+
+    const bitmap = await createImageBitmap(resultBlob);
+    const rawCanvas = document.createElement('canvas');
+    rawCanvas.width = bitmap.width; rawCanvas.height = bitmap.height;
+    rawCanvas.getContext('2d').drawImage(bitmap, 0, 0);
+    bitmap.close();
+
+    removedBgCanvas = refineEdges(rawCanvas, true);
+
+    hideProgress();
+    renderResult();
+    $('btnRemoveBg').disabled = false;
+    $('btnDownload').disabled = false;
+    $('statusBg').textContent = 'Selesai (ISNET)';
+    $('statusBg').className = 'text-xs px-2 py-1 rounded-full bg-green-900/40 text-green-400';
+    showToast('Background dihapus dengan model presisi penuh', 'success');
+}
 
 // ======================================================
 // EDGE REFINEMENT
