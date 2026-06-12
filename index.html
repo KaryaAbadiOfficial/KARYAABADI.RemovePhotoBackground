@@ -167,13 +167,6 @@ footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{
 <script type="module">
 /* ======================================================
    KARYA ABADI REMOVE BACKGROUND — KUALITAS PREMIUM
-   ======================================================
-   Perbaikan kualitas:
-   1. Model AI diganti ke 'isnet_generaluse' (jauh lebih presisi)
-   2. Fetch Interceptor diperluas untuk mendukung model custom
-   3. Edge Refinement: pembersihan tepi pasca-AI untuk
-      menghilangkan sisa background yang menempel di pinggir objek
-   4. Alpha thresholding untuk menghilangkan ghost artifacts
    ====================================================== */
 
 // --- State ---
@@ -188,28 +181,31 @@ let renderTimeout = null;
 const nativeFetch = window.fetch;
 
 // ======================================================
-// FETCH INTERCEPTOR — DIPERLUAS UNTUK MODEL CUSTOM
-// Library memanggil fetch("/models/isnet_fp16/...")
-// Kita redirect ke CDN dan mendukung model lain
+// FETCH INTERCEPTOR — PERBAIKAN UTAMA
 // ======================================================
-function installFetchInterceptor(activeModel) {
-    const modelPath = '/models/' + activeModel;
+function installFetchInterceptor() {
     window.fetch = function(input, init) {
         if (typeof input === 'string') {
-            // Tangkap path model (model default maupun custom)
-            if (input.includes('/models/')) {
-                const fixedUrl = 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/dist' + input;
-                console.log('[Karya Abadi] Fetch redirect:', input, '->', fixedUrl);
-                return nativeFetch.call(this, fixedUrl, init);
-            }
+            let fixedUrl = input;
+            
+            // Tangkap path relatif yang diminta oleh library (misal: "./models/..." atau "../onnx/...")
             if (input.startsWith('./') || input.startsWith('../')) {
-                const fixedUrl = 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/dist/' + input.replace(/^\.\//, '');
+                fixedUrl = 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/dist/' + input.replace(/^\.\//, '').replace(/^\.\.\//, '');
+            } 
+            // Tangkap path absolut yang diminta oleh library
+            else if (input.startsWith('/models/') || input.startsWith('/onnx/')) {
+                fixedUrl = 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/dist' + input;
+            }
+
+            // Jika URL diubah (berarti request ke aset library), arahkan ke CDN
+            if (fixedUrl !== input) {
+                console.log('[Karya Abadi] Fetch redirect:', input, '->', fixedUrl);
                 return nativeFetch.call(this, fixedUrl, init);
             }
         }
         return nativeFetch.call(this, input, init);
     };
-    console.log('[Karya Abadi] Fetch interceptor aktif untuk model:', activeModel);
+    console.log('[Karya Abadi] Fetch interceptor aktif.');
 }
 
 function removeFetchInterceptor() {
@@ -345,13 +341,12 @@ function handleFile(file) {
 
     updateProgress(10, 'Memproses gambar dengan AI presisi tinggi...');
 
-    // AKTIFKAN INTERCEPTOR — redirect ke model generaluse
-    installFetchInterceptor('isnet_generaluse');
+    // AKTIFKAN INTERCEPTOR YANG SUDAH DIPERBAIKI
+    installFetchInterceptor();
 
     try {
         const imageBlob = originalFile instanceof Blob ? originalFile : new Blob([await originalFile.arrayBuffer()], { type: originalFile.type });
 
-        // Gunakan model generaluse yang jauh lebih presisi
         const config = {
             model: 'isnet_generaluse',
             output: {
@@ -381,7 +376,6 @@ function handleFile(file) {
             throw new Error('Hasil bukan Blob. Tipe: ' + typeof resultBlob);
         }
 
-        // Konversi blob ke canvas
         const bitmap = await createImageBitmap(resultBlob);
         const rawCanvas = document.createElement('canvas');
         rawCanvas.width = bitmap.width;
@@ -390,10 +384,6 @@ function handleFile(file) {
         rawCtx.drawImage(bitmap, 0, 0);
         bitmap.close();
 
-        // ======================================================
-        // EDGE REFINEMENT — Pembersihan tepi pasca-AI
-        // Menghilangkan sisa background yang menempel di pinggir
-        // ======================================================
         updateProgress(92, 'Membersihkan sisa background di tepi objek...');
         removedBgCanvas = refineEdges(rawCanvas);
 
@@ -414,8 +404,6 @@ function handleFile(file) {
         console.error('[Karya Abadi] Error:', e);
         let detail = e.message || String(e);
 
-        // Jika model generaluse gagal (misal file tidak ada di versi ini),
-        // coba fallback ke model default dengan edge refinement
         if (detail.includes('isnet_generaluse') || detail.includes('not found') || detail.includes('/models/')) {
             console.log('[Karya Abadi] Model generaluse gagal, mencoba fallback ke model default...');
             hideProgress();
@@ -438,14 +426,13 @@ function handleFile(file) {
 });
 
 // ======================================================
-// FALLBACK: Jika model generaluse tidak tersedia,
-// gunakan model default fp16 + edge refinement yang lebih agresif
+// FALLBACK
 // ======================================================
 async function tryFallbackDefault(imageBlob) {
     showProgress('Mencoba model alternatif...', 'Menggunakan model fp16 + pembersihan agresif...');
     updateProgress(10, 'Mengunduh model fp16...');
 
-    installFetchInterceptor('isnet_fp16');
+    installFetchInterceptor(); // Gunakan interceptor yang sama
 
     const config = {
         output: { format: 'image/png', quality: 1.0 },
@@ -466,7 +453,6 @@ async function tryFallbackDefault(imageBlob) {
     rawCanvas.getContext('2d').drawImage(bitmap, 0, 0);
     bitmap.close();
 
-    // Pembersihan lebih agresif untuk model fp16
     removedBgCanvas = refineEdges(rawCanvas, true);
 
     removeFetchInterceptor();
@@ -480,13 +466,7 @@ async function tryFallbackDefault(imageBlob) {
 }
 
 // ======================================================
-// EDGE REFINEMENT — Inti dari peningkatan kualitas
-// ======================================================
-// Langkah-langkah:
-// 1. Alpha thresholding: hapus piksel "hampir transparan" (ghost)
-// 2. Alpha blur: haluskan channel alpha untuk tepi lebih natural
-// 3. Morphological cleanup: buang noise kecil di luar objek
-// 4. Re-composite: gabungkan kembali warna dengan alpha yang sudah dibersihkan
+// EDGE REFINEMENT
 // ======================================================
 function refineEdges(srcCanvas, aggressive = false) {
     const w = srcCanvas.width;
@@ -495,23 +475,16 @@ function refineEdges(srcCanvas, aggressive = false) {
     const imgData = srcCtx.getImageData(0, 0, w, h);
     const d = imgData.data;
 
-    // Parameter berbeda untuk mode agresif (model fp16)
-    const GHOST_THRESHOLD = aggressive ? 20 : 12;    // Hapus alpha di bawah ini
-    const ALPHA_BLUR_RADIUS = aggressive ? 2 : 1.5;  // Radius blur alpha
-    const NOISE_SIZE = aggressive ? 4 : 3;            // Ukuran noise yang dihapus
+    const GHOST_THRESHOLD = aggressive ? 20 : 12;
+    const ALPHA_BLUR_RADIUS = aggressive ? 2 : 1.5;
+    const NOISE_SIZE = aggressive ? 4 : 3;
 
-    // --- LANGKAH 1: Alpha Thresholding ---
-    // Hapus piksel "hantu" — piksel yang sangat transparan tapi tidak 0
-    // Ini adalah sisa background yang "menempel" di tepi objek
     for (let i = 0; i < d.length; i += 4) {
         if (d[i + 3] > 0 && d[i + 3] < GHOST_THRESHOLD) {
-            d[i + 3] = 0; // Jadikan benar-benar transparan
+            d[i + 3] = 0;
         }
     }
 
-    // --- LANGKAH 2: Morphological Erosion pada Alpha ---
-    // Hapus "noise" — piksel kecil yang tidak terhubung ke objek utama
-    // Caranya: jika piksel tidak transparan tapi mayoritas tetangganya transparan, hapus
     const alphaMap = new Uint8Array(w * h);
     for (let i = 0; i < w * h; i++) alphaMap[i] = d[i * 4 + 3];
 
@@ -523,7 +496,6 @@ function refineEdges(srcCanvas, aggressive = false) {
             const idx = y * w + x;
             if (alphaMap[idx] === 0) { eroded[idx] = 0; continue; }
 
-            // Hitung berapa tetangga yang tidak transparan
             let solidCount = 0;
             let totalCount = 0;
             for (let dy = -halfN; dy <= halfN; dy++) {
@@ -536,24 +508,19 @@ function refineEdges(srcCanvas, aggressive = false) {
                 }
             }
 
-            // Jika kurang dari 40% tetangga yang solid, ini noise — hapus
             const ratio = solidCount / totalCount;
             eroded[idx] = ratio < 0.4 ? 0 : alphaMap[idx];
         }
     }
 
-    // --- LANGKAH 3: Morphological Dilation ringan ---
-    // Kembalikan sedikit tepi yang mungkin terlalu banyak terkikis
-    // Tapi hanya untuk piksel yang benar-benar dekat dengan objek solid
     const dilated = new Uint8Array(eroded);
-    const dilateR = 1; // Radius kecil
+    const dilateR = 1;
 
     for (let y = 0; y < h; y++) {
         for (let x = 0; x < w; x++) {
             const idx = y * w + x;
-            if (eroded[idx] > 0) continue; // Skip yang sudah solid
+            if (eroded[idx] > 0) continue;
 
-            // Cek apakah dekat dengan objek solid
             let maxNeighborAlpha = 0;
             for (let dy = -dilateR; dy <= dilateR; dy++) {
                 for (let dx = -dilateR; dx <= dilateR; dx++) {
@@ -564,15 +531,12 @@ function refineEdges(srcCanvas, aggressive = false) {
                 }
             }
 
-            // Jika ada tetangga dengan alpha tinggi, berikan alpha rendah (soft edge)
             if (maxNeighborAlpha > 200) {
                 dilated[idx] = Math.round(maxNeighborAlpha * 0.3);
             }
         }
     }
 
-    // --- LANGKAH 4: Alpha Blur (Box Blur pada channel alpha saja) ---
-    // Membuat tepi objek lebih halus dan natural, bukan jagged
     const blurred = new Uint8Array(dilated);
     const br = Math.ceil(ALPHA_BLUR_RADIUS);
 
@@ -592,12 +556,10 @@ function refineEdges(srcCanvas, aggressive = false) {
         }
     }
 
-    // --- LANGKAH 5: Re-apply alpha yang sudah dibersihkan ---
     for (let i = 0; i < w * h; i++) {
         d[i * 4 + 3] = blurred[i];
     }
 
-    // Buat canvas hasil
     const outCanvas = document.createElement('canvas');
     outCanvas.width = w;
     outCanvas.height = h;
@@ -699,11 +661,61 @@ function toggleBgColorCtrl(){const e=$('bgColorControls');if($('chkBgColor').che
 function updateOutputInfo(){if(!removedBgCanvas)return;const s=+$('rngUpscale').value;$('statusOutput').textContent=`${removedBgCanvas.width*s}×${removedBgCanvas.height*s}`;$('dlResInfo').textContent=`${removedBgCanvas.width*s} × ${removedBgCanvas.height*s} px (${s}x)`;}
 
 // --- Partikel ---
-(function(){const c=$('particleCanvas'),x=c.getContext('2d');let ps=[],w,h;function rs(){w=c.width=innerWidth;h=c.height=innerHeight;}rs();addEventListener('resize',rs);class P{constructor(){this.rs();}rs(){this.x=Math.random()*w;this.y=Math.random()*h;this.s=Math.random()*2+0.5;this.sx=(Math.random()-0.5)*0.3;this.sy=(Math.random()-0.5)*0.3;this.o=Math.random()*0.3+0.05;this.p=Math.random()*Math.PI*2;}u(){this.x+=this.sx;this.y+=this.sy;this.p+=0.01;if(this.x<-10||this.x>w+10||this.y<-10||this.y>h+10)this.rs();}d(){const o=this.o*(0.6+0.4*Math.sin(this.p));x.beginPath();x.arc(this.x,this.y,Math.max(0.1,this.s),0,Math.PI*2);x.fillStyle=`rgba(220,38,38,${o})`;x.fill();}}for(let i=0;i<50;i++)ps.push(new P());function a(){x.clearRect(0,0,w,h);ps.forEach(p=>{p.u();p.d();});for(let i=0;i<ps.length;i++)for(let j=i+1;j<ps.length;j++){const dx=ps[i].x-ps[j].x,dy=ps[i].y-ps[j].y,dist=Math.sqrt(dx*dx+dy*dy);if(dist<150){x.beginPath();x.moveTo(ps[i].x,ps[i].y);x.lineTo(ps[j].x,ps[j].y);x.strokeStyle=`rgba(220,38,38,${0.04*(1-dist/150)})`;x.lineWidth=0.5;x.stroke();}}requestAnimationFrame(a);}if(!matchMedia('(prefers-reduced-motion:reduce)').matches)a();})();
+(function initParticles() {
+    const canvas = $('particleCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    const count = 60;
 
-document.querySelectorAll('a[href^="#"]').forEach(a=>{a.onclick=e=>{e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth',block:'start'});};});
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
 
-setTimeout(() => loadLib(), 2000);
+    class Particle {
+        constructor() {
+            this.reset();
+        }
+        reset() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.size = Math.random() * 2 + 0.5;
+            this.speedX = (Math.random() - 0.5) * 0.5;
+            this.speedY = (Math.random() - 0.5) * 0.5;
+            this.opacity = Math.random() * 0.5 + 0.1;
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+                this.reset();
+            }
+        }
+        draw() {
+            ctx.fillStyle = `rgba(220, 38, 38, ${this.opacity})`;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    for (let i = 0; i < count; i++) {
+        particles.push(new Particle());
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+            p.update();
+            p.draw();
+        });
+        requestAnimationFrame(animate);
+    }
+    animate();
+})();
+
 </script>
 </body>
 </html>
