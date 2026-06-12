@@ -167,6 +167,7 @@ footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{
 <script type="module">
 /* ======================================================
    KARYA ABADI REMOVE BACKGROUND — KUALITAS PREMIUM
+   PERBAIKAN: Menggunakan publicPath resmi dari library
    ====================================================== */
 
 // --- State ---
@@ -177,40 +178,6 @@ let removeBackgroundFn = null;
 let libLoaded = false;
 let libLoading = false;
 let renderTimeout = null;
-
-const nativeFetch = window.fetch;
-
-// ======================================================
-// FETCH INTERCEPTOR — PERBAIKAN UTAMA
-// ======================================================
-function installFetchInterceptor() {
-    window.fetch = function(input, init) {
-        if (typeof input === 'string') {
-            let fixedUrl = input;
-            
-            // Tangkap path relatif yang diminta oleh library (misal: "./models/..." atau "../onnx/...")
-            if (input.startsWith('./') || input.startsWith('../')) {
-                fixedUrl = 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/dist/' + input.replace(/^\.\//, '').replace(/^\.\.\//, '');
-            } 
-            // Tangkap path absolut yang diminta oleh library
-            else if (input.startsWith('/models/') || input.startsWith('/onnx/')) {
-                fixedUrl = 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/dist' + input;
-            }
-
-            // Jika URL diubah (berarti request ke aset library), arahkan ke CDN
-            if (fixedUrl !== input) {
-                console.log('[Karya Abadi] Fetch redirect:', input, '->', fixedUrl);
-                return nativeFetch.call(this, fixedUrl, init);
-            }
-        }
-        return nativeFetch.call(this, input, init);
-    };
-    console.log('[Karya Abadi] Fetch interceptor aktif.');
-}
-
-function removeFetchInterceptor() {
-    window.fetch = nativeFetch;
-}
 
 // --- Shortcut DOM ---
 const $ = id => document.getElementById(id);
@@ -268,8 +235,6 @@ async function loadLib() {
     const cdnList = [
         { url: 'https://esm.sh/@imgly/background-removal@1.5.5', name: 'esm.sh v1.5.5' },
         { url: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm', name: 'jsdelivr+esm v1.5.5' },
-        { url: 'https://esm.sh/@imgly/background-removal@1.4.5', name: 'esm.sh v1.4.5' },
-        { url: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/+esm', name: 'jsdelivr+esm v1.4.5' },
     ];
 
     for (const cdn of cdnList) {
@@ -325,7 +290,7 @@ function handleFile(file) {
 }
 
 // ======================================================
-// HAPUS BACKGROUND — MODEL GENERALUSE + EDGE REFINEMENT
+// HAPUS BACKGROUND — PERBAIKAN UTAMA: PUBLICPATH
 // ======================================================
  $('btnRemoveBg').addEventListener('click', async () => {
     if (!originalFile) return;
@@ -341,14 +306,13 @@ function handleFile(file) {
 
     updateProgress(10, 'Memproses gambar dengan AI presisi tinggi...');
 
-    // AKTIFKAN INTERCEPTOR YANG SUDAH DIPERBAIKI
-    installFetchInterceptor();
-
     try {
         const imageBlob = originalFile instanceof Blob ? originalFile : new Blob([await originalFile.arrayBuffer()], { type: originalFile.type });
 
+        // KONFIGURASI RESMI: Gunakan publicPath agar Web Worker tahu harus download dari mana
         const config = {
             model: 'isnet_generaluse',
+            publicPath: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/dist/', // INI KUNCINYA
             output: {
                 format: 'image/png',
                 quality: 1.0
@@ -367,7 +331,7 @@ function handleFile(file) {
             }
         };
 
-        console.log('[Karya Abadi] Memulai removeBackground dengan model generaluse...');
+        console.log('[Karya Abadi] Memulai removeBackground...');
         const resultBlob = await removeBackgroundFn(imageBlob, config);
 
         updateProgress(88, 'Menerapkan edge refinement...');
@@ -389,7 +353,6 @@ function handleFile(file) {
 
         updateProgress(100, 'Selesai!');
         setTimeout(() => {
-            removeFetchInterceptor();
             hideProgress();
             renderResult();
             $('btnRemoveBg').disabled = false;
@@ -400,70 +363,17 @@ function handleFile(file) {
         }, 300);
 
     } catch (e) {
-        removeFetchInterceptor();
         console.error('[Karya Abadi] Error:', e);
         let detail = e.message || String(e);
-
-        if (detail.includes('isnet_generaluse') || detail.includes('not found') || detail.includes('/models/')) {
-            console.log('[Karya Abadi] Model generaluse gagal, mencoba fallback ke model default...');
-            hideProgress();
-            try {
-                await tryFallbackDefault(imageBlob);
-                return;
-            } catch (e2) {
-                detail = 'Gagal dengan model generaluse DAN model default.\n\nError terakhir: ' + e2.message;
-            }
-        }
-
         if (e.stack) detail += '\n\n' + e.stack.split('\n').slice(0, 4).join('\n');
         if (detail.includes('Failed to fetch') || detail.includes('NetworkError')) {
-            detail += '\n\n[DIAGNOSIS] Koneksi gagal saat mengunduh model AI. Pastikan koneksi stabil.';
+            detail += '\n\n[DIAGNOSIS] Koneksi gagal saat mengunduh model AI. Pastikan koneksi stabil atau coba gunakan HTTP Server lokal (bukan file://).';
         }
         showError(detail);
         $('btnRemoveBg').disabled = false;
         showToast('Gagal menghapus background', 'error');
     }
 });
-
-// ======================================================
-// FALLBACK
-// ======================================================
-async function tryFallbackDefault(imageBlob) {
-    showProgress('Mencoba model alternatif...', 'Menggunakan model fp16 + pembersihan agresif...');
-    updateProgress(10, 'Mengunduh model fp16...');
-
-    installFetchInterceptor(); // Gunakan interceptor yang sama
-
-    const config = {
-        output: { format: 'image/png', quality: 1.0 },
-        progress: (key, current, total) => {
-            if (total > 0) {
-                const pct = 10 + (current / total) * 75;
-                updateProgress(pct, key === 'fetch:model' ? 'Mengunduh model fp16...' : 'Memproses...');
-            }
-        }
-    };
-
-    const resultBlob = await removeBackgroundFn(imageBlob, config);
-    updateProgress(88, 'Menerapkan pembersihan agresif...');
-
-    const bitmap = await createImageBitmap(resultBlob);
-    const rawCanvas = document.createElement('canvas');
-    rawCanvas.width = bitmap.width; rawCanvas.height = bitmap.height;
-    rawCanvas.getContext('2d').drawImage(bitmap, 0, 0);
-    bitmap.close();
-
-    removedBgCanvas = refineEdges(rawCanvas, true);
-
-    removeFetchInterceptor();
-    hideProgress();
-    renderResult();
-    $('btnRemoveBg').disabled = false;
-    $('btnDownload').disabled = false;
-    $('statusBg').textContent = 'Selesai (fp16)';
-    $('statusBg').className = 'text-xs px-2 py-1 rounded-full bg-green-900/40 text-green-400';
-    showToast('Background dihapus dengan model alternatif + pembersihan agresif', 'success');
-}
 
 // ======================================================
 // EDGE REFINEMENT
@@ -675,9 +585,7 @@ function updateOutputInfo(){if(!removedBgCanvas)return;const s=+$('rngUpscale').
     resize();
 
     class Particle {
-        constructor() {
-            this.reset();
-        }
+        constructor() { this.reset(); }
         reset() {
             this.x = Math.random() * canvas.width;
             this.y = Math.random() * canvas.height;
@@ -689,9 +597,7 @@ function updateOutputInfo(){if(!removedBgCanvas)return;const s=+$('rngUpscale').
         update() {
             this.x += this.speedX;
             this.y += this.speedY;
-            if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
-                this.reset();
-            }
+            if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
         }
         draw() {
             ctx.fillStyle = `rgba(220, 38, 38, ${this.opacity})`;
@@ -701,16 +607,11 @@ function updateOutputInfo(){if(!removedBgCanvas)return;const s=+$('rngUpscale').
         }
     }
 
-    for (let i = 0; i < count; i++) {
-        particles.push(new Particle());
-    }
+    for (let i = 0; i < count; i++) particles.push(new Particle());
 
     function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particles.forEach(p => {
-            p.update();
-            p.draw();
-        });
+        particles.forEach(p => { p.update(); p.draw(); });
         requestAnimationFrame(animate);
     }
     animate();
