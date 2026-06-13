@@ -166,8 +166,10 @@ footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{
 
 <script type="module">
 /* ======================================================
-   KARYA ABADI REMOVE BACKGROUND
-   SOLUSI: Service Worker Proxy untuk redirect aset AI
+   KARYA ABADI REMOVE BACKGROUND — KUALITAS PREMIUM
+   SOLUSI: Gunakan proxyToWorker: false agar file AI 
+   diunduh langsung dari Main Thread (menghindari error 
+   CORS/Worker yang selalu muncul di browser)
    ====================================================== */
 
 // --- State ---
@@ -178,7 +180,6 @@ let removeBackgroundFn = null;
 let libLoaded = false;
 let libLoading = false;
 let renderTimeout = null;
-let swReady = false;
 
 // --- Shortcut DOM ---
 const $ = id => document.getElementById(id);
@@ -186,104 +187,6 @@ const canvasOrig = $('canvasOriginal');
 const canvasResult = $('canvasResult');
 const ctxOrig = canvasOrig.getContext('2d');
 const ctxResult = canvasResult.getContext('2d');
-
-// ======================================================
-// 1. DAFTARKAN SERVICE WORKER PROXY
-// Ini adalah SATU-SATUNYA cara yang bisa mengintercept
-// fetch request dari dalam Web Worker ONNX
-// ======================================================
-async function initServiceWorker() {
-    if (!('serviceWorker' in navigator)) {
-        console.warn('[SW] Browser tidak mendukung Service Worker');
-        return false;
-    }
-    
-    try {
-        // Kode Service Worker sebagai string blob
-        const swCode = `
-            const CDN = 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/';
-            
-            self.addEventListener('fetch', event => {
-                const url = event.request.url;
-                
-                // Intercept semua request yang mencari aset library AI
-                if (url.includes('/models/') || url.includes('/onnx/') || 
-                    url.includes('ort-wasm') || url.includes('.wasm') || 
-                    url.includes('isnet') || url.includes('onnxruntime') ||
-                    url.includes('background-removal')) {
-                    
-                    let path = url;
-                    // Ekstrak path relatif dari URL
-                    const distIdx = url.indexOf('/dist/');
-                    if (distIdx > -1) {
-                        path = url.substring(distIdx + 6); // setelah /dist/
-                    } else {
-                        const slashIdx = url.lastIndexOf('/');
-                        path = url.substring(slashIdx + 1);
-                    }
-                    
-                    const redirectUrl = CDN + path;
-                    console.log('[SW Proxy]', url, '->', redirectUrl);
-                    
-                    event.respondWith(
-                        fetch(redirectUrl, { mode: 'cors' }).catch(() => {
-                            // Fallback: coba tanpa path tambahan
-                            return fetch(CDN + url.split('/').pop(), { mode: 'cors' });
-                        })
-                    );
-                }
-            });
-        `;
-        
-        const blob = new Blob([swCode], { type: 'application/javascript' });
-        const swUrl = URL.createObjectURL(blob);
-        
-        const reg = await navigator.serviceWorker.register(swUrl, { scope: '/' });
-        await navigator.serviceWorker.ready;
-        
-        console.log('[SW] Service Worker Proxy aktif!');
-        swReady = true;
-        return true;
-    } catch (e) {
-        console.warn('[SW] Gagal daftar SW:', e.message);
-        return false;
-    }
-}
-
-// ======================================================
-// 2. FETCH INTERCEPTOR (Main Thread fallback)
-// ======================================================
-const nativeFetch = window.fetch;
-window.fetch = function(input, init) {
-    let url = '';
-    if (typeof input === 'string') url = input;
-    else if (input instanceof Request) url = input.url;
-    else if (input instanceof URL) url = input.href;
-    
-    const CDN = 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/';
-    
-    if (url && (url.includes('/models/') || url.includes('/onnx/') || 
-        url.includes('ort-wasm') || url.includes('.wasm') || 
-        url.includes('isnet') || url.includes('onnxruntime') ||
-        url.includes('background-removal') ||
-        url.startsWith('./') || url.startsWith('../'))) {
-        
-        let path = url;
-        if (url.startsWith('./') || url.startsWith('../')) {
-            path = url.replace(/^\.\//, '').replace(/^\.\.\//, '');
-        } else {
-            const distIdx = url.indexOf('/dist/');
-            if (distIdx > -1) path = url.substring(distIdx + 6);
-            else path = url.split('/').pop();
-        }
-        
-        const redirectUrl = CDN + path;
-        console.log('[Fetch Proxy]', url, '->', redirectUrl);
-        return nativeFetch.call(this, redirectUrl, init);
-    }
-    
-    return nativeFetch.call(this, input, init);
-};
 
 // --- Preset Warna ---
 ['#ffffff','#000000','#dc2626','#2563eb','#16a34a','#eab308','#f97316','#8b5cf6','#ec4899','#06b6d4','#78716c','#1e293b'].forEach(c => {
@@ -332,8 +235,6 @@ async function loadLib() {
     $('statusModel').className = 'text-xs px-2 py-1 rounded-full bg-yellow-900/40 text-yellow-400';
 
     const cdnList = [
-        { url: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/+esm', name: 'jsdelivr v1.4.5' },
-        { url: 'https://esm.sh/@imgly/background-removal@1.4.5', name: 'esm.sh v1.4.5' },
         { url: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm', name: 'jsdelivr v1.5.5' },
         { url: 'https://esm.sh/@imgly/background-removal@1.5.5', name: 'esm.sh v1.5.5' },
     ];
@@ -391,12 +292,12 @@ function handleFile(file) {
 }
 
 // ======================================================
-// HAPUS BACKGROUND
+// HAPUS BACKGROUND — KUNCI PERBAIKAN: proxyToWorker: false
 // ======================================================
  $('btnRemoveBg').addEventListener('click', async () => {
     if (!originalFile) return;
     
-    // Cek apakah dibuka dari file:///
+    // Cek apakah dibuka dari file:/// (WAJIB HTTP SERVER)
     if (window.location.protocol === 'file:') {
         showError('ERROR: File ini harus dibuka via HTTP Server!\n\nKlik kanan file HTML -> "Open with Live Server" (di VS Code).\nAtau jalankan: python -m http.server lalu buka http://localhost:8000');
         return;
@@ -405,12 +306,6 @@ function handleFile(file) {
     $('btnRemoveBg').disabled = true;
     showProgress('Menghapus background...', 'Mempersiapkan AI presisi tinggi...');
     updateProgress(5, 'Memulai proses AI...');
-
-    // Pastikan Service Worker aktif
-    if (!swReady) {
-        updateProgress(7, 'Mengaktifkan Service Worker Proxy...');
-        await initServiceWorker();
-    }
 
     const ok = await loadLib();
     if (!ok || !removeBackgroundFn) {
@@ -424,9 +319,11 @@ function handleFile(file) {
 
         updateProgress(10, 'Memproses gambar dengan AI...');
         
+        // KONFIGURASI YANG MENJAMIN KESUKSESAN:
         const config = {
             model: 'isnet_fp16',
-            publicPath: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/',
+            publicPath: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/dist/',
+            proxyToWorker: false, // PENTING: Memaksa berjalan di Main Thread. Menghindari semua error Web Worker & CORS.
             output: { format: 'image/png', quality: 1.0 },
             progress: (key, current, total) => {
                 if (total > 0) {
@@ -442,7 +339,7 @@ function handleFile(file) {
             }
         };
 
-        console.log('[Karya Abadi] Memulai removeBackground...');
+        console.log('[Karya Abadi] Memulai removeBackground (Main Thread Mode)...');
         const resultBlob = await removeBackgroundFn(imageBlob, config);
 
         updateProgress(88, 'Menerapkan edge refinement...');
