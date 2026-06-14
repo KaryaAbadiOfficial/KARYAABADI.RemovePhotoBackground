@@ -54,11 +54,6 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 .color-swatch{width:32px;height:32px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:all .2s}
 .color-swatch:hover,.color-swatch.active{border-color:#fff;transform:scale(1.15)}
 footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{color:#dc2626}
-.method-btn{padding:10px 16px;border-radius:8px;border:1px solid #2a2a2a;background:#0a0a0a;color:#9ca3af;font-size:12px;cursor:pointer;transition:all .2s;font-family:'Poppins',sans-serif;text-align:left;width:100%}
-.method-btn:hover{border-color:#444;color:#fff}
-.method-btn.active{border-color:var(--red);color:#fff;background:rgba(220,38,38,0.08)}
-.method-btn .method-desc{font-size:10px;color:#666;margin-top:2px}
-.method-btn.active .method-desc{color:#d4a0a0}
 .click-overlay{position:absolute;inset:0;cursor:crosshair;z-index:5;border-radius:12px}
 .click-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.92);padding:16px 28px;border-radius:12px;border:1px solid var(--red);font-size:14px;pointer-events:none;z-index:6;white-space:nowrap;text-align:center}
 .picked-color-preview{display:inline-block;width:18px;height:18px;border-radius:4px;border:1px solid #555;vertical-align:middle;margin-right:6px}
@@ -84,7 +79,7 @@ footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{
 <header class="relative z-10 glass border-b border-kab">
 <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
 <div class="flex items-center gap-3">
-<img src="https://z-cdn-media.chatglm.cn/files/d8d9758a-64b8-473f-9056-3a6cb6005469.png?auth_key=1881188958-36e1c8339315420bbc4474797d44d353-0-787fa910f1c51bcf3e06e58bb7b185b8" alt="Logo Karya Abadi" class="h-11 w-11 object-contain">
+<img src="https://z-cdn-media.chatglm.cn/files/d8d9758a-64b8-473f-9056-3a6cb6005469.png?auth_key=1881188958-36e1c8339315420bbc4474797d44d353-0-787fa910f1c51bcf3e06e58bb7b185b8" alt="Logo" class="h-11 w-11 object-contain">
 <div><h1 class="font-disp text-base md:text-lg font-bold tracking-wider text-white leading-tight">KARYA ABADI</h1><p class="text-[10px] font-disp tracking-[3px] text-kar font-semibold">REMOVE BACKGROUND</p></div>
 </div>
 <nav class="hidden md:flex items-center gap-6 text-sm text-kag">
@@ -97,9 +92,9 @@ footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{
 
 <section class="relative z-10 py-16 md:py-24 text-center px-4">
 <div class="max-w-3xl mx-auto">
-<p class="text-kar font-disp text-xs tracking-[4px] mb-4">PRECISION BACKGROUND REMOVAL</p>
-<h2 class="hero-text font-disp text-3xl md:text-5xl font-black leading-tight mb-6">Hapus Background<br>Gambar Sempurna</h2>
-<p class="text-kag text-base md:text-lg max-w-xl mx-auto mb-8">Engine canvas murni yang dijamin 100% berfungsi tanpa dependensi apapun. Dilengkapi stroke cutting, upscale hingga 10x, dan penyempurnaan warna.</p>
+<p class="text-kar font-disp text-xs tracking-[4px] mb-4">SMART OBJECT DETECTION</p>
+<h2 class="hero-text font-disp text-3xl md:text-5xl font-black leading-tight mb-6">Hapus Background<br>Otomatis & Presisi</h2>
+<p class="text-kag text-base md:text-lg max-w-xl mx-auto mb-8">Engine cerdas mendeteksi objek vs background secara otomatis. Multi-region flood fill dengan gravitasi spasial untuk hasil yang akurat.</p>
 <a href="#tool" class="btn-red inline-flex items-center gap-2 text-base"><i class="fas fa-rocket"></i> Mulai Sekarang</a>
 </div>
 </section>
@@ -118,7 +113,7 @@ footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{
 <div id="workspace" style="display:none">
 <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
 <div class="flex items-center gap-3">
-<button class="btn-red" id="btnRemoveBg" disabled><i class="fas fa-eraser mr-2"></i>Hapus Background</button>
+<button class="btn-red" id="btnRemoveBg" disabled><i class="fas fa-eraser mr-2"></i>Hapus Background Otomatis</button>
 <button class="btn-outline text-sm" id="btnReset"><i class="fas fa-undo mr-2"></i>Ganti Gambar</button>
 </div>
 <div class="text-sm text-kag"><span id="imgInfo"></span></div>
@@ -126,26 +121,28 @@ footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-8">
 <div><div class="flex items-center gap-2 mb-3"><span class="w-2 h-2 rounded-full bg-kag"></span><h3 class="font-semibold text-sm tracking-wide text-kagl">GAMBAR ASLI</h3></div><div class="preview-wrap" id="origWrap"><canvas id="canvasOriginal"></canvas></div></div>
-<div><div class="flex items-center gap-2 mb-3"><span class="w-2 h-2 rounded-full bg-kar"></span><h3 class="font-semibold text-sm tracking-wide text-kagl">HASIL</h3></div><div class="preview-wrap checkerboard" id="resultWrap"><canvas id="canvasResult"></canvas><div class="click-overlay" id="clickOverlay" style="display:none"></div><div class="click-hint" id="clickHint" style="display:none"><i class="fas fa-mouse-pointer text-kar mr-2"></i>Klik pada warna background yang ingin dihapus</div></div></div>
+<div><div class="flex items-center gap-2 mb-3"><span class="w-2 h-2 rounded-full bg-kar"></span><h3 class="font-semibold text-sm tracking-wide text-kagl">HASIL</h3></div><div class="preview-wrap checkerboard" id="resultWrap"><canvas id="canvasResult"></canvas></div></div>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 mb-8">
 
 <div class="ctrl-card">
-<h4><i class="fas fa-sliders-h mr-2"></i>Metode Penghapusan</h4>
-<div class="space-y-2 mb-4">
-<button class="method-btn active" data-method="auto"><i class="fas fa-wand-magic-sparkles mr-2 text-kar"></i>Deteksi Otomatis<div class="method-desc">Auto-detect warna background dari tepi gambar</div></button>
-<button class="method-btn" data-method="manual"><i class="fas fa-mouse-pointer mr-2 text-kar"></i>Pilih Warna Manual<div class="method-desc">Klik pada area background untuk hapus warna tersebut</div></button>
-<button class="method-btn" data-method="global"><i class="fas fa-fill-drip mr-2 text-kar"></i>Hapus Semua Warna Serupa<div class="method-desc">Hapus SEMUA pixel warna serupa di seluruh gambar</div></button>
+<h4><i class="fas fa-brain mr-2"></i>Pengaturan Deteksi</h4>
+<div class="space-y-4">
+<div>
+<div class="flex justify-between text-xs text-kag mb-1"><span>Sensitivitas Deteksi</span><span id="valSensitivity">50</span></div>
+<input type="range" id="rngSensitivity" min="10" max="90" value="50">
+<p class="text-[10px] text-kag mt-1">Rendah = hanya warna sangat mirip | Tinggi = lebih banyak warna termasuk background</p>
 </div>
-<div id="toleranceSection">
-<div class="flex justify-between text-xs text-kag mb-1"><span>Toleransi Warna</span><span id="valTolerance">35</span></div>
-<input type="range" id="rngTolerance" min="5" max="120" value="35">
-<p class="text-[10px] text-kag mt-1">Rendah = presisi tinggi | Tinggi = lebih banyak terhapus</p>
+<div>
+<div class="flex justify-between text-xs text-kag mb-1"><span>Ketajaman Tepi</span><span id="valEdge">3</span></div>
+<input type="range" id="rngEdge" min="0" max="8" value="3">
+<p class="text-[10px] text-kag mt-1">0 = tepi sangat halus | 8 = tepi tegas</p>
 </div>
-<div id="pickedColorInfo" class="mt-3 p-3 bg-ka rounded-lg text-xs text-kag" style="display:none">
-<span class="picked-color-preview" id="pickedColorBox"></span>
-<span id="pickedColorText">-</span>
+<div class="p-3 bg-ka rounded-lg text-[11px] text-kag leading-relaxed">
+<i class="fas fa-lightbulb text-yellow-500 mr-1"></i>
+<strong>Tips:</strong> Untuk background gradient, naikkan sensitivitas. Untuk background polos, turunkan untuk hasil lebih presisi.
+</div>
 </div>
 </div>
 
@@ -155,11 +152,9 @@ footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{
 
 <div class="ctrl-card"><h4><i class="fas fa-fill-drip mr-2"></i>Warna Background</h4><label class="flex items-center gap-3 cursor-pointer mb-4"><input type="checkbox" id="chkBgColor" class="w-4 h-4 accent-red-600"><span class="text-sm">Aktifkan Warna Solid</span></label><div id="bgColorControls" class="opacity-40 pointer-events-none transition-opacity"><div class="flex items-center gap-3 mb-4"><input type="color" id="pickBgColor" value="#ffffff" class="w-10 h-10 rounded-lg cursor-pointer border-2 border-kab bg-transparent"><span class="text-sm text-kag" id="hexBgColor">#FFFFFF</span></div><p class="text-xs text-kag mb-2">Warna Preset:</p><div class="flex flex-wrap gap-2" id="presetColors"></div></div></div>
 
-<div class="ctrl-card"><h4><i class="fas fa-expand-arrows-alt mr-2"></i>Tingkatkan Gambar</h4><div class="mb-4"><div class="flex justify-between text-xs text-kag mb-1"><span>Skala Perbesaran</span><span id="valUpscale" class="text-kar font-bold">1x</span></div><input type="range" id="rngUpscale" min="1" max="10" value="1" step="1"></div><div class="flex flex-wrap gap-2 mb-4" id="upscalePresets"></div><div class="p-3 bg-ka rounded-lg text-xs text-kag leading-relaxed"><i class="fas fa-info-circle text-kar mr-1"></i>Upscale diterapkan saat download. Preview tetap ukuran asli.</div></div>
+<div class="ctrl-card"><h4><i class="fas fa-expand-arrows-alt mr-2"></i>Tingkatkan Gambar</h4><div class="mb-4"><div class="flex justify-between text-xs text-kag mb-1"><span>Skala Perbesaran</span><span id="valUpscale" class="text-kar font-bold">1x</span></div><input type="range" id="rngUpscale" min="1" max="10" value="1" step="1"></div><div class="flex flex-wrap gap-2 mb-4" id="upscalePresets"></div><div class="p-3 bg-ka rounded-lg text-xs text-kag leading-relaxed"><i class="fas fa-info-circle text-kar mr-1"></i>Upscale diterapkan saat download.</div></div>
 
-<div class="ctrl-card flex flex-col justify-between"><div><h4><i class="fas fa-download mr-2"></i>Export HD</h4><p class="text-sm text-kag mb-4">Download hasil kualitas tinggi format PNG lossless.</p></div><div class="space-y-3"><div class="p-3 bg-ka rounded-lg text-xs text-kag"><p><i class="fas fa-image text-kar mr-1"></i> Format: <strong class="text-white">PNG (Lossless)</strong></p><p class="mt-1"><i class="fas fa-expand text-kar mr-1"></i> Resolusi: <strong class="text-white" id="dlResInfo">-</strong></p></div><button class="btn-red w-full text-center" id="btnDownload" disabled><i class="fas fa-file-download mr-2"></i>Download HD PNG</button></div></div>
-
-<div class="ctrl-card"><h4><i class="fas fa-info-circle mr-2"></i>Status Proses</h4><div class="space-y-3 text-sm"><div class="flex items-center justify-between"><span class="text-kag">Metode</span><span id="statusMethod" class="text-xs px-2 py-1 rounded-full bg-ka text-kag">-</span></div><div class="flex items-center justify-between"><span class="text-kag">Status</span><span id="statusBg" class="text-xs px-2 py-1 rounded-full bg-ka text-kag">Menunggu</span></div><div class="flex items-center justify-between"><span class="text-kag">Ukuran Asli</span><span id="statusSize" class="text-xs text-white">-</span></div><div class="flex items-center justify-between"><span class="text-kag">Ukuran Output</span><span id="statusOutput" class="text-xs text-white">-</span></div><div class="flex items-center justify-between"><span class="text-kag">Pixel Dihapus</span><span id="statusPixels" class="text-xs text-white">-</span></div></div></div>
+<div class="ctrl-card flex flex-col justify-between"><div><h4><i class="fas fa-download mr-2"></i>Export HD</h4><p class="text-sm text-kag mb-4">Download hasil kualitas tinggi format PNG.</p></div><div class="space-y-3"><div class="p-3 bg-ka rounded-lg text-xs text-kag"><p><i class="fas fa-image text-kar mr-1"></i> Format: <strong class="text-white">PNG Lossless</strong></p><p class="mt-1"><i class="fas fa-expand text-kar mr-1"></i> Resolusi: <strong class="text-white" id="dlResInfo">-</strong></p></div><button class="btn-red w-full text-center" id="btnDownload" disabled><i class="fas fa-file-download mr-2"></i>Download HD PNG</button></div></div>
 
 </div>
 </div>
@@ -168,12 +163,12 @@ footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{
 <section id="features" class="relative z-10 py-20 border-t border-kab">
 <div class="max-w-6xl mx-auto px-4">
 <h2 class="font-disp text-2xl md:text-3xl font-bold text-center mb-4 tracking-wide">Fitur Unggulan</h2>
-<p class="text-kag text-center mb-14 max-w-xl mx-auto">Semua yang Anda butuhkan untuk pengolahan gambar profesional dalam satu alat.</p>
+<p class="text-kag text-center mb-14 max-w-xl mx-auto">Semua yang Anda butuhkan untuk pengolahan gambar profesional.</p>
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-<div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300"><div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-bolt text-2xl text-kar"></i></div><h3 class="font-semibold mb-2">100% Berfungsi</h3><p class="text-xs text-kag leading-relaxed">Engine canvas murni tanpa dependensi eksternal. Dijamin berhasil di semua browser.</p></div>
+<div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300"><div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-brain text-2xl text-kar"></i></div><h3 class="font-semibold mb-2">Deteksi Objek Cerdas</h3><p class="text-xs text-kag leading-relaxed">Multi-region flood fill dengan gravitasi spasial. Otomatis bedakan objek dan background.</p></div>
 <div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300"><div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-border-style text-2xl text-kar"></i></div><h3 class="font-semibold mb-2">Stroke Cutting</h3><p class="text-xs text-kag leading-relaxed">Stroke putih dan garis hitam tipis di luar untuk keperluan cutting profesional.</p></div>
 <div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300"><div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-expand-arrows-alt text-2xl text-kar"></i></div><h3 class="font-semibold mb-2">Upscale 10x</h3><p class="text-xs text-kag leading-relaxed">Tingkatkan resolusi gambar hingga 10 kali lipat dengan sharpening otomatis.</p></div>
-<div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300"><div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-palette text-2xl text-kar"></i></div><h3 class="font-semibold mb-2">Enhancement Warna</h3><p class="text-xs text-kag leading-relaxed">Saturasi, kecerahan, kontras, dan vibrance yang bisa disesuaikan secara detail.</p></div>
+<div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300"><div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-palette text-2xl text-kar"></i></div><h3 class="font-semibold mb-2">Enhancement Warna</h3><p class="text-xs text-kag leading-relaxed">Saturasi, kecerahan, kontras, dan vibrance yang bisa disesuaikan.</p></div>
 </div>
 </div>
 </section>
@@ -181,38 +176,38 @@ footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{
 <footer id="footer" class="relative z-10 border-t border-kab bg-kad">
 <div class="max-w-7xl mx-auto px-4 py-14">
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
-<div><div class="flex items-center gap-3 mb-5"><img src="https://z-cdn-media.chatglm.cn/files/d8d9758a-64b8-473f-9056-3a6cb6005469.png?auth_key=1881188958-36e1c8339315420bbc4474797d44d353-0-787fa910f1c51bcf3e06e58bb7b185b8" alt="Logo" class="h-10 w-10 object-contain"><div><p class="font-disp text-sm font-bold tracking-wider">KARYA ABADI</p><p class="text-[9px] font-disp tracking-[2px] text-kar">REMOVE BACKGROUND</p></div></div><p class="text-sm text-kag leading-relaxed">Layanan penghapusan background dengan engine canvas murni. Semua proses di browser Anda — privasi 100% terjaga.</p></div>
-<div><h4 class="font-disp text-xs tracking-[2px] text-kar mb-5">LAYANAN</h4><ul class="space-y-3 text-sm"><li><a href="#tool"><i class="fas fa-angle-right text-kar mr-2 text-xs"></i>Hapus Background</a></li><li><a href="#tool"><i class="fas fa-angle-right text-kar mr-2 text-xs"></i>Stroke Cutting</a></li><li><a href="#tool"><i class="fas fa-angle-right text-kar mr-2 text-xs"></i>Upscale Gambar</a></li><li><a href="#tool"><i class="fas fa-angle-right text-kar mr-2 text-xs"></i>Penyempurnaan Warna</a></li></ul></div>
-<div><h4 class="font-disp text-xs tracking-[2px] text-kar mb-5">KEUNGGULAN</h4><ul class="space-y-3 text-sm text-kag"><li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>100% Berfungsi Tanpa Server</li><li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>3 Metode Penghapusan</li><li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>Privasi Terjaga 100%</li><li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>Gratis Tanpa Batas</li><li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>Export HD PNG Lossless</li></ul></div>
+<div><div class="flex items-center gap-3 mb-5"><img src="https://z-cdn-media.chatglm.cn/files/d8d9758a-64b8-473f-9056-3a6cb6005469.png?auth_key=1881188958-36e1c8339315420bbc4474797d44d353-0-787fa910f1c51bcf3e06e58bb7b185b8" alt="Logo" class="h-10 w-10 object-contain"><div><p class="font-disp text-sm font-bold tracking-wider">KARYA ABADI</p><p class="text-[9px] font-disp tracking-[2px] text-kar">REMOVE BACKGROUND</p></div></div><p class="text-sm text-kag leading-relaxed">Layanan penghapusan background dengan engine cerdas. Semua proses di browser — privasi 100% terjaga.</p></div>
+<div><h4 class="font-disp text-xs tracking-[2px] text-kar mb-5">LAYANAN</h4><ul class="space-y-3 text-sm"><li><a href="#tool"><i class="fas fa-angle-right text-kar mr-2 text-xs"></i>Hapus Background Otomatis</a></li><li><a href="#tool"><i class="fas fa-angle-right text-kar mr-2 text-xs"></i>Stroke Cutting</a></li><li><a href="#tool"><i class="fas fa-angle-right text-kar mr-2 text-xs"></i>Upscale Gambar</a></li><li><a href="#tool"><i class="fas fa-angle-right text-kar mr-2 text-xs"></i>Penyempurnaan Warna</a></li></ul></div>
+<div><h4 class="font-disp text-xs tracking-[2px] text-kar mb-5">KEUNGGULAN</h4><ul class="space-y-3 text-sm text-kag"><li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>Deteksi Objek Otomatis</li><li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>100% Berfungsi Tanpa Server</li><li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>Privasi Terjaga 100%</li><li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>Gratis Tanpa Batas</li><li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>Export HD PNG Lossless</li></ul></div>
 <div><h4 class="font-disp text-xs tracking-[2px] text-kar mb-5">HUBUNGI KAMI</h4><ul class="space-y-3 text-sm text-kag"><li><i class="fas fa-envelope text-kar mr-2 text-xs"></i>info@karyaabadi.co.id</li><li><i class="fas fa-phone text-kar mr-2 text-xs"></i>+62 812-3456-7890</li><li><i class="fas fa-map-marker-alt text-kar mr-2 text-xs"></i>Jakarta, Indonesia</li></ul><div class="flex gap-3 mt-5"><a href="#" class="w-9 h-9 rounded-lg bg-ka flex items-center justify-center text-kag hover:bg-kar hover:text-white transition-all"><i class="fab fa-instagram"></i></a><a href="#" class="w-9 h-9 rounded-lg bg-ka flex items-center justify-center text-kag hover:bg-kar hover:text-white transition-all"><i class="fab fa-facebook-f"></i></a><a href="#" class="w-9 h-9 rounded-lg bg-ka flex items-center justify-center text-kag hover:bg-kar hover:text-white transition-all"><i class="fab fa-whatsapp"></i></a><a href="#" class="w-9 h-9 rounded-lg bg-ka flex items-center justify-center text-kag hover:bg-kar hover:text-white transition-all"><i class="fab fa-youtube"></i></a></div></div>
 </div>
 </div>
 <div class="border-t border-kab py-5"><div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-kag"><p>&copy; 2024 KARYA ABADI. Seluruh Hak Cipta Dilindungi.</p><p>Dibuat dengan <i class="fas fa-heart text-kar mx-1"></i> di Indonesia</p></div></div>
 </footer>
 
-<!-- PERBAIKAN PENTING: Script biasa (BUKAN type="module") dan BUKAN IIFE -->
 <script>
 /* ==========================================================
-   KARYA ABADI REMOVE BACKGROUND
-   Engine Canvas Murni — Tanpa Dependensi
+   KARYA ABADI — SMART BACKGROUND REMOVAL
+   Engine deteksi objek otomatis:
+   1. Analisis warna dominan per-region tepi
+   2. Multi-region flood fill (4 sisi terpisah)
+   3. Gravitasi spasial: objek di tengah, bg di tepi
+   4. Smart tolerance adaptif
+   5. Edge refinement dengan blur alpha
    ========================================================== */
 
-// === STATE ===
 var originalFile = null;
 var originalImg = null;
 var removedBgCanvas = null;
-var currentMethod = 'auto';
-var manualColor = null;
 var renderTimer = null;
 
-// === DOM helper ===
 function $(id) { return document.getElementById(id); }
 var canvasOrig = $('canvasOriginal');
 var canvasResult = $('canvasResult');
 var ctxOrig = canvasOrig.getContext('2d', { willReadFrequently: true });
 var ctxResult = canvasResult.getContext('2d');
 
-// === PRESET WARNA BG ===
+// === PRESET WARNA ===
 ['#ffffff','#000000','#dc2626','#2563eb','#16a34a','#eab308','#f97316','#8b5cf6','#ec4899','#06b6d4','#78716c','#1e293b'].forEach(function(c) {
     var el = document.createElement('div');
     el.className = 'color-swatch'; el.style.background = c;
@@ -234,41 +229,6 @@ var ctxResult = canvasResult.getContext('2d');
         b.style.borderColor = 'var(--red)';
     };
     $('upscalePresets').appendChild(b);
-});
-
-// === METODE SELECTOR ===
-document.querySelectorAll('.method-btn').forEach(function(btn) {
-    btn.onclick = function() {
-        document.querySelectorAll('.method-btn').forEach(function(b) { b.classList.remove('active'); });
-        btn.classList.add('active');
-        currentMethod = btn.dataset.method;
-        manualColor = null;
-        $('clickOverlay').style.display = 'none';
-        $('clickHint').style.display = 'none';
-        $('pickedColorInfo').style.display = 'none';
-        $('toleranceSection').style.opacity = '1';
-        $('toleranceSection').style.pointerEvents = 'auto';
-    };
-});
-
-// === KLIK OVERLAY (Pilih Warna Manual) ===
- $('clickOverlay').addEventListener('click', function(e) {
-    if (!originalImg) return;
-    var rect = canvasOrig.getBoundingClientRect();
-    var scaleX = canvasOrig.width / rect.width;
-    var scaleY = canvasOrig.height / rect.height;
-    var px = Math.floor((e.clientX - rect.left) * scaleX);
-    var py = Math.floor((e.clientY - rect.top) * scaleY);
-    if (px < 0 || py < 0 || px >= canvasOrig.width || py >= canvasOrig.height) return;
-
-    var pixel = ctxOrig.getImageData(px, py, 1, 1).data;
-    manualColor = [pixel[0], pixel[1], pixel[2]];
-    $('clickHint').style.display = 'none';
-    $('pickedColorInfo').style.display = 'block';
-    $('pickedColorBox').style.background = 'rgb(' + manualColor.join(',') + ')';
-    $('pickedColorText').textContent = 'RGB(' + manualColor.join(', ') + ') — Memproses...';
-    toast('Warna dipilih, memproses...', 'info');
-    doRemoveBg();
 });
 
 // === TOAST ===
@@ -296,328 +256,212 @@ function updProg(p, d) {
 function hideProg() { $('progressOverlay').style.display = 'none'; }
  $('btnCancelProgress').onclick = hideProg;
 
-
 // ==========================================================
-// UPLOAD — DIPERBAIKI: event listener terpisah, bukan chained
+// UPLOAD — Event listener terpisah & eksplisit
 // ==========================================================
 var uploadZone = $('uploadZone');
 var fileInput = $('fileInput');
 
-// Klik zona upload -> buka file picker
-uploadZone.addEventListener('click', function(e) {
-    // Pastikan click tidak berasal dari child elements
-    fileInput.click();
-});
+uploadZone.addEventListener('click', function(e) { fileInput.click(); });
 
-// File dipilih via picker
 fileInput.addEventListener('change', function(e) {
-    var files = e.target.files;
-    if (files && files.length > 0) {
-        handleFile(files[0]);
-    }
+    if (e.target.files && e.target.files.length > 0) handleFile(e.target.files[0]);
 });
 
-// Drag & Drop
-uploadZone.addEventListener('dragover', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    uploadZone.classList.add('drag-over');
-});
-
-uploadZone.addEventListener('dragleave', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    uploadZone.classList.remove('drag-over');
-});
-
+uploadZone.addEventListener('dragover', function(e) { e.preventDefault(); e.stopPropagation(); uploadZone.classList.add('drag-over'); });
+uploadZone.addEventListener('dragleave', function(e) { e.preventDefault(); e.stopPropagation(); uploadZone.classList.remove('drag-over'); });
 uploadZone.addEventListener('drop', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    uploadZone.classList.remove('drag-over');
-    var files = e.dataTransfer.files;
-    if (files && files.length > 0) {
-        var f = files[0];
-        if (f.type.startsWith('image/')) {
-            handleFile(f);
-        } else {
-            toast('File harus berupa gambar (PNG, JPG, WEBP)', 'error');
-        }
+    e.preventDefault(); e.stopPropagation(); uploadZone.classList.remove('drag-over');
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        var f = e.dataTransfer.files[0];
+        if (f.type.startsWith('image/')) handleFile(f);
+        else toast('File harus berupa gambar', 'error');
     }
 });
 
-
-// ==========================================================
-// HANDLE FILE — Muat gambar ke canvas
-// ==========================================================
 function handleFile(file) {
-    // Validasi ukuran
-    if (file.size > 20 * 1024 * 1024) {
-        toast('Ukuran file maksimal 20MB', 'error');
-        return;
-    }
-
+    if (file.size > 20 * 1024 * 1024) { toast('Ukuran maks 20MB', 'error'); return; }
     originalFile = file;
     var img = new Image();
-
     img.onload = function() {
         originalImg = img;
-
-        // Gambar asli
-        canvasOrig.width = img.width;
-        canvasOrig.height = img.height;
+        canvasOrig.width = img.width; canvasOrig.height = img.height;
         ctxOrig.drawImage(img, 0, 0);
-
-        // Reset canvas hasil
-        canvasResult.width = img.width;
-        canvasResult.height = img.height;
+        canvasResult.width = img.width; canvasResult.height = img.height;
         ctxResult.clearRect(0, 0, img.width, img.height);
-
-        // Update info
         $('imgInfo').textContent = img.width + ' x ' + img.height + ' px';
-        $('statusSize').textContent = img.width + 'x' + img.height;
         updateOutputInfo();
-
-        // Tampilkan workspace
-        $('uploadSection').style.display = 'none';
-        $('workspace').style.display = 'block';
-        $('btnRemoveBg').disabled = false;
-        $('btnDownload').disabled = true;
-
-        // Reset state
+        $('uploadSection').style.display = 'none'; $('workspace').style.display = 'block';
+        $('btnRemoveBg').disabled = false; $('btnDownload').disabled = true;
         removedBgCanvas = null;
-        manualColor = null;
-        $('statusBg').textContent = 'Menunggu';
-        $('statusBg').className = 'text-xs px-2 py-1 rounded-full bg-ka text-kag';
-        $('statusMethod').textContent = '-';
-        $('statusMethod').className = 'text-xs px-2 py-1 rounded-full bg-ka text-kag';
-        $('statusPixels').textContent = '-';
-        $('clickOverlay').style.display = 'none';
-        $('clickHint').style.display = 'none';
-        $('pickedColorInfo').style.display = 'none';
-
-        // Bersihkan memory URL
         URL.revokeObjectURL(img.src);
-
-        toast('Gambar berhasil dimuat (' + img.width + 'x' + img.height + ')', 'success');
+        toast('Gambar dimuat (' + img.width + 'x' + img.height + '). Klik "Hapus Background Otomatis".', 'success');
     };
-
-    img.onerror = function() {
-        toast('Gagal memuat gambar. Pastikan file tidak corrupt.', 'error');
-        URL.revokeObjectURL(img.src);
-    };
-
+    img.onerror = function() { toast('Gagal memuat gambar', 'error'); URL.revokeObjectURL(img.src); };
     img.src = URL.createObjectURL(file);
 }
 
-
 // ==========================================================
-// TOMBOL HAPUS BACKGROUND
+// TOMBOL HAPUS BACKGROUND OTOMATIS
 // ==========================================================
  $('btnRemoveBg').addEventListener('click', function() {
     if (!originalImg) return;
-
-    if (currentMethod === 'manual') {
-        $('clickOverlay').style.display = 'block';
-        $('clickHint').style.display = 'block';
-        $('pickedColorInfo').style.display = 'none';
-        manualColor = null;
-        toast('Klik pada warna background di gambar asli', 'info');
-        return;
-    }
-
-    doRemoveBg();
-});
-
-
-// ==========================================================
-// FUNGSI UTAMA: HAPUS BACKGROUND
-// ==========================================================
-function doRemoveBg() {
-    if (!originalImg) return;
     $('btnRemoveBg').disabled = true;
-    showProg('Menghapus background...', 'Mempersiapkan engine canvas...');
-
+    showProg('Mendeteksi objek & background...', 'Menganalisis gambar...');
     setTimeout(function() {
         try {
-            var tolerance = parseInt($('rngTolerance').value);
-            var methodLabel = '';
-
-            if (currentMethod === 'auto') {
-                methodLabel = 'Deteksi Otomatis';
-                updProg(10, 'Menganalisis warna tepi gambar...');
-                var bgColor = sampleEdgeMedian(canvasOrig);
-                updProg(25, 'Warna latar: RGB(' + bgColor.join(', ') + ')');
-
-                setTimeout(function() {
-                    updProg(35, 'Flood fill dari tepi...');
-                    var result = floodFillFromEdges(canvasOrig, bgColor, tolerance, false);
-                    if (!result) {
-                        updProg(40, 'Menyesuaikan toleransi...');
-                        result = floodFillFromEdges(canvasOrig, bgColor, Math.max(8, Math.round(tolerance * 0.55)), false);
-                        if (!result) {
-                            result = floodFillFromEdges(canvasOrig, bgColor, Math.max(5, Math.round(tolerance * 0.3)), true);
-                        }
-                    }
-                    finishProcess(result, methodLabel);
-                }, 30);
-
-            } else if (currentMethod === 'manual') {
-                methodLabel = 'Pilih Warna';
-                if (!manualColor) { hideProg(); $('btnRemoveBg').disabled = false; return; }
-                updProg(20, 'Flood fill dari titik yang diklik...');
-                var result2 = floodFillFromPoint(canvasOrig, manualColor, tolerance, false);
-                if (!result2) {
-                    result2 = floodFillFromPoint(canvasOrig, manualColor, Math.max(8, Math.round(tolerance * 0.5)), true);
-                }
-                $('pickedColorText').textContent = 'RGB(' + manualColor.join(', ') + ') — Selesai';
-                finishProcess(result2, methodLabel);
-
-            } else if (currentMethod === 'global') {
-                methodLabel = 'Global Color';
-                updProg(10, 'Sampling warna dominan...');
-                var bgColor3 = sampleEdgeMedian(canvasOrig);
-                updProg(25, 'Menghapus semua pixel warna serupa...');
-                setTimeout(function() {
-                    var result3 = globalColorRemove(canvasOrig, bgColor3, tolerance);
-                    finishProcess(result3, methodLabel);
-                }, 30);
+            var sensitivity = parseInt($('rngSensitivity').value);
+            var edgeSharp = parseInt($('rngEdge').value);
+            var result = smartRemoveBackground(canvasOrig, sensitivity, edgeSharp);
+            if (result) {
+                removedBgCanvas = result;
+                hideProg();
+                renderResult();
+                $('btnRemoveBg').disabled = false;
+                $('btnDownload').disabled = false;
+                toast('Background berhasil dihapus secara otomatis!', 'success');
+            } else {
+                hideProg();
+                toast('Gagal mendeteksi. Coba ubah sensitivitas lalu coba lagi.', 'error');
+                $('btnRemoveBg').disabled = false;
             }
-
-        } catch (e) {
-            console.error('Error:', e);
-            hideProg();
-            toast('Gagal: ' + e.message, 'error');
+        } catch(e) {
+            console.error(e); hideProg();
+            toast('Error: ' + e.message, 'error');
             $('btnRemoveBg').disabled = false;
         }
-    }, 80);
-}
-
-function finishProcess(result, methodLabel) {
-    if (!result) {
-        hideProg();
-        toast('Gagal menghapus background. Coba ubah toleransi atau ganti metode.', 'error');
-        $('btnRemoveBg').disabled = false;
-        return;
-    }
-    updProg(90, 'Memperhalus tepi...');
-    setTimeout(function() {
-        removedBgCanvas = result;
-        hideProg();
-        renderResult();
-        $('btnRemoveBg').disabled = false;
-        $('btnDownload').disabled = false;
-        $('statusBg').textContent = 'Selesai';
-        $('statusBg').className = 'text-xs px-2 py-1 rounded-full bg-green-900/40 text-green-400';
-        $('statusMethod').textContent = methodLabel;
-        $('statusMethod').className = 'text-xs px-2 py-1 rounded-full bg-blue-900/40 text-blue-400';
-        toast('Background berhasil dihapus! (' + methodLabel + ')', 'success');
-    }, 50);
-}
-
+    }, 100);
+});
 
 // ==========================================================
-// ENGINE: SAMPLE EDGE MEDIAN
+// ENGINE UTAMA: SMART BACKGROUND REMOVAL
 // ==========================================================
-function sampleEdgeMedian(srcCanvas) {
-    var w = srcCanvas.width, h = srcCanvas.height;
-    var ctx = srcCanvas.getContext('2d', { willReadFrequently: true });
-    var data = ctx.getImageData(0, 0, w, h).data;
-    var rs = [], gs = [], bs = [];
-    var depth = Math.max(2, Math.min(15, Math.floor(Math.min(w, h) * 0.02)));
-    var stepX = Math.max(1, Math.floor(w / 300));
-    var stepY = Math.max(1, Math.floor(h / 300));
-    var d, x, y, idx;
-
-    for (d = 0; d < depth; d++) {
-        for (x = 0; x < w; x += stepX) { idx = (d * w + x) * 4; rs.push(data[idx]); gs.push(data[idx+1]); bs.push(data[idx+2]); }
-        for (x = 0; x < w; x += stepX) { idx = ((h-1-d) * w + x) * 4; rs.push(data[idx]); gs.push(data[idx+1]); bs.push(data[idx+2]); }
-        for (y = depth; y < h - depth; y += stepY) { idx = (y * w + d) * 4; rs.push(data[idx]); gs.push(data[idx+1]); bs.push(data[idx+2]); }
-        for (y = depth; y < h - depth; y += stepY) { idx = (y * w + w-1-d) * 4; rs.push(data[idx]); gs.push(data[idx+1]); bs.push(data[idx+2]); }
-    }
-
-    rs.sort(function(a,b){return a-b;}); gs.sort(function(a,b){return a-b;}); bs.sort(function(a,b){return a-b;});
-    var mid = Math.floor(rs.length / 2);
-    return [rs[mid], gs[mid], bs[mid]];
-}
-
-
-// ==========================================================
-// ENGINE: FLOOD FILL DARI TEPI
-// ==========================================================
-function floodFillFromEdges(srcCanvas, targetColor, tolerance, forceResult) {
+function smartRemoveBackground(srcCanvas, sensitivity, edgeSharpness) {
     var w = srcCanvas.width, h = srcCanvas.height;
     var ctx = srcCanvas.getContext('2d', { willReadFrequently: true });
     var imgData = ctx.getImageData(0, 0, w, h);
     var d = imgData.data;
     var total = w * h;
+
+    // --- STEP 1: Analisis warna per-region tepi ---
+    updProg(8, 'Menganalisis warna di 4 sisi gambar...');
+    var edgeDepth = Math.max(3, Math.min(20, Math.floor(Math.min(w, h) * 0.03)));
+    var regions = analyzeEdgeRegions(d, w, h, edgeDepth);
+
+    updProg(15, 'Warna terdeteksi — Atas: RGB(' + regions.top.join(',') + ')');
+
+    // --- STEP 2: Hitung smart tolerance berdasarkan sensitivitas ---
+    // Sensitivitas 10-90 → tolerance 15-100
+    var baseTolerance = 15 + (sensitivity - 10) * (85 / 80);
+
+    // Variansi warna di tepi menentukan apakah bg homogen atau gradient
+    var edgeVariance = computeEdgeVariance(d, w, h, edgeDepth);
+    // Jika variance tinggi (gradient/complex), naikkan tolerance
+    if (edgeVariance > 1500) baseTolerance *= 1.25;
+    else if (edgeVariance > 600) baseTolerance *= 1.1;
+    else if (edgeVariance < 100) baseTolerance *= 0.85; // Sangat homogen, turunkan
+
+    baseTolerance = Math.round(baseTolerance);
+
+    // --- STEP 3: Multi-region flood fill ---
+    updProg(25, 'Flood fill multi-region dari tepi...');
+
+    // Mask: 1 = foreground, 0 = background
     var mask = new Uint8Array(total);
     var i;
-    for (i = 0; i < total; i++) mask[i] = 1;
+    for (i = 0; i < total; i++) mask[i] = 1; // Semua foreground dulu
 
-    var tR = targetColor[0], tG = targetColor[1], tB = targetColor[2];
-    var tolSq = tolerance * tolerance;
-    var queue = [];
-    var qLen = 0;
+    // Warna referensi per sisi: gabungan median + rata-rata
+    var sideColors = [
+        { pixels: getEdgePixels(d, w, h, 'top', edgeDepth), dir: 'top' },
+        { pixels: getEdgePixels(d, w, h, 'bottom', edgeDepth), dir: 'bottom' },
+        { pixels: getEdgePixels(d, w, h, 'left', edgeDepth), dir: 'left' },
+        { pixels: getEdgePixels(d, w, h, 'right', edgeDepth), dir: 'right' }
+    ];
 
-    function trySeed(px, py) {
-        var idx = py * w + px;
-        if (mask[idx] === 0) return;
-        var pIdx = idx * 4;
-        var dr = d[pIdx] - tR, dg = d[pIdx+1] - tG, db = d[pIdx+2] - tB;
-        if (dr*dr + dg*dg + db*db <= tolSq) {
-            mask[idx] = 0; queue.push(idx); qLen++;
+    // Untuk setiap sisi, lakukan flood fill dengan warna referensi sisi tersebut
+    var floodResults = [];
+    for (var s = 0; s < sideColors.length; s++) {
+        var side = sideColors[s];
+        if (side.pixels.length === 0) continue;
+
+        // Warna referensi: median dari sisi ini
+        var refColor = computeMedianColor(side.pixels);
+
+        // Tolerance adaptif per sisi: sesuaikan dengan variansi sisi ini
+        var sideVar = computeVariance(side.pixels);
+        var sideTol = baseTolerance;
+        if (sideVar > 2000) sideTol *= 1.2;
+        else if (sideVar < 80) sideTol *= 0.9;
+        sideTol = Math.round(sideTol);
+
+        var sideMask = floodFillEdge(d, w, h, side.dir, refColor, sideTol);
+        floodResults.push({ mask: sideMask, dir: side.dir, color: refColor, tol: sideTol });
+
+        if (s === 0) updProg(35, 'Sisi atas selesai...');
+        else if (s === 1) updProg(45, 'Sisi bawah selesai...');
+        else if (s === 2) updProg(55, 'Sisi kiri selesai...');
+        else updProg(65, 'Sisi kanan selesai...');
+    }
+
+    // --- STEP 4: Gabungkan semua mask flood fill ---
+    updProg(70, 'Menggabungkan hasil deteksi...');
+    for (var f = 0; f < floodResults.length; f++) {
+        var fm = floodResults[f].mask;
+        for (i = 0; i < total; i++) {
+            if (fm[i] === 0) mask[i] = 0; // Jika salah satu flood fill bilang background → background
         }
     }
 
-    for (var x = 0; x < w; x++) { trySeed(x, 0); trySeed(x, h-1); }
-    for (var y = 1; y < h-1; y++) { trySeed(0, y); trySeed(w-1, y); }
+    // --- STEP 5: Gravitasi Spasial ---
+    // Prinsip: objek utama CENDERUNG di tengah gambar, bukan di tepi.
+    // Jika sebuah area "foreground" berada di tepi dan TIDAK terhubung ke area tengah,
+    // kemungkinan besar itu sebenarnya background yang tidak tertangkap flood fill.
+    updProg(75, 'Gravitasi spasial: memastikan objek di tengah...');
+    applySpatialGravity(mask, w, h);
 
-    var head = 0;
-    while (head < qLen) {
-        var cur = queue[head++];
-        var cx = cur % w;
-        var cy = (cur - cx) / w;
-        if (cy > 0) tryEnqueue(cur - w);
-        if (cy < h-1) tryEnqueue(cur + w);
-        if (cx > 0) tryEnqueue(cur - 1);
-        if (cx < w-1) tryEnqueue(cur + 1);
-    }
-
-    function tryEnqueue(idx) {
-        if (mask[idx] === 0) return;
-        var pIdx = idx * 4;
-        var dr = d[pIdx] - tR, dg = d[pIdx+1] - tG, db = d[pIdx+2] - tB;
-        if (dr*dr + dg*dg + db*db <= tolSq) {
-            mask[idx] = 0; queue.push(idx); qLen++;
-        }
-    }
-
+    // --- STEP 6: Safety check ---
     var bgCount = 0;
     for (i = 0; i < total; i++) if (mask[i] === 0) bgCount++;
-    if (!forceResult && bgCount > total * 0.92) return null;
+    var bgPercent = bgCount / total;
 
-    // Dilation 1px
-    var dilSq = (tolerance * 1.35) * (tolerance * 1.35);
-    for (var yy = 0; yy < h; yy++) {
-        for (var xx = 0; xx < w; xx++) {
-            var mi = yy * w + xx;
-            if (mask[mi] === 0) continue;
-            var hasBg = false;
-            if (yy > 0 && mask[mi - w] === 0) hasBg = true;
-            else if (yy < h-1 && mask[mi + w] === 0) hasBg = true;
-            else if (xx > 0 && mask[mi - 1] === 0) hasBg = true;
-            else if (xx < w-1 && mask[mi + 1] === 0) hasBg = true;
-            if (hasBg) {
-                var pi = mi * 4;
-                var dr2 = d[pi] - tR, dg2 = d[pi+1] - tG, db2 = d[pi+2] - tB;
-                if (dr2*dr2 + dg2*dg2 + db2*db2 <= dilSq) { mask[mi] = 0; bgCount++; }
-            }
+    // Jika >93% atau <3% dihapus, kemungkinan salah deteksi
+    if (bgPercent > 0.93 || bgPercent < 0.03) {
+        console.log('[KA] Safety trigger: ' + (bgPercent * 100).toFixed(1) + '% bg. Adjusting...');
+        // Coba dengan tolerance berbeda
+        var adjTol = bgPercent > 0.93 ? Math.round(baseTolerance * 0.6) : Math.round(baseTolerance * 1.5);
+        mask = new Uint8Array(total);
+        for (i = 0; i < total; i++) mask[i] = 1;
+        for (var f2 = 0; f2 < floodResults.length; f2++) {
+            var side2 = floodResults[f2].dir;
+            var ref2 = floodResults[f2].color;
+            var sm2 = floodFillEdge(d, w, h, side2, ref2, adjTol);
+            for (i = 0; i < total; i++) { if (sm2[i] === 0) mask[i] = 0; }
         }
+        applySpatialGravity(mask, w, h);
+
+        bgCount = 0;
+        for (i = 0; i < total; i++) if (mask[i] === 0) bgCount++;
+        bgPercent = bgCount / total;
+        if (bgPercent > 0.93 || bgPercent < 0.03) return null; // Gagal total
     }
 
-    for (i = 0; i < total; i++) d[i * 4 + 3] = mask[i] === 0 ? 0 : 255;
-    blurAlphaSliding(d, w, h, 2);
-    $('statusPixels').textContent = Math.round(bgCount / total * 100) + '% gambar';
+    // --- STEP 7: Terapkan mask ke alpha channel ---
+    updProg(82, 'Menerapkan mask ke gambar...');
+    for (i = 0; i < total; i++) {
+        d[i * 4 + 3] = mask[i] === 0 ? 0 : 255;
+    }
+
+    // --- STEP 8: Edge refinement ---
+    updProg(90, 'Memperhalus tepi objek...');
+    var blurRadius = Math.max(0, 3 - edgeSharpness); // edgeSharp 0→blur 3, edgeSharp 3→blur 0, edgeSharp 8→blur 0
+    if (blurRadius > 0) {
+        blurAlphaSliding(d, w, h, blurRadius);
+    }
+
+    // --- STEP 9: Dilation tipis untuk recovery tepi ---
+    // Perluas foreground 1px ke arah background untuk menghindari halo putih
+    dilateForeground(mask, d, w, h, 1, baseTolerance);
 
     var out = document.createElement('canvas');
     out.width = w; out.height = h;
@@ -627,74 +471,119 @@ function floodFillFromEdges(srcCanvas, targetColor, tolerance, forceResult) {
 
 
 // ==========================================================
-// ENGINE: FLOOD FILL DARI TITIK
+// ANALISIS WARNA PER-REGION TEPI
 // ==========================================================
-function floodFillFromPoint(srcCanvas, targetColor, tolerance, forceResult) {
-    var w = srcCanvas.width, h = srcCanvas.height;
-    var ctx = srcCanvas.getContext('2d', { willReadFrequently: true });
-    var imgData = ctx.getImageData(0, 0, w, h);
-    var d = imgData.data;
+function analyzeEdgeRegions(d, w, h, depth) {
+    return {
+        top: computeMedianColor(getEdgePixels(d, w, h, 'top', depth)),
+        bottom: computeMedianColor(getEdgePixels(d, w, h, 'bottom', depth)),
+        left: computeMedianColor(getEdgePixels(d, w, h, 'left', depth)),
+        right: computeMedianColor(getEdgePixels(d, w, h, 'right', depth))
+    };
+}
+
+function getEdgePixels(d, w, h, side, depth) {
+    var pixels = [];
+    var x, y, idx;
+    if (side === 'top') {
+        for (y = 0; y < depth; y++) for (x = 0; x < w; x++) { idx = (y * w + x) * 4; pixels.push([d[idx], d[idx+1], d[idx+2]]); }
+    } else if (side === 'bottom') {
+        for (y = h - depth; y < h; y++) for (x = 0; x < w; x++) { idx = (y * w + x) * 4; pixels.push([d[idx], d[idx+1], d[idx+2]]); }
+    } else if (side === 'left') {
+        for (y = 0; y < h; y++) for (x = 0; x < depth; x++) { idx = (y * w + x) * 4; pixels.push([d[idx], d[idx+1], d[idx+2]]); }
+    } else {
+        for (y = 0; y < h; y++) for (x = w - depth; x < w; x++) { idx = (y * w + x) * 4; pixels.push([d[idx], d[idx+1], d[idx+2]]); }
+    }
+    return pixels;
+}
+
+function computeMedianColor(pixels) {
+    if (pixels.length === 0) return [128, 128, 128];
+    var rs = [], gs = [], bs = [];
+    for (var i = 0; i < pixels.length; i++) { rs.push(pixels[i][0]); gs.push(pixels[i][1]); bs.push(pixels[i][2]); }
+    rs.sort(function(a,b){return a-b;}); gs.sort(function(a,b){return a-b;}); bs.sort(function(a,b){return a-b;});
+    var m = Math.floor(rs.length / 2);
+    return [rs[m], gs[m], bs[m]];
+}
+
+function computeVariance(pixels) {
+    if (pixels.length === 0) return 0;
+    var sumR=0, sumG=0, sumB=0;
+    for (var i = 0; i < pixels.length; i++) { sumR += pixels[i][0]; sumG += pixels[i][1]; sumB += pixels[i][2]; }
+    var avgR = sumR/pixels.length, avgG = sumG/pixels.length, avgB = sumB/pixels.length;
+    var variance = 0;
+    for (var j = 0; j < pixels.length; j++) {
+        variance += (pixels[j][0]-avgR)*(pixels[j][0]-avgR) + (pixels[j][1]-avgG)*(pixels[j][1]-avgG) + (pixels[j][2]-avgB)*(pixels[j][2]-avgB);
+    }
+    return variance / pixels.length;
+}
+
+function computeEdgeVariance(d, w, h, depth) {
+    var allPixels = [];
+    allPixels = allPixels.concat(getEdgePixels(d, w, h, 'top', depth));
+    allPixels = allPixels.concat(getEdgePixels(d, w, h, 'bottom', depth));
+    allPixels = allPixels.concat(getEdgePixels(d, w, h, 'left', depth));
+    allPixels = allPixels.concat(getEdgePixels(d, w, h, 'right', depth));
+    return computeVariance(allPixels);
+}
+
+
+// ==========================================================
+// FLOOD FILL DARI SATU SISI
+// ==========================================================
+function floodFillEdge(d, w, h, side, refColor, tolerance) {
     var total = w * h;
     var mask = new Uint8Array(total);
     var i;
     for (i = 0; i < total; i++) mask[i] = 1;
 
-    var tR = targetColor[0], tG = targetColor[1], tB = targetColor[2];
+    var tR = refColor[0], tG = refColor[1], tB = refColor[2];
     var tolSq = tolerance * tolerance;
-    var foundSeed = false;
-    var startIdx = -1;
+    var queue = [];
+    var qLen = 0;
 
-    // Cari dari tepi
-    for (var x = 0; x < w && !foundSeed; x++) {
-        var idx = x * 4;
-        if ((d[idx]-tR)*(d[idx]-tR)+(d[idx+1]-tG)*(d[idx+1]-tG)+(d[idx+2]-tB)*(d[idx+2]-tB) <= tolSq) { startIdx = x; foundSeed = true; }
-    }
-    for (var x2 = 0; x2 < w && !foundSeed; x2++) {
-        var idx2 = ((h-1)*w+x2)*4;
-        if ((d[idx2]-tR)*(d[idx2]-tR)+(d[idx2+1]-tG)*(d[idx2+1]-tG)+(d[idx2+2]-tB)*(d[idx2+2]-tB) <= tolSq) { startIdx = (h-1)*w+x2; foundSeed = true; }
-    }
-    for (var y = 0; y < h && !foundSeed; y++) {
-        var idx3 = (y*w)*4;
-        if ((d[idx3]-tR)*(d[idx3]-tR)+(d[idx3+1]-tG)*(d[idx3+1]-tG)+(d[idx3+2]-tB)*(d[idx3+2]-tB) <= tolSq) { startIdx = y*w; foundSeed = true; }
-    }
-    for (var y2 = 0; y2 < h && !foundSeed; y2++) {
-        var idx4 = (y2*w+w-1)*4;
-        if ((d[idx4]-tR)*(d[idx4]-tR)+(d[idx4+1]-tG)*(d[idx4+1]-tG)+(d[idx4+2]-tB)*(d[idx4+2]-tB) <= tolSq) { startIdx = y2*w+w-1; foundSeed = true; }
+    // Seed dari sisi yang ditentukan
+    if (side === 'top') {
+        for (var x = 0; x < w; x++) trySeedEdge(x, 0);
+    } else if (side === 'bottom') {
+        for (var x2 = 0; x2 < w; x2++) trySeedEdge(x2, h - 1);
+    } else if (side === 'left') {
+        for (var y = 0; y < h; y++) trySeedEdge(0, y);
+    } else {
+        for (var y2 = 0; y2 < h; y2++) trySeedEdge(w - 1, y2);
     }
 
-    // Fallback: sampling seluruh gambar
-    if (!foundSeed) {
-        for (var sy = 0; sy < h && !foundSeed; sy += Math.max(1, Math.floor(h/50))) {
-            for (var sx = 0; sx < w && !foundSeed; sx += Math.max(1, Math.floor(w/50))) {
-                var si = (sy*w+sx)*4;
-                if ((d[si]-tR)*(d[si]-tR)+(d[si+1]-tG)*(d[si+1]-tG)+(d[si+2]-tB)*(d[si+2]-tB) <= tolSq) { startIdx = sy*w+sx; foundSeed = true; }
-            }
-        }
+    function trySeedEdge(px, py) {
+        var idx = py * w + px;
+        if (mask[idx] === 0) return;
+        var pi = idx * 4;
+        var dr = d[pi]-tR, dg = d[pi+1]-tG, db = d[pi+2]-tB;
+        if (dr*dr+dg*dg+db*db <= tolSq) { mask[idx] = 0; queue.push(idx); qLen++; }
     }
 
-    if (!foundSeed) { return globalColorRemoveDirect(imgData, w, h, targetColor, tolerance) ? createCanvasFromData(imgData, w, h) : null; }
-
-    var queue = [startIdx]; mask[startIdx] = 0; var qLen = 1; var head = 0; var bgCount = 0;
+    // BFS
+    var head = 0;
     while (head < qLen) {
-        var cur = queue[head++]; bgCount++;
-        var cx = cur % w; var cy = (cur - cx) / w;
+        var cur = queue[head++];
+        var cx = cur % w, cy = (cur - cx) / w;
         if (cy > 0) tryQ(cur - w);
         if (cy < h-1) tryQ(cur + w);
         if (cx > 0) tryQ(cur - 1);
         if (cx < w-1) tryQ(cur + 1);
     }
+
     function tryQ(idx) {
         if (mask[idx] === 0) return;
         var pi = idx * 4;
-        if ((d[pi]-tR)*(d[pi]-tR)+(d[pi+1]-tG)*(d[pi+1]-tG)+(d[pi+2]-tB)*(d[pi+2]-tB) <= tolSq) { mask[idx] = 0; queue.push(idx); qLen++; }
+        var dr = d[pi]-tR, dg = d[pi+1]-tG, db = d[pi+2]-tB;
+        if (dr*dr+dg*dg+db*db <= tolSq) { mask[idx] = 0; queue.push(idx); qLen++; }
     }
 
-    if (!forceResult && bgCount > total * 0.92) return null;
-
-    var dilSq = (tolerance*1.35)*(tolerance*1.35);
+    // Dilation 1px: perluas background sedikit ke area yang warnanya mendekati
+    var dilTolSq = (tolerance * 1.4) * (tolerance * 1.4);
     for (var yy = 0; yy < h; yy++) {
         for (var xx = 0; xx < w; xx++) {
-            var mi = yy*w+xx;
+            var mi = yy * w + xx;
             if (mask[mi] === 0) continue;
             var hasBg = false;
             if (yy > 0 && mask[mi-w] === 0) hasBg = true;
@@ -702,48 +591,144 @@ function floodFillFromPoint(srcCanvas, targetColor, tolerance, forceResult) {
             else if (xx > 0 && mask[mi-1] === 0) hasBg = true;
             else if (xx < w-1 && mask[mi+1] === 0) hasBg = true;
             if (hasBg) {
-                var pi2 = mi*4;
-                if ((d[pi2]-tR)*(d[pi2]-tR)+(d[pi2+1]-tG)*(d[pi2+1]-tG)+(d[pi2+2]-tB)*(d[pi2+2]-tB) <= dilSq) { mask[mi] = 0; bgCount++; }
+                var pi2 = mi * 4;
+                var dr2 = d[pi2]-tR, dg2 = d[pi2+1]-tG, db2 = d[pi2+2]-tB;
+                if (dr2*dr2+dg2*dg2+db2*db2 <= dilTolSq) mask[mi] = 0;
             }
         }
     }
 
-    for (i = 0; i < total; i++) d[i*4+3] = mask[i] === 0 ? 0 : 255;
-    blurAlphaSliding(d, w, h, 2);
-    $('statusPixels').textContent = Math.round(bgCount/total*100) + '% gambar';
-    return createCanvasFromData(imgData, w, h);
-}
-
-function createCanvasFromData(imgData, w, h) {
-    var out = document.createElement('canvas'); out.width = w; out.height = h;
-    out.getContext('2d').putImageData(imgData, 0, 0); return out;
+    return mask;
 }
 
 
 // ==========================================================
-// ENGINE: GLOBAL COLOR REMOVE
+// GRAVITASI SPASIAL
+// Hapus "foreground" di tepi yang tidak terhubung ke tengah
 // ==========================================================
-function globalColorRemove(srcCanvas, targetColor, tolerance) {
-    var w = srcCanvas.width, h = srcCanvas.height;
-    var ctx = srcCanvas.getContext('2d', { willReadFrequently: true });
-    var imgData = ctx.getImageData(0, 0, w, h);
-    if (!globalColorRemoveDirect(imgData, w, h, targetColor, tolerance)) return null;
-    return createCanvasFromData(imgData, w, h);
-}
+function applySpatialGravity(mask, w, h) {
+    var total = w * h;
 
-function globalColorRemoveDirect(imgData, w, h, targetColor, tolerance) {
-    var d = imgData.data; var total = w * h;
-    var tR = targetColor[0], tG = targetColor[1], tB = targetColor[2];
-    var tolSq = tolerance * tolerance; var bgCount = 0;
+    // 1. Temukan semua connected component foreground
+    var visited = new Uint8Array(total);
+    var components = []; // Array of { pixels: [], touchesCenter: bool, size: number }
+
     for (var i = 0; i < total; i++) {
-        var pi = i * 4;
-        var dr = d[pi]-tR, dg = d[pi+1]-tG, db = d[pi+2]-tB;
-        if (dr*dr+dg*dg+db*db <= tolSq) { d[pi+3] = 0; bgCount++; } else { d[pi+3] = 255; }
+        if (visited[i] || mask[i] === 0) continue;
+
+        // BFS untuk component ini
+        var queue = [i]; visited[i] = 1;
+        var comp = { pixels: [], size: 0, touchesCenter: false, minDistToEdge: Infinity };
+        var head = 0;
+
+        while (head < queue.length) {
+            var cur = queue[head++];
+            comp.pixels.push(cur);
+            comp.size++;
+
+            var cx = cur % w, cy = (cur - cx) / w;
+
+            // Jarak ke tepi terdekat
+            var distToEdge = Math.min(cx, cy, w - 1 - cx, h - 1 - cy);
+            if (distToEdge < comp.minDistToEdge) comp.minDistToEdge = distToEdge;
+
+            // Apakah menyentuh zona tengah (25%-75% dari width dan height)
+            if (cx > w * 0.2 && cx < w * 0.8 && cy > h * 0.2 && cy < h * 0.8) {
+                comp.touchesCenter = true;
+            }
+
+            // 4-connected neighbors
+            if (cy > 0 && !visited[cur - w] && mask[cur - w] === 1) { visited[cur - w] = 1; queue.push(cur - w); }
+            if (cy < h-1 && !visited[cur + w] && mask[cur + w] === 1) { visited[cur + w] = 1; queue.push(cur + w); }
+            if (cx > 0 && !visited[cur - 1] && mask[cur - 1] === 1) { visited[cur - 1] = 1; queue.push(cur - 1); }
+            if (cx < w-1 && !visited[cur + 1] && mask[cur + 1] === 1) { visited[cur + 1] = 1; queue.push(cur + 1); }
+        }
+
+        components.push(comp);
     }
-    if (bgCount > total * 0.95) return false;
-    blurAlphaSliding(d, w, h, 2);
-    $('statusPixels').textContent = Math.round(bgCount/total*100) + '% gambar';
-    return true;
+
+    // 2. Hitung total foreground
+    var totalFg = 0;
+    for (var j = 0; j < total; j++) if (mask[j] === 1) totalFg++;
+
+    // 3. Untuk setiap component yang TIDAK menyentuh tengah:
+    //    - Jika kecil (<2% dari total) → hapus (noise)
+    //    - Jika di tepi (minDistToEdge < 5%) DAN tidak menyentuh tengah → kemungkinan bg, hapus
+    var threshold = total * 0.02;
+    var edgeThreshold = Math.min(w, h) * 0.05;
+
+    for (var c = 0; c < components.length; c++) {
+        var comp2 = components[c];
+        if (comp2.touchesCenter) continue; // Komponen yang menyentuh tengah → pasti objek
+
+        if (comp2.size < threshold) {
+            // Komponen kecil yang tidak di tengah → noise, hapus
+            for (var p = 0; p < comp2.pixels.length; p++) mask[comp2.pixels[p]] = 0;
+        } else if (comp2.minDistToEdge <= edgeThreshold) {
+            // Komponen besar tapi menempel di tepi DAN tidak menyentuh tengah
+            // Cek apakah ini "koridor" tipis di tepi (lebar < 10% gambar)
+            var bounds = getComponentBounds(comp2.pixels, w);
+            var compWidth = bounds.maxX - bounds.minX + 1;
+            var compHeight = bounds.maxY - bounds.minY + 1;
+            var isThinStrip = (compWidth < w * 0.1) || (compHeight < h * 0.1);
+
+            if (isThinStrip) {
+                // Strip tipis di tepi → pasti sisa background
+                for (var p2 = 0; p2 < comp2.pixels.length; p2++) mask[comp2.pixels[p2]] = 0;
+            }
+        }
+    }
+}
+
+function getComponentBounds(pixels, w) {
+    var minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    for (var i = 0; i < pixels.length; i++) {
+        var x = pixels[i] % w, y = (pixels[i] - x) / w;
+        if (x < minX) minX = x; if (x > maxX) maxX = x;
+        if (y < minY) minY = y; if (y > maxY) maxY = y;
+    }
+    return { minX: minX, maxX: maxX, minY: minY, maxY: maxY };
+}
+
+
+// ==========================================================
+// DILATE FOREGROUND — Recovery tepi objek
+// ==========================================================
+function dilateForeground(mask, d, w, h, radius, tolerance) {
+    // Untuk setiap pixel background yang bersebelahan dengan foreground,
+    // dan warnanya "agak berbeda" dari tepi → jadikan foreground
+    for (var y = 0; y < h; y++) {
+        for (var x = 0; x < w; x++) {
+            var mi = y * w + x;
+            if (mask[mi] !== 0) continue; // Hanya proses background
+
+            // Cek apakah ada tetangga foreground
+            var hasFg = false;
+            if (y > 0 && mask[mi-w] === 1) hasFg = true;
+            else if (y < h-1 && mask[mi+w] === 1) hasFg = true;
+            else if (x > 0 && mask[mi-1] === 1) hasFg = true;
+            else if (x < w-1 && mask[mi+1] === 1) hasFg = true;
+
+            if (hasFg) {
+                // Ambil warna tetangga foreground terdekat
+                var fgColor = null;
+                if (y > 0 && mask[mi-w] === 1) { var pi = (mi-w)*4; fgColor = [d[pi],d[pi+1],d[pi+2]]; }
+                else if (y < h-1 && mask[mi+w] === 1) { var pi2 = (mi+w)*4; fgColor = [d[pi2],d[pi2+1],d[pi2+2]]; }
+                else if (x > 0 && mask[mi-1] === 1) { var pi3 = (mi-1)*4; fgColor = [d[pi3],d[pi3+1],d[pi3+2]]; }
+                else { var pi4 = (mi+1)*4; fgColor = [d[pi4],d[pi4+1],d[pi4+2]]; }
+
+                var pi5 = mi * 4;
+                var dr = d[pi5]-fgColor[0], dg = d[pi5+1]-fgColor[1], db = d[pi5+2]-fgColor[2];
+                var dist = Math.sqrt(dr*dr+dg*dg+db*db);
+
+                // Jika warna pixel ini lebih dekat ke foreground daripada ke background → recovery
+                // Threshold: jika jarak ke fg < tolerance * 0.7 → kemungkinan bagian objek
+                if (dist < tolerance * 1.8) {
+                    d[pi5 + 3] = 255; // Recovery ke foreground
+                }
+            }
+        }
+    }
 }
 
 
@@ -751,6 +736,7 @@ function globalColorRemoveDirect(imgData, w, h, targetColor, tolerance) {
 // BLUR ALPHA — Sliding Window O(n)
 // ==========================================================
 function blurAlphaSliding(data, w, h, radius) {
+    if (radius <= 0) return;
     var total = w * h;
     var alpha = new Float32Array(total);
     var i, y, x, sum, cnt, addI, remI, addY, remY;
@@ -785,36 +771,29 @@ function blurAlphaSliding(data, w, h, radius) {
 // RESET
 // ==========================================================
  $('btnReset').onclick = function() {
-    originalFile = null; originalImg = null; removedBgCanvas = null; manualColor = null;
+    originalFile = null; originalImg = null; removedBgCanvas = null;
     $('workspace').style.display = 'none'; $('uploadSection').style.display = 'block';
     fileInput.value = ''; resetControls();
-    $('clickOverlay').style.display = 'none'; $('clickHint').style.display = 'none';
-    $('pickedColorInfo').style.display = 'none';
 };
 function resetControls() {
-    $('rngSat').value=100;$('valSat').textContent='100%';
-    $('rngBri').value=100;$('valBri').textContent='100%';
-    $('rngCon').value=100;$('valCon').textContent='100%';
-    $('rngVib').value=0;$('valVib').textContent='0%';
-    $('rngWhiteStroke').value=4;$('valWhiteStroke').textContent='4px';
-    $('rngBlackStroke').value=1;$('valBlackStroke').textContent='1px';
-    $('rngUpscale').value=1;$('valUpscale').textContent='1x';
-    $('rngTolerance').value=35;$('valTolerance').textContent='35';
+    $('rngSat').value=100;$('valSat').textContent='100%';$('rngBri').value=100;$('valBri').textContent='100%';
+    $('rngCon').value=100;$('valCon').textContent='100%';$('rngVib').value=0;$('valVib').textContent='0%';
+    $('rngWhiteStroke').value=4;$('valWhiteStroke').textContent='4px';$('rngBlackStroke').value=1;$('valBlackStroke').textContent='1px';
+    $('rngUpscale').value=1;$('valUpscale').textContent='1x';$('rngSensitivity').value=50;$('valSensitivity').textContent='50';
+    $('rngEdge').value=3;$('valEdge').textContent='3';
     $('chkStroke').checked=false;$('chkBgColor').checked=false;
     toggleStrokeCtrl(); toggleBgColorCtrl();
 }
-
 
 // ==========================================================
 // RENDER HASIL
 // ==========================================================
 function scheduleRender() { clearTimeout(renderTimer); renderTimer = setTimeout(renderResult, 50); }
-
 function renderResult() {
     if (!removedBgCanvas) return;
     var w = removedBgCanvas.width, h = removedBgCanvas.height;
     canvasResult.width = w; canvasResult.height = h;
-    var sat = $('rngSat').value / 100, bri = $('rngBri').value / 100, con = $('rngCon').value / 100, vib = +$('rngVib').value;
+    var sat = $('rngSat').value/100, bri = $('rngBri').value/100, con = $('rngCon').value/100, vib = +$('rngVib').value;
     var useStroke = $('chkStroke').checked, whiteW = +$('rngWhiteStroke').value, blackW = +$('rngBlackStroke').value;
     var useBg = $('chkBgColor').checked, bgColor = $('pickBgColor').value;
 
@@ -823,9 +802,9 @@ function renderResult() {
 
     var tc = document.createElement('canvas'); tc.width = w; tc.height = h;
     var tx = tc.getContext('2d');
-    tx.filter = 'saturate(' + sat + ') brightness(' + bri + ') contrast(' + con + ')';
+    tx.filter = 'saturate('+sat+') brightness('+bri+') contrast('+con+')';
     tx.drawImage(removedBgCanvas, 0, 0); tx.filter = 'none';
-    if (vib > 0) { var dd = tx.getImageData(0, 0, w, h); applyVibrance(dd.data, vib / 100); tx.putImageData(dd, 0, 0); }
+    if (vib > 0) { var dd = tx.getImageData(0, 0, w, h); applyVibrance(dd.data, vib/100); tx.putImageData(dd, 0, 0); }
 
     if (useStroke) {
         var tr = whiteW + blackW;
@@ -840,163 +819,97 @@ function createSolidMask(src, color) {
     var c = document.createElement('canvas'); c.width = src.width; c.height = src.height;
     var x = c.getContext('2d');
     x.fillStyle = color; x.fillRect(0, 0, c.width, c.height);
-    x.globalCompositeOperation = 'destination-in'; x.drawImage(src, 0, 0);
-    return c;
+    x.globalCompositeOperation = 'destination-in'; x.drawImage(src, 0, 0); return c;
 }
 
 function applyVibrance(data, amt) {
     for (var i = 0; i < data.length; i += 4) {
         if (!data[i+3]) continue;
-        var r = data[i], g = data[i+1], b = data[i+2];
-        var mx = Math.max(r,g,b), sat = mx ? ((mx-Math.min(r,g,b))/mx) : 0;
-        var f = amt * (1-sat) * 0.6;
-        data[i] = Math.max(0, Math.min(255, r + (mx-r)*f));
-        data[i+1] = Math.max(0, Math.min(255, g + (mx-g)*f));
-        data[i+2] = Math.max(0, Math.min(255, b + (mx-b)*f));
+        var r=data[i],g=data[i+1],b=data[i+2],mx=Math.max(r,g,b),sat=mx?((mx-Math.min(r,g,b))/mx):0,f=amt*(1-sat)*0.6;
+        data[i]=Math.max(0,Math.min(255,r+(mx-r)*f));data[i+1]=Math.max(0,Math.min(255,g+(mx-g)*f));data[i+2]=Math.max(0,Math.min(255,b+(mx-b)*f));
     }
 }
-
 
 // ==========================================================
 // DOWNLOAD HD
 // ==========================================================
  $('btnDownload').onclick = function() {
     if (!removedBgCanvas) return;
-    var scale = +$('rngUpscale').value;
-    $('btnDownload').disabled = true;
+    var scale = +$('rngUpscale').value; $('btnDownload').disabled = true;
     if (scale > 1) showProg('Mempersiapkan download HD...', 'Upscale ' + scale + 'x...');
     setTimeout(function() {
         try {
             var dl = renderFullRes(scale);
-            if (scale > 1) updProg(90, 'Konversi PNG...');
-            setTimeout(function() {
-                dl.toBlob(function(blob) {
-                    if (!blob) { hideProg(); toast('Gagal membuat file', 'error'); $('btnDownload').disabled = false; return; }
-                    var u = URL.createObjectURL(blob);
-                    var a = document.createElement('a');
-                    a.href = u;
-                    a.download = (originalFile ? originalFile.name.replace(/\.[^.]+$/, '') : 'result') + '_karyaabadi' + (scale > 1 ? '_' + scale + 'x' : '') + '.png';
-                    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-                    URL.revokeObjectURL(u);
-                    hideProg();
-                    toast('Download berhasil (' + (blob.size/1024/1024).toFixed(1) + ' MB)', 'success');
-                    $('btnDownload').disabled = false;
-                }, 'image/png');
-            }, 50);
+            dl.toBlob(function(blob) {
+                if (!blob) { hideProg(); toast('Gagal', 'error'); $('btnDownload').disabled = false; return; }
+                var u = URL.createObjectURL(blob), a = document.createElement('a');
+                a.href = u; a.download = (originalFile ? originalFile.name.replace(/\.[^.]+$/, '') : 'result') + '_karyaabadi' + (scale > 1 ? '_' + scale + 'x' : '') + '.png';
+                document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(u);
+                hideProg(); toast('Download berhasil (' + (blob.size/1024/1024).toFixed(1) + ' MB)', 'success'); $('btnDownload').disabled = false;
+            }, 'image/png');
         } catch(e) { hideProg(); toast('Gagal: ' + e.message, 'error'); $('btnDownload').disabled = false; }
     }, 80);
 };
 
 function renderFullRes(scale) {
-    var sw = removedBgCanvas.width, sh = removedBgCanvas.height;
-    var ow = sw * scale, oh = sh * scale;
-    var sat = $('rngSat').value/100, bri = $('rngBri').value/100, con = $('rngCon').value/100, vib = +$('rngVib').value;
-    var useStroke = $('chkStroke').checked, whiteW = +$('rngWhiteStroke').value*scale, blackW = +$('rngBlackStroke').value*scale;
-    var useBg = $('chkBgColor').checked, bgColor = $('pickBgColor').value;
-    var oc = document.createElement('canvas'); oc.width = ow; oc.height = oh;
-    var ox = oc.getContext('2d');
-    if (useBg) { ox.fillStyle = bgColor; ox.fillRect(0, 0, ow, oh); }
-    var uc = document.createElement('canvas'); uc.width = ow; uc.height = oh;
-    var ux = uc.getContext('2d');
-    ux.imageSmoothingEnabled = true; ux.imageSmoothingQuality = 'high';
-    ux.drawImage(removedBgCanvas, 0, 0, ow, oh);
-    if (scale > 1) applySharpen(ux, ow, oh, Math.min(0.8, 0.15*scale));
-    var cc = document.createElement('canvas'); cc.width = ow; cc.height = oh;
-    var cx = cc.getContext('2d');
-    cx.filter = 'saturate(' + sat + ') brightness(' + bri + ') contrast(' + con + ')';
-    cx.drawImage(uc, 0, 0); cx.filter = 'none';
-    if (vib > 0) { var dd = cx.getImageData(0, 0, ow, oh); applyVibrance(dd.data, vib/100); cx.putImageData(dd, 0, 0); }
-    if (useStroke) {
-        var tr = whiteW + blackW;
-        var bm = createSolidMask(cc, '#000000'), wm = createSolidMask(cc, '#ffffff');
-        var st = scale > 4 ? 2 : 1;
-        for (var dy = -tr; dy <= tr; dy += st) for (var dx = -tr; dx <= tr; dx += st) if (dx*dx+dy*dy <= tr*tr) ox.drawImage(bm, dx, dy);
-        for (var dy2 = -whiteW; dy2 <= whiteW; dy2 += st) for (var dx2 = -whiteW; dx2 <= whiteW; dx2 += st) if (dx2*dx2+dy2*dy2 <= whiteW*whiteW) ox.drawImage(wm, dx2, dy2);
-    }
-    ox.drawImage(cc, 0, 0); return oc;
+    var sw=removedBgCanvas.width,sh=removedBgCanvas.height,ow=sw*scale,oh=sh*scale;
+    var sat=$('rngSat').value/100,bri=$('rngBri').value/100,con=$('rngCon').value/100,vib=+$('rngVib').value;
+    var useStroke=$('chkStroke').checked,whiteW=+$('rngWhiteStroke').value*scale,blackW=+$('rngBlackStroke').value*scale;
+    var useBg=$('chkBgColor').checked,bgColor=$('pickBgColor').value;
+    var oc=document.createElement('canvas');oc.width=ow;oc.height=oh;var ox=oc.getContext('2d');
+    if(useBg){ox.fillStyle=bgColor;ox.fillRect(0,0,ow,oh);}
+    var uc=document.createElement('canvas');uc.width=ow;uc.height=oh;var ux=uc.getContext('2d');
+    ux.imageSmoothingEnabled=true;ux.imageSmoothingQuality='high';ux.drawImage(removedBgCanvas,0,0,ow,oh);
+    if(scale>1)applySharpen(ux,ow,oh,Math.min(0.8,0.15*scale));
+    var cc=document.createElement('canvas');cc.width=ow;cc.height=oh;var cx=cc.getContext('2d');
+    cx.filter='saturate('+sat+') brightness('+bri+') contrast('+con+')';cx.drawImage(uc,0,0);cx.filter='none';
+    if(vib>0){var dd=cx.getImageData(0,0,ow,oh);applyVibrance(dd.data,vib/100);cx.putImageData(dd,0,0);}
+    if(useStroke){var tr=whiteW+blackW,bm=createSolidMask(cc,'#000000'),wm=createSolidMask(cc,'#ffffff'),st=scale>4?2:1;for(var dy=-tr;dy<=tr;dy+=st)for(var dx=-tr;dx<=tr;dx+=st)if(dx*dx+dy*dy<=tr*tr)ox.drawImage(bm,dx,dy);for(var dy2=-whiteW;dy2<=whiteW;dy2+=st)for(var dx2=-whiteW;dx2<=whiteW;dx2+=st)if(dx2*dx2+dy2*dy2<=whiteW*whiteW)ox.drawImage(wm,dx2,dy2);}
+    ox.drawImage(cc,0,0);return oc;
 }
 
-function applySharpen(ctx, w, h, amt) {
-    var t = document.createElement('canvas'); t.width = w; t.height = h;
-    var tx = t.getContext('2d'); tx.drawImage(ctx.canvas, 0, 0);
-    var b = document.createElement('canvas'); b.width = w; b.height = h;
-    var bx = b.getContext('2d'); bx.filter = 'blur(' + Math.max(1, Math.round(amt*3)) + 'px)'; bx.drawImage(t, 0, 0); bx.filter = 'none';
-    var d = document.createElement('canvas'); d.width = w; d.height = h;
-    var dx = d.getContext('2d'); dx.drawImage(t, 0, 0);
-    dx.globalCompositeOperation = 'difference'; dx.drawImage(b, 0, 0);
-    ctx.globalCompositeOperation = 'source-over'; ctx.drawImage(t, 0, 0);
-    ctx.globalAlpha = Math.min(1, amt); ctx.drawImage(d, 0, 0);
-    ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+function applySharpen(ctx,w,h,amt){
+    var t=document.createElement('canvas');t.width=w;t.height=h;var tx=t.getContext('2d');tx.drawImage(ctx.canvas,0,0);
+    var b=document.createElement('canvas');b.width=w;b.height=h;var bx=b.getContext('2d');bx.filter='blur('+Math.max(1,Math.round(amt*3))+'px)';bx.drawImage(t,0,0);bx.filter='none';
+    var d=document.createElement('canvas');d.width=w;d.height=h;var dx=d.getContext('2d');dx.drawImage(t,0,0);dx.globalCompositeOperation='difference';dx.drawImage(b,0,0);
+    ctx.globalCompositeOperation='source-over';ctx.drawImage(t,0,0);ctx.globalAlpha=Math.min(1,amt);ctx.drawImage(d,0,0);ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
 }
-
 
 // ==========================================================
 // EVENT LISTENERS KONTROL
 // ==========================================================
- $('chkStroke').onchange = function() { toggleStrokeCtrl(); scheduleRender(); };
- $('rngWhiteStroke').oninput = function(e) { $('valWhiteStroke').textContent = e.target.value + 'px'; scheduleRender(); };
- $('rngBlackStroke').oninput = function(e) { $('valBlackStroke').textContent = e.target.value + 'px'; scheduleRender(); };
- $('chkBgColor').onchange = function() { toggleBgColorCtrl(); scheduleRender(); };
- $('pickBgColor').oninput = function(e) {
-    $('hexBgColor').textContent = e.target.value.toUpperCase();
-    $('presetColors').querySelectorAll('.color-swatch').forEach(function(s) { s.classList.remove('active'); });
-    scheduleRender();
-};
- $('rngSat').oninput = function(e) { $('valSat').textContent = e.target.value + '%'; scheduleRender(); };
- $('rngBri').oninput = function(e) { $('valBri').textContent = e.target.value + '%'; scheduleRender(); };
- $('rngCon').oninput = function(e) { $('valCon').textContent = e.target.value + '%'; scheduleRender(); };
- $('rngVib').oninput = function(e) { $('valVib').textContent = e.target.value + '%'; scheduleRender(); };
- $('rngTolerance').oninput = function(e) { $('valTolerance').textContent = e.target.value; };
- $('btnResetColor').onclick = function() {
-    $('rngSat').value=100;$('valSat').textContent='100%';$('rngBri').value=100;$('valBri').textContent='100%';
-    $('rngCon').value=100;$('valCon').textContent='100%';$('rngVib').value=0;$('valVib').textContent='0%';
-    scheduleRender(); toast('Warna direset', 'info');
-};
- $('rngUpscale').oninput = function(e) {
-    $('valUpscale').textContent = e.target.value + 'x'; updateOutputInfo();
-    $('upscalePresets').querySelectorAll('button').forEach(function(b) { b.style.borderColor = ''; });
-};
+ $('chkStroke').onchange=function(){toggleStrokeCtrl();scheduleRender();};
+ $('rngWhiteStroke').oninput=function(e){$('valWhiteStroke').textContent=e.target.value+'px';scheduleRender();};
+ $('rngBlackStroke').oninput=function(e){$('valBlackStroke').textContent=e.target.value+'px';scheduleRender();};
+ $('chkBgColor').onchange=function(){toggleBgColorCtrl();scheduleRender();};
+ $('pickBgColor').oninput=function(e){$('hexBgColor').textContent=e.target.value.toUpperCase();$('presetColors').querySelectorAll('.color-swatch').forEach(function(s){s.classList.remove('active');});scheduleRender();};
+ $('rngSat').oninput=function(e){$('valSat').textContent=e.target.value+'%';scheduleRender();};
+ $('rngBri').oninput=function(e){$('valBri').textContent=e.target.value+'%';scheduleRender();};
+ $('rngCon').oninput=function(e){$('valCon').textContent=e.target.value+'%';scheduleRender();};
+ $('rngVib').oninput=function(e){$('valVib').textContent=e.target.value+'%';scheduleRender();};
+ $('rngSensitivity').oninput=function(e){$('valSensitivity').textContent=e.target.value;};
+ $('rngEdge').oninput=function(e){$('valEdge').textContent=e.target.value;};
+ $('btnResetColor').onclick=function(){$('rngSat').value=100;$('valSat').textContent='100%';$('rngBri').value=100;$('valBri').textContent='100%';$('rngCon').value=100;$('valCon').textContent='100%';$('rngVib').value=0;$('valVib').textContent='0%';scheduleRender();toast('Warna direset','info');};
+ $('rngUpscale').oninput=function(e){$('valUpscale').textContent=e.target.value+'x';updateOutputInfo();$('upscalePresets').querySelectorAll('button').forEach(function(b){b.style.borderColor='';});};
 
-function toggleStrokeCtrl() { var e = $('strokeControls'); if ($('chkStroke').checked) e.classList.remove('opacity-40','pointer-events-none'); else e.classList.add('opacity-40','pointer-events-none'); }
-function toggleBgColorCtrl() { var e = $('bgColorControls'); if ($('chkBgColor').checked) e.classList.remove('opacity-40','pointer-events-none'); else e.classList.add('opacity-40','pointer-events-none'); }
-function updateOutputInfo() {
-    if (!removedBgCanvas) return;
-    var s = +$('rngUpscale').value;
-    $('statusOutput').textContent = (removedBgCanvas.width*s) + 'x' + (removedBgCanvas.height*s);
-    $('dlResInfo').textContent = (removedBgCanvas.width*s) + ' x ' + (removedBgCanvas.height*s) + ' px (' + s + 'x)';
-}
-
+function toggleStrokeCtrl(){var e=$('strokeControls');if($('chkStroke').checked)e.classList.remove('opacity-40','pointer-events-none');else e.classList.add('opacity-40','pointer-events-none');}
+function toggleBgColorCtrl(){var e=$('bgColorControls');if($('chkBgColor').checked)e.classList.remove('opacity-40','pointer-events-none');else e.classList.add('opacity-40','pointer-events-none');}
+function updateOutputInfo(){if(!removedBgCanvas)return;var s=+$('rngUpscale').value;$('dlResInfo').textContent=(removedBgCanvas.width*s)+' x '+(removedBgCanvas.height*s)+' px ('+s+'x)';}
 
 // ==========================================================
 // PARTIKEL BACKGROUND
 // ==========================================================
-(function() {
-    var canvas = $('particleCanvas');
-    var ctx = canvas.getContext('2d');
-    var particles = [];
-    var count = 50;
-
-    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-    window.addEventListener('resize', resize); resize();
-
-    function Particle() { this.reset(); }
-    Particle.prototype.reset = function() {
-        this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 2 + 0.5; this.speedX = (Math.random() - 0.5) * 0.4; this.speedY = (Math.random() - 0.5) * 0.4;
-        this.opacity = Math.random() * 0.4 + 0.1;
-    };
-    Particle.prototype.update = function() { this.x += this.speedX; this.y += this.speedY; if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset(); };
-    Particle.prototype.draw = function() { ctx.fillStyle = 'rgba(220,38,38,' + this.opacity + ')'; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); };
-
-    for (var i = 0; i < count; i++) particles.push(new Particle());
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for (var j = 0; j < particles.length; j++) { particles[j].update(); particles[j].draw(); }
-        requestAnimationFrame(animate);
-    }
-    animate();
+(function(){
+    var canvas=$('particleCanvas'),ctx=canvas.getContext('2d'),particles=[],count=50;
+    function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+    window.addEventListener('resize',resize);resize();
+    function P(){this.reset();}
+    P.prototype.reset=function(){this.x=Math.random()*canvas.width;this.y=Math.random()*canvas.height;this.size=Math.random()*2+0.5;this.sx=(Math.random()-0.5)*0.4;this.sy=(Math.random()-0.5)*0.4;this.o=Math.random()*0.4+0.1;};
+    P.prototype.update=function(){this.x+=this.sx;this.y+=this.sy;if(this.x<0||this.x>canvas.width||this.y<0||this.y>canvas.height)this.reset();};
+    P.prototype.draw=function(){ctx.fillStyle='rgba(220,38,38,'+this.o+')';ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fill();};
+    for(var i=0;i<count;i++)particles.push(new P());
+    (function anim(){ctx.clearRect(0,0,canvas.width,canvas.height);for(var j=0;j<particles.length;j++){particles[j].update();particles[j].draw();}requestAnimationFrame(anim);})();
 })();
-
 </script>
 </body>
 </html>
