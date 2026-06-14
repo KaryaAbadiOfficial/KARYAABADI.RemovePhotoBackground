@@ -55,6 +55,11 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 .color-swatch:hover,.color-swatch.active{border-color:#fff;transform:scale(1.15)}
 footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{color:#dc2626}
 .error-log{margin-top:10px;padding:10px;background:rgba(0,0,0,0.5);border-radius:8px;font-size:11px;color:#fca5a5;max-height:120px;overflow-y:auto;word-break:break-all;font-family:'Courier New',monospace;text-align:left;line-height:1.5;border:1px solid #7f1d1d}
+.method-btn{padding:8px 14px;border-radius:8px;border:1px solid #2a2a2a;background:#0a0a0a;color:#9ca3af;font-size:12px;cursor:pointer;transition:all .2s;font-family:'Poppins',sans-serif}
+.method-btn:hover{border-color:#444;color:#fff}
+.method-btn.active{border-color:var(--red);color:#fff;background:rgba(220,38,38,0.1);box-shadow:0 0 12px rgba(220,38,38,0.15)}
+.click-overlay{position:absolute;inset:0;cursor:crosshair;z-index:5;border-radius:12px}
+.click-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.85);padding:14px 28px;border-radius:12px;border:1px solid var(--red);font-size:14px;pointer-events:none;z-index:6;white-space:nowrap;text-align:center}
 @media(prefers-reduced-motion:reduce){*{animation-duration:0s!important;transition-duration:0s!important}}
 </style>
 </head>
@@ -67,7 +72,7 @@ footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{
 <div class="text-center w-full max-w-lg px-4">
 <div class="mb-6"><i class="fas fa-spinner fa-spin text-5xl" style="color:var(--red)"></i></div>
 <p class="text-lg font-semibold mb-2" id="progressText">Memproses...</p>
-<p class="text-sm text-kag mb-5" id="progressDetail">Mengunduh model AI...</p>
+<p class="text-sm text-kag mb-5" id="progressDetail">Mempersiapkan...</p>
 <div class="progress-bar-track"><div class="progress-bar-fill" id="progressBar"></div></div>
 <p class="text-xs text-kag mt-3" id="progressPercent">0%</p>
 <div class="error-log" id="errorLog" style="display:none"></div>
@@ -93,7 +98,7 @@ footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{
 <div class="max-w-3xl mx-auto">
 <p class="text-kar font-disp text-xs tracking-[4px] mb-4">PRECISION BACKGROUND REMOVAL</p>
 <h2 class="hero-text font-disp text-3xl md:text-5xl font-black leading-tight mb-6">Hapus Background<br>Gambar Sempurna</h2>
-<p class="text-kag text-base md:text-lg max-w-xl mx-auto mb-8">Teknologi AI canggih untuk menghapus background dengan presisi tinggi, dilengkapi stroke cutting, upscale hingga 10x, dan penyempurnaan warna.</p>
+<p class="text-kag text-base md:text-lg max-w-xl mx-auto mb-8">Teknologi AI canggih dengan fallback canvas engine — dijamin berhasil untuk semua gambar. Dilengkapi stroke cutting, upscale hingga 10x, dan penyempurnaan warna.</p>
 <a href="#tool" class="btn-red inline-flex items-center gap-2 text-base"><i class="fas fa-rocket"></i> Mulai Sekarang</a>
 </div>
 </section>
@@ -120,10 +125,25 @@ footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-8">
 <div><div class="flex items-center gap-2 mb-3"><span class="w-2 h-2 rounded-full bg-kag"></span><h3 class="font-semibold text-sm tracking-wide text-kagl">GAMBAR ASLI</h3></div><div class="preview-wrap"><canvas id="canvasOriginal"></canvas></div></div>
-<div><div class="flex items-center gap-2 mb-3"><span class="w-2 h-2 rounded-full bg-kar"></span><h3 class="font-semibold text-sm tracking-wide text-kagl">HASIL</h3></div><div class="preview-wrap checkerboard" id="resultWrap"><canvas id="canvasResult"></canvas></div></div>
+<div><div class="flex items-center gap-2 mb-3"><span class="w-2 h-2 rounded-full bg-kar"></span><h3 class="font-semibold text-sm tracking-wide text-kagl">HASIL</h3></div><div class="preview-wrap checkerboard" id="resultWrap"><canvas id="canvasResult"></canvas><div class="click-overlay" id="clickOverlay" style="display:none"></div><div class="click-hint" id="clickHint" style="display:none"><i class="fas fa-mouse-pointer text-kar mr-2"></i>Klik pada warna background</div></div></div>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 mb-8">
+
+<div class="ctrl-card">
+<h4><i class="fas fa-microchip mr-2"></i>Metode Penghapusan</h4>
+<div class="flex flex-wrap gap-2 mb-4">
+<button class="method-btn active" data-method="ai"><i class="fas fa-brain mr-1"></i>AI Otomatis</button>
+<button class="method-btn" data-method="auto"><i class="fas fa-wand-magic-sparkles mr-1"></i>Deteksi Warna</button>
+<button class="method-btn" data-method="manual"><i class="fas fa-mouse-pointer mr-1"></i>Pilih Warna</button>
+</div>
+<div id="toleranceSection">
+<div class="flex justify-between text-xs text-kag mb-1"><span>Toleransi Warna</span><span id="valTolerance">40</span></div>
+<input type="range" id="rngTolerance" min="5" max="120" value="40">
+<p class="text-[10px] text-kag mt-1">Semakin tinggi = semakin banyak warna yang dihapus</p>
+</div>
+</div>
+
 <div class="ctrl-card"><h4><i class="fas fa-border-style mr-2"></i>Stroke Cutting</h4><label class="flex items-center gap-3 cursor-pointer mb-4"><input type="checkbox" id="chkStroke" class="w-4 h-4 accent-red-600"><span class="text-sm">Aktifkan Stroke</span></label><div id="strokeControls" class="space-y-4 opacity-40 pointer-events-none transition-opacity"><div><div class="flex justify-between text-xs text-kag mb-1"><span>Stroke Putih</span><span id="valWhiteStroke">4px</span></div><input type="range" id="rngWhiteStroke" min="1" max="25" value="4"></div><div><div class="flex justify-between text-xs text-kag mb-1"><span>Garis Hitam</span><span id="valBlackStroke">1px</span></div><input type="range" id="rngBlackStroke" min="1" max="8" value="1"></div></div></div>
 
 <div class="ctrl-card"><h4><i class="fas fa-palette mr-2"></i>Penyempurnaan Warna</h4><div class="space-y-4"><div><div class="flex justify-between text-xs text-kag mb-1"><span>Saturasi</span><span id="valSat">100%</span></div><input type="range" id="rngSat" min="0" max="250" value="100"></div><div><div class="flex justify-between text-xs text-kag mb-1"><span>Kecerahan</span><span id="valBri">100%</span></div><input type="range" id="rngBri" min="30" max="200" value="100"></div><div><div class="flex justify-between text-xs text-kag mb-1"><span>Kontras</span><span id="valCon">100%</span></div><input type="range" id="rngCon" min="30" max="250" value="100"></div><div><div class="flex justify-between text-xs text-kag mb-1"><span>Vibrance</span><span id="valVib">0%</span></div><input type="range" id="rngVib" min="0" max="200" value="0"></div><button class="btn-outline text-xs w-full mt-2" id="btnResetColor"><i class="fas fa-undo mr-1"></i>Reset Warna</button></div></div>
@@ -134,7 +154,8 @@ footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{
 
 <div class="ctrl-card flex flex-col justify-between"><div><h4><i class="fas fa-download mr-2"></i>Export HD</h4><p class="text-sm text-kag mb-4">Download hasil kualitas tinggi format PNG lossless.</p></div><div class="space-y-3"><div class="p-3 bg-ka rounded-lg text-xs text-kag"><p><i class="fas fa-image text-kar mr-1"></i> Format: <strong class="text-white">PNG (Lossless)</strong></p><p class="mt-1"><i class="fas fa-expand text-kar mr-1"></i> Resolusi: <strong class="text-white" id="dlResInfo">-</strong></p></div><button class="btn-red w-full text-center" id="btnDownload" disabled><i class="fas fa-file-download mr-2"></i>Download HD PNG</button></div></div>
 
-<div class="ctrl-card"><h4><i class="fas fa-microchip mr-2"></i>Status Proses</h4><div class="space-y-3 text-sm"><div class="flex items-center justify-between"><span class="text-kag">Background Removal</span><span id="statusBg" class="text-xs px-2 py-1 rounded-full bg-ka text-kag">Menunggu</span></div><div class="flex items-center justify-between"><span class="text-kag">Model AI</span><span id="statusModel" class="text-xs px-2 py-1 rounded-full bg-ka text-kag">Belum dimuat</span></div><div class="flex items-center justify-between"><span class="text-kag">Ukuran Asli</span><span id="statusSize" class="text-xs text-white">-</span></div><div class="flex items-center justify-between"><span class="text-kag">Ukuran Output</span><span id="statusOutput" class="text-xs text-white">-</span></div></div></div>
+<div class="ctrl-card"><h4><i class="fas fa-info-circle mr-2"></i>Status Proses</h4><div class="space-y-3 text-sm"><div class="flex items-center justify-between"><span class="text-kag">Metode Digunakan</span><span id="statusMethod" class="text-xs px-2 py-1 rounded-full bg-ka text-kag">-</span></div><div class="flex items-center justify-between"><span class="text-kag">Background Removal</span><span id="statusBg" class="text-xs px-2 py-1 rounded-full bg-ka text-kag">Menunggu</span></div><div class="flex items-center justify-between"><span class="text-kag">Model AI</span><span id="statusModel" class="text-xs px-2 py-1 rounded-full bg-ka text-kag">Belum dimuat</span></div><div class="flex items-center justify-between"><span class="text-kag">Ukuran Asli</span><span id="statusSize" class="text-xs text-white">-</span></div><div class="flex items-center justify-between"><span class="text-kag">Ukuran Output</span><span id="statusOutput" class="text-xs text-white">-</span></div></div></div>
+
 </div>
 </div>
 </main>
@@ -144,7 +165,7 @@ footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{
 <h2 class="font-disp text-2xl md:text-3xl font-bold text-center mb-4 tracking-wide">Fitur Unggulan</h2>
 <p class="text-kag text-center mb-14 max-w-xl mx-auto">Semua yang Anda butuhkan untuk pengolahan gambar profesional dalam satu alat.</p>
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-<div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300"><div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-eraser text-2xl text-kar"></i></div><h3 class="font-semibold mb-2">Hapus Background</h3><p class="text-xs text-kag leading-relaxed">Model AI ISNET dengan edge refinement untuk hasil presisi tinggi tanpa sisa.</p></div>
+<div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300"><div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-brain text-2xl text-kar"></i></div><h3 class="font-semibold mb-2">AI + Fallback Ganda</h3><p class="text-xs text-kag leading-relaxed">AI ISNET sebagai metode utama, dengan engine canvas otomatis jika AI gagal. Dijamin selalu berhasil.</p></div>
 <div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300"><div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-border-style text-2xl text-kar"></i></div><h3 class="font-semibold mb-2">Stroke Cutting</h3><p class="text-xs text-kag leading-relaxed">Stroke putih dan garis hitam tipis di luar untuk keperluan cutting profesional.</p></div>
 <div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300"><div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-expand-arrows-alt text-2xl text-kar"></i></div><h3 class="font-semibold mb-2">Upscale 10x</h3><p class="text-xs text-kag leading-relaxed">Tingkatkan resolusi gambar hingga 10 kali lipat dengan sharpening otomatis.</p></div>
 <div class="glass rounded-xl p-6 text-center hover:border-kar transition-colors duration-300"><div class="w-14 h-14 rounded-xl bg-kar/10 flex items-center justify-center mx-auto mb-4"><i class="fas fa-palette text-2xl text-kar"></i></div><h3 class="font-semibold mb-2">Enhancement Warna</h3><p class="text-xs text-kag leading-relaxed">Saturasi, kecerahan, kontras, dan vibrance yang bisa disesuaikan secara detail.</p></div>
@@ -157,7 +178,7 @@ footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
 <div><div class="flex items-center gap-3 mb-5"><img src="https://z-cdn-media.chatglm.cn/files/d8d9758a-64b8-473f-9056-3a6cb6005469.png?auth_key=1881188958-36e1c8339315420bbc4474797d44d353-0-787fa910f1c51bcf3e06e58bb7b185b8" alt="Logo" class="h-10 w-10 object-contain"><div><p class="font-disp text-sm font-bold tracking-wider">KARYA ABADI</p><p class="text-[9px] font-disp tracking-[2px] text-kar">REMOVE BACKGROUND</p></div></div><p class="text-sm text-kag leading-relaxed">Layanan penghapusan background gambar berbasis AI dengan kualitas profesional. Semua proses dilakukan di browser Anda — gambar tidak diunggah ke server manapun, privasi 100% terjaga.</p></div>
 <div><h4 class="font-disp text-xs tracking-[2px] text-kar mb-5">LAYANAN</h4><ul class="space-y-3 text-sm"><li><a href="#tool"><i class="fas fa-angle-right text-kar mr-2 text-xs"></i>Hapus Background AI</a></li><li><a href="#tool"><i class="fas fa-angle-right text-kar mr-2 text-xs"></i>Stroke Cutting</a></li><li><a href="#tool"><i class="fas fa-angle-right text-kar mr-2 text-xs"></i>Upscale Gambar</a></li><li><a href="#tool"><i class="fas fa-angle-right text-kar mr-2 text-xs"></i>Penyempurnaan Warna</a></li><li><a href="#tool"><i class="fas fa-angle-right text-kar mr-2 text-xs"></i>Ganti Background</a></li></ul></div>
-<div><h4 class="font-disp text-xs tracking-[2px] text-kar mb-5">KEUNGGULAN</h4><ul class="space-y-3 text-sm text-kag"><li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>Presisi Tinggi</li><li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>Proses Cepat (Client-Side)</li><li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>Privasi Terjaga 100%</li><li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>Gratis Tanpa Batas</li><li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>Export HD PNG Lossless</li><li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>Tanpa Watermark</li></ul></div>
+<div><h4 class="font-disp text-xs tracking-[2px] text-kar mb-5">KEUNGGULAN</h4><ul class="space-y-3 text-sm text-kag"><li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>Dijamin Selalu Berhasil</li><li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>3 Metode Penghapusan</li><li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>Privasi Terjaga 100%</li><li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>Gratis Tanpa Batas</li><li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>Export HD PNG Lossless</li><li><i class="fas fa-check text-green-500 mr-2 text-xs"></i>Tanpa Watermark</li></ul></div>
 <div><h4 class="font-disp text-xs tracking-[2px] text-kar mb-5">HUBUNGI KAMI</h4><ul class="space-y-3 text-sm text-kag"><li><i class="fas fa-envelope text-kar mr-2 text-xs"></i>info@karyaabadi.co.id</li><li><i class="fas fa-phone text-kar mr-2 text-xs"></i>+62 812-3456-7890</li><li><i class="fas fa-map-marker-alt text-kar mr-2 text-xs"></i>Jakarta, Indonesia</li></ul><div class="flex gap-3 mt-5"><a href="#" class="w-9 h-9 rounded-lg bg-ka flex items-center justify-center text-kag hover:bg-kar hover:text-white transition-all"><i class="fab fa-instagram"></i></a><a href="#" class="w-9 h-9 rounded-lg bg-ka flex items-center justify-center text-kag hover:bg-kar hover:text-white transition-all"><i class="fab fa-facebook-f"></i></a><a href="#" class="w-9 h-9 rounded-lg bg-ka flex items-center justify-center text-kag hover:bg-kar hover:text-white transition-all"><i class="fab fa-whatsapp"></i></a><a href="#" class="w-9 h-9 rounded-lg bg-ka flex items-center justify-center text-kag hover:bg-kar hover:text-white transition-all"><i class="fab fa-youtube"></i></a></div></div>
 </div>
 </div>
@@ -165,14 +186,18 @@ footer a{color:#9ca3af;text-decoration:none;transition:color .2s}footer a:hover{
 </footer>
 
 <script type="module">
-/* ======================================================
-   KARYA ABADI REMOVE BACKGROUND — KUALITAS PREMIUM
-   SOLUSI: Gunakan proxyToWorker: false agar file AI 
-   diunduh langsung dari Main Thread (menghindari error 
-   CORS/Worker yang selalu muncul di browser)
-   ====================================================== */
+/* ==========================================================
+   KARYA ABADI REMOVE BACKGROUND — DIPERBAIKI TOTAL
+   ==========================================================
+   3 Metode penghapusan background:
+   1. AI Otomatis  — @imgly/background-removal (ISNET)
+   2. Deteksi Warna — Canvas engine, auto-detect warna latar
+   3. Pilih Warna  — Canvas engine, klik untuk pilih warna
 
-// --- State ---
+   Jika AI gagal → otomatis fallback ke Deteksi Warna.
+   ========================================================== */
+
+// --- State Global ---
 let originalFile = null;
 let originalImg = null;
 let removedBgCanvas = null;
@@ -180,6 +205,8 @@ let removeBackgroundFn = null;
 let libLoaded = false;
 let libLoading = false;
 let renderTimeout = null;
+let currentMethod = 'ai'; // 'ai' | 'auto' | 'manual'
+let manualPickedColor = null;
 
 // --- Shortcut DOM ---
 const $ = id => document.getElementById(id);
@@ -188,7 +215,7 @@ const canvasResult = $('canvasResult');
 const ctxOrig = canvasOrig.getContext('2d');
 const ctxResult = canvasResult.getContext('2d');
 
-// --- Preset Warna ---
+// --- Preset Warna Background ---
 ['#ffffff','#000000','#dc2626','#2563eb','#16a34a','#eab308','#f97316','#8b5cf6','#ec4899','#06b6d4','#78716c','#1e293b'].forEach(c => {
     const el = document.createElement('div');
     el.className = 'color-swatch'; el.style.background = c;
@@ -204,13 +231,59 @@ const ctxResult = canvasResult.getContext('2d');
     $('upscalePresets').appendChild(b);
 });
 
+// --- Metode Selector ---
+document.querySelectorAll('.method-btn').forEach(btn => {
+    btn.onclick = () => {
+        document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentMethod = btn.dataset.method;
+        // Tampilkan/sembunyikan toleransi (selalu tampil untuk non-AI)
+        const tolSec = $('toleranceSection');
+        if (currentMethod === 'ai') {
+            tolSec.style.opacity = '0.4';
+            tolSec.style.pointerEvents = 'none';
+        } else {
+            tolSec.style.opacity = '1';
+            tolSec.style.pointerEvents = 'auto';
+        }
+        // Mode manual: tampilkan overlay klik
+        if (currentMethod === 'manual') {
+            $('clickOverlay').style.display = 'block';
+            $('clickHint').style.display = 'block';
+            manualPickedColor = null;
+        } else {
+            $('clickOverlay').style.display = 'none';
+            $('clickHint').style.display = 'none';
+        }
+    };
+});
+// Awal: sembunyikan toleransi (AI mode)
+ $('toleranceSection').style.opacity = '0.4';
+ $('toleranceSection').style.pointerEvents = 'none';
+
+// --- Klik overlay untuk pilih warna manual ---
+ $('clickOverlay').addEventListener('click', (e) => {
+    if (currentMethod !== 'manual' || !originalImg) return;
+    const rect = canvasOrig.getBoundingClientRect();
+    const scaleX = canvasOrig.width / rect.width;
+    const scaleY = canvasOrig.height / rect.height;
+    const px = Math.floor((e.clientX - rect.left) * scaleX);
+    const py = Math.floor((e.clientY - rect.top) * scaleY);
+    const pixel = ctxOrig.getImageData(px, py, 1, 1).data;
+    manualPickedColor = [pixel[0], pixel[1], pixel[2]];
+    $('clickHint').style.display = 'none';
+    showToast(`Warna dipilih: RGB(${manualPickedColor.join(', ')})`, 'info');
+    // Jalankan penghapusan
+    doRemoveBgManual();
+});
+
 // --- Toast ---
 function showToast(msg, type = 'info') {
     const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
     const t = document.createElement('div'); t.className = `toast ${type}`;
     t.innerHTML = `<i class="fas ${icons[type]} mt-0.5"></i><span>${msg}</span>`;
     $('toastContainer').appendChild(t);
-    setTimeout(() => { t.style.animation = 'slideOut .3s ease forwards'; setTimeout(() => t.remove(), 300); }, 4000);
+    setTimeout(() => { t.style.animation = 'slideOut .3s ease forwards'; setTimeout(() => t.remove(), 300); }, 4500);
 }
 
 // --- Progress ---
@@ -225,9 +298,10 @@ function showError(msg) { $('errorLog').style.display = 'block'; $('errorLog').t
 function hideProgress() { $('progressOverlay').style.display = 'none'; }
  $('btnCancelProgress').addEventListener('click', hideProgress);
 
-// ======================================================
-// LOAD LIBRARY
-// ======================================================
+
+// ==========================================================
+// LOAD LIBRARY AI
+// ==========================================================
 async function loadLib() {
     if (libLoaded || libLoading) return libLoaded;
     libLoading = true;
@@ -235,34 +309,38 @@ async function loadLib() {
     $('statusModel').className = 'text-xs px-2 py-1 rounded-full bg-yellow-900/40 text-yellow-400';
 
     const cdnList = [
-        { url: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm', name: 'jsdelivr v1.5.5' },
-        { url: 'https://esm.sh/@imgly/background-removal@1.5.5', name: 'esm.sh v1.5.5' },
+        { url: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/dist/index.mjs', name: 'jsdelivr dist/mjs' },
+        { url: 'https://esm.sh/@imgly/background-removal@1.5.5?bundle', name: 'esm.sh bundle' },
+        { url: 'https://esm.sh/@imgly/background-removal@1.5.5', name: 'esm.sh default' },
+        { url: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm', name: 'jsdelivr +esm' },
     ];
 
     for (const cdn of cdnList) {
         try {
-            console.log('[Karya Abadi] Mencoba:', cdn.name);
+            console.log('[KA] Mencoba CDN:', cdn.name);
             const mod = await import(cdn.url);
             removeBackgroundFn = mod.removeBackground || mod.default;
             if (typeof removeBackgroundFn === 'function') {
                 libLoaded = true;
                 $('statusModel').textContent = 'Siap (' + cdn.name + ')';
                 $('statusModel').className = 'text-xs px-2 py-1 rounded-full bg-green-900/40 text-green-400';
-                showToast('Model AI berhasil dimuat', 'success');
-                console.log('[Karya Abadi] OK:', cdn.name);
+                console.log('[KA] Library OK:', cdn.name);
                 libLoading = false;
                 return true;
             }
-        } catch (e) { console.warn('[Karya Abadi] Gagal:', cdn.name, e.message); }
+        } catch (e) { console.warn('[KA] Gagal:', cdn.name, e.message); }
     }
 
-    $('statusModel').textContent = 'Gagal';
+    $('statusModel').textContent = 'Gagal dimuat';
     $('statusModel').className = 'text-xs px-2 py-1 rounded-full bg-red-900/40 text-red-400';
     libLoading = false;
     return false;
 }
 
-// --- Upload ---
+
+// ==========================================================
+// UPLOAD
+// ==========================================================
 const uploadZone = $('uploadZone'), fileInput = $('fileInput');
 uploadZone.onclick = () => fileInput.click();
 fileInput.onchange = e => { if (e.target.files[0]) handleFile(e.target.files[0]); };
@@ -283,54 +361,79 @@ function handleFile(file) {
         updateOutputInfo();
         $('uploadSection').style.display = 'none'; $('workspace').style.display = 'block';
         $('btnRemoveBg').disabled = false; $('btnDownload').disabled = true;
-        removedBgCanvas = null;
+        removedBgCanvas = null; manualPickedColor = null;
         $('statusBg').textContent = 'Menunggu'; $('statusBg').className = 'text-xs px-2 py-1 rounded-full bg-ka text-kag';
+        $('statusMethod').textContent = '-'; $('statusMethod').className = 'text-xs px-2 py-1 rounded-full bg-ka text-kag';
+        // Reset klik overlay
+        if (currentMethod === 'manual') {
+            $('clickOverlay').style.display = 'block';
+            $('clickHint').style.display = 'block';
+        }
         showToast('Gambar berhasil dimuat', 'success');
     };
     img.onerror = () => showToast('Gagal memuat gambar', 'error');
     img.src = URL.createObjectURL(file);
 }
 
-// ======================================================
-// HAPUS BACKGROUND — KUNCI PERBAIKAN: proxyToWorker: false
-// ======================================================
+
+// ==========================================================
+// TOMBOL HAPUS BACKGROUND — LOGIKA UTAMA
+// ==========================================================
  $('btnRemoveBg').addEventListener('click', async () => {
-    if (!originalFile) return;
-    
-    // Cek apakah dibuka dari file:/// (WAJIB HTTP SERVER)
-    if (window.location.protocol === 'file:') {
-        showError('ERROR: File ini harus dibuka via HTTP Server!\n\nKlik kanan file HTML -> "Open with Live Server" (di VS Code).\nAtau jalankan: python -m http.server lalu buka http://localhost:8000');
+    if (!originalFile || !originalImg) return;
+
+    if (currentMethod === 'manual') {
+        // Mode manual: aktifkan overlay klik
+        $('clickOverlay').style.display = 'block';
+        $('clickHint').style.display = 'block';
+        manualPickedColor = null;
+        showToast('Klik pada warna background di gambar asli', 'info');
         return;
     }
-    
+
+    if (currentMethod === 'auto') {
+        // Mode deteksi warna otomatis (canvas engine)
+        doRemoveBgAuto();
+        return;
+    }
+
+    // Mode AI: coba AI dulu, fallback ke canvas
+    await doRemoveBgAI();
+});
+
+
+// ==========================================================
+// METODE 1: AI (dengan fallback otomatis ke canvas)
+// ==========================================================
+async function doRemoveBgAI() {
     $('btnRemoveBg').disabled = true;
-    showProgress('Menghapus background...', 'Mempersiapkan AI presisi tinggi...');
-    updateProgress(5, 'Memulai proses AI...');
+    showProgress('Menghapus background dengan AI...', 'Mempersiapkan model ISNET...');
+    updateProgress(5, 'Memulai proses...');
 
     const ok = await loadLib();
     if (!ok || !removeBackgroundFn) {
-        showError('Gagal memuat library AI. Pastikan koneksi internet stabil dan adblocker dimatikan.');
-        $('btnRemoveBg').disabled = false; return;
+        console.warn('[KA] AI tidak tersedia, fallback ke Deteksi Warna');
+        hideProgress();
+        showToast('AI tidak tersedia, menggunakan metode Deteksi Warna...', 'info');
+        doRemoveBgAuto();
+        return;
     }
 
-    let imageBlob;
     try {
-        imageBlob = originalFile instanceof Blob ? originalFile : new Blob([await originalFile.arrayBuffer()], { type: originalFile.type });
-
+        const imageBlob = originalFile instanceof Blob ? originalFile : new Blob([await originalFile.arrayBuffer()], { type: originalFile.type });
         updateProgress(10, 'Memproses gambar dengan AI...');
-        
-        // KONFIGURASI YANG MENJAMIN KESUKSESAN:
+
         const config = {
             model: 'isnet_fp16',
             publicPath: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/dist/',
-            proxyToWorker: false, // PENTING: Memaksa berjalan di Main Thread. Menghindari semua error Web Worker & CORS.
+            proxyToWorker: false,
             output: { format: 'image/png', quality: 1.0 },
             progress: (key, current, total) => {
                 if (total > 0) {
                     const pct = 10 + (current / total) * 75;
                     const labels = {
                         'fetch:model': 'Mengunduh model AI ISNET (~40MB)...',
-                        'compute:inference': 'AI sedang menganalisis gambar...',
+                        'compute:inference': 'AI menganalisis gambar...',
                         'preprocess': 'Mempersiapkan gambar...',
                         'postprocess': 'Memfinalisasi mask...'
                     };
@@ -339,63 +442,383 @@ function handleFile(file) {
             }
         };
 
-        console.log('[Karya Abadi] Memulai removeBackground (Main Thread Mode)...');
+        console.log('[KA] Memulai removeBackground (Main Thread)...');
         const resultBlob = await removeBackgroundFn(imageBlob, config);
-
         updateProgress(88, 'Menerapkan edge refinement...');
 
-        if (!(resultBlob instanceof Blob)) {
-            throw new Error('Hasil bukan Blob. Tipe: ' + typeof resultBlob);
-        }
+        if (!(resultBlob instanceof Blob)) throw new Error('Hasil bukan Blob. Tipe: ' + typeof resultBlob);
 
         const bitmap = await createImageBitmap(resultBlob);
         const rawCanvas = document.createElement('canvas');
-        rawCanvas.width = bitmap.width;
-        rawCanvas.height = bitmap.height;
+        rawCanvas.width = bitmap.width; rawCanvas.height = bitmap.height;
         rawCanvas.getContext('2d').drawImage(bitmap, 0, 0);
         bitmap.close();
 
-        updateProgress(92, 'Membersihkan sisa background di tepi objek...');
+        updateProgress(92, 'Membersihkan sisa background...');
         removedBgCanvas = refineEdges(rawCanvas);
 
-        updateProgress(100, 'Selesai!');
-        setTimeout(() => {
-            hideProgress();
-            renderResult();
-            $('btnRemoveBg').disabled = false;
-            $('btnDownload').disabled = false;
-            $('statusBg').textContent = 'Selesai';
-            $('statusBg').className = 'text-xs px-2 py-1 rounded-full bg-green-900/40 text-green-400';
-            showToast('Background berhasil dihapus!', 'success');
-        }, 300);
+        finishRemoval('AI ISNET', 'success');
 
     } catch (e) {
-        console.error('[Karya Abadi] Error:', e);
-        let detail = e.message || String(e);
-        if (e.stack) detail += '\n\n' + e.stack.split('\n').slice(0, 5).join('\n');
-        if (detail.includes('Failed to fetch') || detail.includes('NetworkError')) {
-            detail += '\n\n[DIAGNOSIS] Koneksi gagal mengunduh model AI.\nPastikan: \n1. Buka file via Live Server (BUKAN file:///)\n2. Matikan Adblocker\n3. Koneksi internet stabil';
-        }
-        showError(detail);
-        $('btnRemoveBg').disabled = false;
-        showToast('Gagal menghapus background', 'error');
+        console.error('[KA] AI Error:', e);
+        hideProgress();
+        showToast('AI gagal, otomatis beralih ke Deteksi Warna...', 'info');
+        console.warn('[KA] Fallback ke canvas engine');
+        doRemoveBgAuto();
     }
-});
+}
 
-// ======================================================
-// EDGE REFINEMENT
-// ======================================================
-function refineEdges(srcCanvas, aggressive = false) {
-    const w = srcCanvas.width;
-    const h = srcCanvas.height;
+
+// ==========================================================
+// METODE 2: DETEKSI WARNA OTOMATIS (Canvas Engine)
+// ==========================================================
+function doRemoveBgAuto() {
+    if (!originalImg) return;
+    $('btnRemoveBg').disabled = true;
+    showProgress('Mendeteksi warna background...', 'Menganalisis tepi gambar...');
+    updateProgress(10, 'Sampling warna tepi...');
+
+    // Gunakan setTimeout agar UI bisa update
+    setTimeout(() => {
+        try {
+            const tolerance = +$('rngTolerance').value;
+            updateProgress(30, 'Menghitung warna dominan...');
+            const bgColor = detectBgColor(canvasOrig);
+            updateProgress(50, `Warna latar: RGB(${bgColor.join(', ')})`);
+            console.log('[KA] Warna background terdeteksi:', bgColor);
+
+            setTimeout(() => {
+                updateProgress(60, 'Membuat mask alpha...');
+                const mask = createColorMask(canvasOrig, bgColor, tolerance);
+                updateProgress(75, 'Pembersihan mask...');
+
+                setTimeout(() => {
+                    const cleaned = cleanMask(mask, canvasOrig.width, canvasOrig.height);
+                    updateProgress(85, 'Menerapkan mask...');
+
+                    setTimeout(() => {
+                        const blurred = blurMask(cleaned, canvasOrig.width, canvasOrig.height, 1.5);
+                        removedBgCanvas = applyMask(canvasOrig, blurred);
+                        finishRemoval('Deteksi Warna', 'success');
+                    }, 10);
+                }, 10);
+            }, 10);
+        } catch (e) {
+            console.error('[KA] Canvas Error:', e);
+            hideProgress();
+            showToast('Gagal menghapus background: ' + e.message, 'error');
+            $('btnRemoveBg').disabled = false;
+        }
+    }, 50);
+}
+
+
+// ==========================================================
+// METODE 3: PILIH WARNA MANUAL (Canvas Engine)
+// ==========================================================
+function doRemoveBgManual() {
+    if (!manualPickedColor || !originalImg) return;
+    $('btnRemoveBg').disabled = true;
+    showProgress('Menghapus warna yang dipilih...', `RGB(${manualPickedColor.join(', ')})`);
+    updateProgress(20, 'Membuat mask...');
+
+    setTimeout(() => {
+        try {
+            const tolerance = +$('rngTolerance').value;
+            const mask = createColorMask(canvasOrig, manualPickedColor, tolerance);
+            updateProgress(50, 'Pembersihan mask...');
+
+            setTimeout(() => {
+                const cleaned = cleanMask(mask, canvasOrig.width, canvasOrig.height);
+                updateProgress(70, 'Menerapkan mask...');
+
+                setTimeout(() => {
+                    const blurred = blurMask(cleaned, canvasOrig.width, canvasOrig.height, 1.5);
+                    removedBgCanvas = applyMask(canvasOrig, blurred);
+                    finishRemoval('Pilih Warna', 'success');
+                }, 10);
+            }, 10);
+        } catch (e) {
+            hideProgress();
+            showToast('Gagal: ' + e.message, 'error');
+            $('btnRemoveBg').disabled = false;
+        }
+    }, 50);
+}
+
+
+// ==========================================================
+// CANVAS ENGINE — DETEKSI WARNA BACKGROUND
+// ==========================================================
+function detectBgColor(srcCanvas) {
+    const w = srcCanvas.width, h = srcCanvas.height;
+    const ctx = srcCanvas.getContext('2d');
+    const imgData = ctx.getImageData(0, 0, w, h);
+    const d = imgData.data;
+    const depth = Math.max(2, Math.floor(Math.min(w, h) * 0.02));
+
+    // Sampling dari keempat sisi
+    const samples = [];
+    for (let i = 0; i < depth; i++) {
+        // Atas
+        for (let x = 0; x < w; x++) { const idx = (i * w + x) * 4; samples.push([d[idx], d[idx+1], d[idx+2]]); }
+        // Bawah
+        for (let x = 0; x < w; x++) { const idx = ((h-1-i) * w + x) * 4; samples.push([d[idx], d[idx+1], d[idx+2]]); }
+        // Kiri
+        for (let y = depth; y < h - depth; y++) { const idx = (y * w + i) * 4; samples.push([d[idx], d[idx+1], d[idx+2]]); }
+        // Kanan
+        for (let y = depth; y < h - depth; y++) { const idx = (y * w + w-1-i) * 4; samples.push([d[idx], d[idx+1], d[idx+2]]); }
+    }
+
+    // K-means sederhana (k=3) untuk menemukan cluster warna dominan
+    const clusters = simpleKMeans(samples, 3, 10);
+
+    // Cluster terbesar = background
+    clusters.sort((a, b) => b.count - a.count);
+    return clusters[0].center;
+}
+
+function simpleKMeans(points, k, iterations) {
+    // Inisialisasi centroid acak dari data
+    const centroids = [];
+    const used = new Set();
+    for (let i = 0; i < k; i++) {
+        let idx;
+        do { idx = Math.floor(Math.random() * points.length); } while (used.has(idx) && used.size < points.length);
+        used.add(idx);
+        centroids.push([...points[idx]]);
+    }
+
+    const counts = new Array(k).fill(0);
+    const sums = centroids.map(c => [0, 0, 0]);
+
+    for (let iter = 0; iter < iterations; iter++) {
+        counts.fill(0);
+        sums.forEach(s => { s[0] = 0; s[1] = 0; s[2] = 0; });
+
+        for (const p of points) {
+            let minDist = Infinity, minIdx = 0;
+            for (let c = 0; c < k; c++) {
+                const dr = p[0] - centroids[c][0], dg = p[1] - centroids[c][1], db = p[2] - centroids[c][2];
+                const dist = dr*dr + dg*dg + db*db;
+                if (dist < minDist) { minDist = dist; minIdx = c; }
+            }
+            counts[minIdx]++;
+            sums[minIdx][0] += p[0]; sums[minIdx][1] += p[1]; sums[minIdx][2] += p[2];
+        }
+
+        for (let c = 0; c < k; c++) {
+            if (counts[c] > 0) {
+                centroids[c][0] = sums[c][0] / counts[c];
+                centroids[c][1] = sums[c][1] / counts[c];
+                centroids[c][2] = sums[c][2] / counts[c];
+            }
+        }
+    }
+
+    return centroids.map((center, i) => ({ center: center.map(Math.round), count: counts[i] }));
+}
+
+
+// ==========================================================
+// CANVAS ENGINE — BUAT MASK ALPHA DARI WARNA
+// ==========================================================
+function createColorMask(srcCanvas, bgColor, tolerance) {
+    const w = srcCanvas.width, h = srcCanvas.height;
+    const ctx = srcCanvas.getContext('2d');
+    const imgData = ctx.getImageData(0, 0, w, h);
+    const d = imgData.data;
+    const mask = new Float32Array(w * h);
+    const tLow = tolerance * 0.55;
+    const tHigh = tolerance;
+
+    for (let i = 0; i < w * h; i++) {
+        const r = d[i*4], g = d[i*4+1], b = d[i*4+2];
+        const dr = r - bgColor[0], dg = g - bgColor[1], db = b - bgColor[2];
+        const dist = Math.sqrt(dr*dr + dg*dg + db*db);
+
+        if (dist < tLow) {
+            mask[i] = 0; // Pasti background
+        } else if (dist < tHigh) {
+            mask[i] = (dist - tLow) / (tHigh - tLow); // Transisi halus
+        } else {
+            mask[i] = 1; // Pasti foreground
+        }
+    }
+    return mask;
+}
+
+
+// ==========================================================
+// CANVAS ENGINE — BERSIHKAN MASK
+// ==========================================================
+function cleanMask(mask, w, h) {
+    let result = new Float32Array(mask);
+
+    // Erosi: hapus noise foreground kecil
+    result = morphOp(result, w, h, 2, 'erode');
+
+    // Dilation: isi lubang kecil di background
+    result = morphOp(result, w, h, 2, 'dilate');
+
+    // Hapus pulau foreground kecil (connected component analysis)
+    result = removeSmallFgIslands(result, w, h);
+
+    // Dilation lagi untuk recovery tepi
+    result = morphOp(result, w, h, 1, 'dilate');
+
+    return result;
+}
+
+function morphOp(mask, w, h, radius, type) {
+    const out = new Float32Array(mask.length);
+    const isErode = type === 'erode';
+
+    for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+            const idx = y * w + x;
+            if (isErode) {
+                // Erode: jika ada tetangga background → jadi background
+                let minVal = 1;
+                for (let dy = -radius; dy <= radius; dy++) {
+                    for (let dx = -radius; dx <= radius; dx++) {
+                        if (dx*dx + dy*dy > radius*radius) continue;
+                        const nx = x + dx, ny = y + dy;
+                        if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
+                            minVal = Math.min(minVal, mask[ny * w + nx]);
+                        }
+                    }
+                }
+                out[idx] = minVal;
+            } else {
+                // Dilate: jika ada tetangga foreground → jadi foreground
+                let maxVal = 0;
+                for (let dy = -radius; dy <= radius; dy++) {
+                    for (let dx = -radius; dx <= radius; dx++) {
+                        if (dx*dx + dy*dy > radius*radius) continue;
+                        const nx = x + dx, ny = y + dy;
+                        if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
+                            maxVal = Math.max(maxVal, mask[ny * w + nx]);
+                        }
+                    }
+                }
+                out[idx] = maxVal;
+            }
+        }
+    }
+    return out;
+}
+
+function removeSmallFgIslands(mask, w, h) {
+    const visited = new Uint8Array(w * h);
+    const minSize = Math.max(50, Math.floor(w * h * 0.0005)); // Minimal 0.05% dari total pixel
+    const out = new Float32Array(mask);
+
+    for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+            const idx = y * w + x;
+            if (visited[idx] || mask[idx] < 0.5) continue;
+
+            // BFS untuk menemukan connected component
+            const queue = [idx];
+            visited[idx] = 1;
+            const component = [idx];
+            let head = 0;
+
+            while (head < queue.length) {
+                const cur = queue[head++];
+                const cx = cur % w, cy = Math.floor(cur / w);
+                const neighbors = [
+                    cx > 0 ? cur - 1 : -1,
+                    cx < w-1 ? cur + 1 : -1,
+                    cy > 0 ? cur - w : -1,
+                    cy < h-1 ? cur + w : -1
+                ];
+                for (const n of neighbors) {
+                    if (n >= 0 && !visited[n] && mask[n] >= 0.5) {
+                        visited[n] = 1;
+                        queue.push(n);
+                        component.push(n);
+                    }
+                }
+            }
+
+            // Jika komponen terlalu kecil, hapus (jadikan background)
+            if (component.length < minSize) {
+                for (const p of component) out[p] = 0;
+            }
+        }
+    }
+    return out;
+}
+
+
+// ==========================================================
+// CANVAS ENGINE — BLUR MASK (Box blur 2-pass separable)
+// ==========================================================
+function blurMask(mask, w, h, radius) {
+    const r = Math.ceil(radius);
+    const temp = new Float32Array(mask.length);
+    const out = new Float32Array(mask.length);
+
+    // Horizontal pass
+    for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+            let sum = 0, count = 0;
+            for (let dx = -r; dx <= r; dx++) {
+                const nx = x + dx;
+                if (nx >= 0 && nx < w) { sum += mask[y * w + nx]; count++; }
+            }
+            temp[y * w + x] = sum / count;
+        }
+    }
+
+    // Vertical pass
+    for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+            let sum = 0, count = 0;
+            for (let dy = -r; dy <= r; dy++) {
+                const ny = y + dy;
+                if (ny >= 0 && ny < h) { sum += temp[ny * w + x]; count++; }
+            }
+            out[y * w + x] = sum / count;
+        }
+    }
+    return out;
+}
+
+
+// ==========================================================
+// CANVAS ENGINE — TERAPKAN MASK KE GAMBAR
+// ==========================================================
+function applyMask(srcCanvas, mask) {
+    const w = srcCanvas.width, h = srcCanvas.height;
+    const srcCtx = srcCanvas.getContext('2d');
+    const srcData = srcCtx.getImageData(0, 0, w, h);
+    const d = srcData.data;
+
+    for (let i = 0; i < w * h; i++) {
+        d[i * 4 + 3] = Math.round(Math.max(0, Math.min(1, mask[i])) * 255);
+    }
+
+    const outCanvas = document.createElement('canvas');
+    outCanvas.width = w; outCanvas.height = h;
+    outCanvas.getContext('2d').putImageData(srcData, 0, 0);
+    return outCanvas;
+}
+
+
+// ==========================================================
+// EDGE REFINEMENT (untuk hasil AI)
+// ==========================================================
+function refineEdges(srcCanvas) {
+    const w = srcCanvas.width, h = srcCanvas.height;
     const srcCtx = srcCanvas.getContext('2d');
     const imgData = srcCtx.getImageData(0, 0, w, h);
     const d = imgData.data;
+    const GHOST_THRESHOLD = 12;
 
-    const GHOST_THRESHOLD = aggressive ? 20 : 12;
-    const ALPHA_BLUR_RADIUS = aggressive ? 2 : 1.5;
-    const NOISE_SIZE = aggressive ? 4 : 3;
-
+    // Hapus ghost pixels (alpha sangat rendah)
     for (let i = 0; i < d.length; i += 4) {
         if (d[i + 3] > 0 && d[i + 3] < GHOST_THRESHOLD) d[i + 3] = 0;
     }
@@ -403,53 +826,34 @@ function refineEdges(srcCanvas, aggressive = false) {
     const alphaMap = new Uint8Array(w * h);
     for (let i = 0; i < w * h; i++) alphaMap[i] = d[i * 4 + 3];
 
+    // Erosi kecil
+    const halfN = 1;
     const eroded = new Uint8Array(w * h);
-    const halfN = Math.floor(NOISE_SIZE / 2);
-
     for (let y = 0; y < h; y++) {
         for (let x = 0; x < w; x++) {
             const idx = y * w + x;
             if (alphaMap[idx] === 0) { eroded[idx] = 0; continue; }
-            let solidCount = 0, totalCount = 0;
+            let solidCount = 0, total = 0;
             for (let dy = -halfN; dy <= halfN; dy++) {
                 for (let dx = -halfN; dx <= halfN; dx++) {
                     const nx = x + dx, ny = y + dy;
-                    if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
-                        totalCount++;
-                        if (alphaMap[ny * w + nx] > GHOST_THRESHOLD) solidCount++;
-                    }
+                    if (nx >= 0 && nx < w && ny >= 0 && ny < h) { total++; if (alphaMap[ny * w + nx] > GHOST_THRESHOLD) solidCount++; }
                 }
             }
-            eroded[idx] = (solidCount / totalCount) < 0.4 ? 0 : alphaMap[idx];
+            eroded[idx] = (solidCount / total) < 0.4 ? 0 : alphaMap[idx];
         }
     }
 
-    const dilated = new Uint8Array(eroded);
-    const dilateR = 1;
-    for (let y = 0; y < h; y++) {
-        for (let x = 0; x < w; x++) {
-            const idx = y * w + x;
-            if (eroded[idx] > 0) continue;
-            let maxNeighborAlpha = 0;
-            for (let dy = -dilateR; dy <= dilateR; dy++) {
-                for (let dx = -dilateR; dx <= dilateR; dx++) {
-                    const nx = x + dx, ny = y + dy;
-                    if (nx >= 0 && nx < w && ny >= 0 && ny < h) maxNeighborAlpha = Math.max(maxNeighborAlpha, eroded[ny * w + nx]);
-                }
-            }
-            if (maxNeighborAlpha > 200) dilated[idx] = Math.round(maxNeighborAlpha * 0.3);
-        }
-    }
-
-    const blurred = new Uint8Array(dilated);
-    const br = Math.ceil(ALPHA_BLUR_RADIUS);
+    // Blur alpha untuk tepi halus
+    const br = 2;
+    const blurred = new Uint8Array(eroded);
     for (let y = 0; y < h; y++) {
         for (let x = 0; x < w; x++) {
             let sum = 0, count = 0;
             for (let dy = -br; dy <= br; dy++) {
                 for (let dx = -br; dx <= br; dx++) {
                     const nx = x + dx, ny = y + dy;
-                    if (nx >= 0 && nx < w && ny >= 0 && ny < h) { sum += dilated[ny * w + nx]; count++; }
+                    if (nx >= 0 && nx < w && ny >= 0 && ny < h) { sum += eroded[ny * w + nx]; count++; }
                 }
             }
             blurred[y * w + x] = Math.round(sum / count);
@@ -464,9 +868,42 @@ function refineEdges(srcCanvas, aggressive = false) {
     return outCanvas;
 }
 
+
+// ==========================================================
+// FINISH REMOVAL — common handler setelah berhasil
+// ==========================================================
+function finishRemoval(methodName, status) {
+    updateProgress(100, 'Selesai!');
+    setTimeout(() => {
+        hideProgress();
+        renderResult();
+        $('btnRemoveBg').disabled = false;
+        $('btnDownload').disabled = false;
+        $('statusBg').textContent = 'Selesai';
+        $('statusBg').className = 'text-xs px-2 py-1 rounded-full bg-green-900/40 text-green-400';
+        $('statusMethod').textContent = methodName;
+        $('statusMethod').className = 'text-xs px-2 py-1 rounded-full bg-blue-900/40 text-blue-400';
+        showToast(`Background berhasil dihapus! (Metode: ${methodName})`, 'success');
+    }, 300);
+}
+
+
 // --- Reset ---
- $('btnReset').onclick = () => { originalFile = null; originalImg = null; removedBgCanvas = null; $('workspace').style.display = 'none'; $('uploadSection').style.display = 'block'; fileInput.value = ''; resetControls(); };
-function resetControls() { $('rngSat').value=100;$('valSat').textContent='100%';$('rngBri').value=100;$('valBri').textContent='100%';$('rngCon').value=100;$('valCon').textContent='100%';$('rngVib').value=0;$('valVib').textContent='0%';$('rngWhiteStroke').value=4;$('valWhiteStroke').textContent='4px';$('rngBlackStroke').value=1;$('valBlackStroke').textContent='1px';$('rngUpscale').value=1;$('valUpscale').textContent='1x';$('chkStroke').checked=false;$('chkBgColor').checked=false;toggleStrokeCtrl();toggleBgColorCtrl(); }
+ $('btnReset').onclick = () => {
+    originalFile = null; originalImg = null; removedBgCanvas = null; manualPickedColor = null;
+    $('workspace').style.display = 'none'; $('uploadSection').style.display = 'block';
+    fileInput.value = ''; resetControls();
+    $('clickOverlay').style.display = 'none'; $('clickHint').style.display = 'none';
+};
+function resetControls() {
+    $('rngSat').value=100;$('valSat').textContent='100%';$('rngBri').value=100;$('valBri').textContent='100%';
+    $('rngCon').value=100;$('valCon').textContent='100%';$('rngVib').value=0;$('valVib').textContent='0%';
+    $('rngWhiteStroke').value=4;$('valWhiteStroke').textContent='4px';$('rngBlackStroke').value=1;$('valBlackStroke').textContent='1px';
+    $('rngUpscale').value=1;$('valUpscale').textContent='1x';$('rngTolerance').value=40;$('valTolerance').textContent='40';
+    $('chkStroke').checked=false;$('chkBgColor').checked=false;
+    toggleStrokeCtrl();toggleBgColorCtrl();
+}
+
 
 // --- Render Hasil ---
 function scheduleRender() { clearTimeout(renderTimeout); renderTimeout = setTimeout(renderResult, 50); }
@@ -507,6 +944,7 @@ function applyVibrance(data, amt) {
     }
 }
 
+
 // --- Download HD ---
  $('btnDownload').onclick = async () => {
     if (!removedBgCanvas) return;
@@ -515,7 +953,13 @@ function applyVibrance(data, amt) {
     await new Promise(r => setTimeout(r, 50));
     try {
         const dl = await renderFullRes(scale); updateProgress(90, 'Konversi PNG...'); await new Promise(r => setTimeout(r, 30));
-        dl.toBlob(blob => { if(!blob){hideProgress();showToast('Gagal','error');$('btnDownload').disabled=false;return;} const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=`${originalFile?originalFile.name.replace(/\.[^.]+$/,''):'result'}_karyaabadi${scale>1?'_'+scale+'x':''}.png`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);hideProgress();showToast(`Download (${(blob.size/1024/1024).toFixed(1)} MB)`,'success');$('btnDownload').disabled=false; },'image/png');
+        dl.toBlob(blob => {
+            if(!blob){hideProgress();showToast('Gagal','error');$('btnDownload').disabled=false;return;}
+            const u=URL.createObjectURL(blob),a=document.createElement('a');
+            a.href=u;a.download=`${originalFile?originalFile.name.replace(/\.[^.]+$/,''):'result'}_karyaabadi${scale>1?'_'+scale+'x':''}.png`;
+            document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);
+            hideProgress();showToast(`Download berhasil (${(blob.size/1024/1024).toFixed(1)} MB)`,'success');$('btnDownload').disabled=false;
+        },'image/png');
     } catch(e){ hideProgress(); showToast('Gagal: '+e.message,'error'); $('btnDownload').disabled=false; }
 };
 
@@ -533,27 +977,41 @@ async function renderFullRes(scale) {
     cx.filter=`saturate(${sat}) brightness(${bri}) contrast(${con})`;cx.drawImage(uc,0,0);cx.filter='none';
     if(vib>0){const d=cx.getImageData(0,0,ow,oh);applyVibrance(d.data,vib/100);cx.putImageData(d,0,0);}
     updateProgress(65,'Warna...');
-    if(useStroke){const tr=whiteW+blackW,bm=createSolidMask(cc,'#000000'),wm=createSolidMask(cc,'#ffffff'),st=scale>4?2:1;for(let dy=-tr;dy<=tr;dy+=st)for(let dx=-tr;dx<=tr;dx+=st)if(dx*dx+dy*dy<=tr*tr)ox.drawImage(bm,dx,dy);for(let dy=-whiteW;dy<=whiteW;dy+=st)for(let dx=-whiteW;dx<=whiteW;dx+=st)if(dx*dx+dy*dy<=whiteW*whiteW)ox.drawImage(wm,dx,dy);updateProgress(80,'Stroke...');}
+    if(useStroke){
+        const tr=whiteW+blackW,bm=createSolidMask(cc,'#000000'),wm=createSolidMask(cc,'#ffffff'),st=scale>4?2:1;
+        for(let dy=-tr;dy<=tr;dy+=st)for(let dx=-tr;dx<=tr;dx+=st)if(dx*dx+dy*dy<=tr*tr)ox.drawImage(bm,dx,dy);
+        for(let dy=-whiteW;dy<=whiteW;dy+=st)for(let dx=-whiteW;dx<=whiteW;dx+=st)if(dx*dx+dy*dy<=whiteW*whiteW)ox.drawImage(wm,dx,dy);
+        updateProgress(80,'Stroke...');
+    }
     ox.drawImage(cc,0,0);updateProgress(88,'Finalisasi...');await new Promise(r=>setTimeout(r,10));return oc;
 }
 
-function applySharpen(ctx,w,h,amt){const t=document.createElement('canvas');t.width=w;t.height=h;const tx=t.getContext('2d');tx.drawImage(ctx.canvas,0,0);const b=document.createElement('canvas');b.width=w;b.height=h;const bx=b.getContext('2d');bx.filter=`blur(${Math.max(1,Math.round(amt*3))}px)`;bx.drawImage(t,0,0);bx.filter='none';const d=document.createElement('canvas');d.width=w;d.height=h;const dx=d.getContext('2d');dx.drawImage(t,0,0);dx.globalCompositeOperation='difference';dx.drawImage(b,0,0);ctx.globalCompositeOperation='source-over';ctx.drawImage(t,0,0);ctx.globalAlpha=Math.min(1,amt);ctx.drawImage(d,0,0);ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';}
+function applySharpen(ctx,w,h,amt){
+    const t=document.createElement('canvas');t.width=w;t.height=h;const tx=t.getContext('2d');tx.drawImage(ctx.canvas,0,0);
+    const b=document.createElement('canvas');b.width=w;b.height=h;const bx=b.getContext('2d');bx.filter=`blur(${Math.max(1,Math.round(amt*3))}px)`;bx.drawImage(t,0,0);bx.filter='none';
+    const d=document.createElement('canvas');d.width=w;d.height=h;const dx=d.getContext('2d');dx.drawImage(t,0,0);dx.globalCompositeOperation='difference';dx.drawImage(b,0,0);
+    ctx.globalCompositeOperation='source-over';ctx.drawImage(t,0,0);ctx.globalAlpha=Math.min(1,amt);ctx.drawImage(d,0,0);ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
+}
+
 
 // --- Event Listeners Kontrol ---
- $('chkStroke').onchange=()=>{const e=$('strokeControls');if($('chkStroke').checked)e.classList.remove('opacity-40','pointer-events-none');else e.classList.add('opacity-40','pointer-events-none');scheduleRender();};
+ $('chkStroke').onchange=()=>{toggleStrokeCtrl();scheduleRender();};
  $('rngWhiteStroke').oninput=e=>{$('valWhiteStroke').textContent=e.target.value+'px';scheduleRender();};
  $('rngBlackStroke').oninput=e=>{$('valBlackStroke').textContent=e.target.value+'px';scheduleRender();};
- $('chkBgColor').onchange=()=>{const e=$('bgColorControls');if($('chkBgColor').checked)e.classList.remove('opacity-40','pointer-events-none');else e.classList.add('opacity-40','pointer-events-none');scheduleRender();};
+ $('chkBgColor').onchange=()=>{toggleBgColorCtrl();scheduleRender();};
  $('pickBgColor').oninput=e=>{$('hexBgColor').textContent=e.target.value.toUpperCase();$('presetColors').querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('active'));scheduleRender();};
  $('rngSat').oninput=e=>{$('valSat').textContent=e.target.value+'%';scheduleRender();};
  $('rngBri').oninput=e=>{$('valBri').textContent=e.target.value+'%';scheduleRender();};
  $('rngCon').oninput=e=>{$('valCon').textContent=e.target.value+'%';scheduleRender();};
  $('rngVib').oninput=e=>{$('valVib').textContent=e.target.value+'%';scheduleRender();};
+ $('rngTolerance').oninput=e=>{$('valTolerance').textContent=e.target.value;};
  $('btnResetColor').onclick=()=>{$('rngSat').value=100;$('valSat').textContent='100%';$('rngBri').value=100;$('valBri').textContent='100%';$('rngCon').value=100;$('valCon').textContent='100%';$('rngVib').value=0;$('valVib').textContent='0%';scheduleRender();showToast('Warna direset','info');};
  $('rngUpscale').oninput=e=>{$('valUpscale').textContent=e.target.value+'x';updateOutputInfo();$('upscalePresets').querySelectorAll('button').forEach(b=>b.style.borderColor='');};
+
 function toggleStrokeCtrl(){const e=$('strokeControls');if($('chkStroke').checked)e.classList.remove('opacity-40','pointer-events-none');else e.classList.add('opacity-40','pointer-events-none');}
 function toggleBgColorCtrl(){const e=$('bgColorControls');if($('chkBgColor').checked)e.classList.remove('opacity-40','pointer-events-none');else e.classList.add('opacity-40','pointer-events-none');}
 function updateOutputInfo(){if(!removedBgCanvas)return;const s=+$('rngUpscale').value;$('statusOutput').textContent=`${removedBgCanvas.width*s}×${removedBgCanvas.height*s}`;$('dlResInfo').textContent=`${removedBgCanvas.width*s} × ${removedBgCanvas.height*s} px (${s}x)`;}
+
 
 // --- Partikel ---
 (function initParticles() {
@@ -561,32 +1019,18 @@ function updateOutputInfo(){if(!removedBgCanvas)return;const s=+$('rngUpscale').
     const ctx = canvas.getContext('2d');
     let particles = [];
     const count = 60;
-
     function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     window.addEventListener('resize', resize); resize();
-
     class Particle {
         constructor() { this.reset(); }
-        reset() {
-            this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
-            this.size = Math.random() * 2 + 0.5; this.speedX = (Math.random() - 0.5) * 0.5;
-            this.speedY = (Math.random() - 0.5) * 0.5; this.opacity = Math.random() * 0.5 + 0.1;
-        }
+        reset() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.size = Math.random() * 2 + 0.5; this.speedX = (Math.random() - 0.5) * 0.5; this.speedY = (Math.random() - 0.5) * 0.5; this.opacity = Math.random() * 0.5 + 0.1; }
         update() { this.x += this.speedX; this.y += this.speedY; if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset(); }
         draw() { ctx.fillStyle = `rgba(220, 38, 38, ${this.opacity})`; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
     }
-
     for (let i = 0; i < count; i++) particles.push(new Particle());
     function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animate); }
     animate();
 })();
-
-// --- Cek file:/// saat pertama kali load ---
-if (window.location.protocol === 'file:') {
-    setTimeout(() => {
-        showToast('PERINGATAN: Buka file ini via Live Server, bukan klik 2x!', 'error');
-    }, 1000);
-}
 
 </script>
 </body>
